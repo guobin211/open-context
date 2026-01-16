@@ -1,0 +1,351 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`Code Chunk Builder > should create chunks from extracted symbols 1`] = `
+[
+  {
+    "embeddingText": "function func1()
+function func1() {
+  return 1;
+}",
+    "payload": {
+      "code": "function func1() {
+  return 1;
+}",
+      "commit": "main",
+      "exported": true,
+      "file_path": "src/index.ts",
+      "importance": 0.9,
+      "indexed_at": 1768475567452,
+      "language": "typescript",
+      "repo_id": "repo1",
+      "repo_name": "test-repo",
+      "signature": "function func1()",
+      "symbol_id": "ws1/repo1/src/index.ts#func1",
+      "symbol_kind": "function",
+      "symbol_name": "func1",
+      "visibility": "public",
+      "workspace_id": "ws1",
+    },
+    "symbolId": "ws1/repo1/src/index.ts#func1",
+  },
+]
+`;
+
+exports[`Graph Builder > should build dependency graph from code 1`] = `
+[
+  {
+    "confidence": 1,
+    "from": "file",
+    "to": "./other",
+    "type": "IMPORTS",
+  },
+  {
+    "confidence": 0.8,
+    "from": "ws1/repo1/src/main.ts#Main.run",
+    "to": "other",
+    "type": "CALLS",
+  },
+  {
+    "confidence": 0.8,
+    "from": "ws1/repo1/src/main.ts#Main.run",
+    "to": "Main.helper",
+    "type": "CALLS",
+  },
+]
+`;
+
+exports[`Indexers > Code Chunk Builder > should create chunks from extracted symbols 1`] = `
+[
+  {
+    "embeddingText": "function func1()
+function func1() {
+  return 1;
+}",
+    "payload": {
+      "code": "function func1() {
+  return 1;
+}",
+      "commit": "main",
+      "exported": true,
+      "file_path": "src/index.ts",
+      "importance": 0.9,
+      "indexed_at": 1768475890706,
+      "language": "typescript",
+      "repo_id": "repo1",
+      "repo_name": "test-repo",
+      "signature": "function func1()",
+      "symbol_id": "ws1/repo1/src/index.ts#func1",
+      "symbol_kind": "function",
+      "symbol_name": "func1",
+      "visibility": "public",
+      "workspace_id": "ws1",
+    },
+    "symbolId": "ws1/repo1/src/index.ts#func1",
+  },
+]
+`;
+
+exports[`Indexers > Graph Builder > should build dependency graph from code 1`] = `
+[
+  {
+    "confidence": 1,
+    "from": "file",
+    "to": "./other",
+    "type": "IMPORTS",
+  },
+  {
+    "confidence": 0.8,
+    "from": "ws1/repo1/src/main.ts#Main.run",
+    "to": "other",
+    "type": "CALLS",
+  },
+  {
+    "confidence": 0.8,
+    "from": "ws1/repo1/src/main.ts#Main.run",
+    "to": "Main.helper",
+    "type": "CALLS",
+  },
+]
+`;
+
+exports[`Indexers > Symbol Extractor > should extract arrow functions 1`] = `
+[
+  {
+    "codeChunk": "const arrowFunc = (x: number) => x * 2;",
+    "docComment": undefined,
+    "exported": false,
+    "kind": "function",
+    "location": {
+      "endLine": 2,
+      "startLine": 2,
+    },
+    "name": "arrowFunc",
+    "qualifiedName": "arrowFunc",
+    "signature": "const arrowFunc = arrowFunc(x: number)",
+    "visibility": "public",
+  },
+]
+`;
+
+exports[`Indexers > Symbol Extractor > should extract class declarations 1`] = `
+[
+  {
+    "codeChunk": "class TestClass {
+          constructor() {}
+          testMethod() {}
+        }",
+    "docComment": undefined,
+    "exported": false,
+    "kind": "class",
+    "location": {
+      "endLine": 5,
+      "startLine": 2,
+    },
+    "name": "TestClass",
+    "qualifiedName": "TestClass",
+    "visibility": "public",
+  },
+  {
+    "codeChunk": "constructor() {}",
+    "docComment": undefined,
+    "exported": false,
+    "kind": "method",
+    "location": {
+      "endLine": 3,
+      "startLine": 3,
+    },
+    "name": "constructor",
+    "qualifiedName": "TestClass.constructor",
+    "signature": "method constructor()",
+    "visibility": "public",
+  },
+  {
+    "codeChunk": "testMethod() {}",
+    "docComment": undefined,
+    "exported": false,
+    "kind": "method",
+    "location": {
+      "endLine": 4,
+      "startLine": 4,
+    },
+    "name": "testMethod",
+    "qualifiedName": "TestClass.testMethod",
+    "signature": "method testMethod()",
+    "visibility": "public",
+  },
+]
+`;
+
+exports[`Indexers > Symbol Extractor > should extract export statements 1`] = `
+[
+  {
+    "codeChunk": "function exportedFunc() {}",
+    "docComment": undefined,
+    "exported": true,
+    "kind": "function",
+    "location": {
+      "endLine": 2,
+      "startLine": 2,
+    },
+    "name": "exportedFunc",
+    "qualifiedName": "exportedFunc",
+    "signature": "function exportedFunc()",
+    "visibility": "public",
+  },
+  {
+    "codeChunk": "class DefaultClass {}",
+    "docComment": undefined,
+    "exported": true,
+    "kind": "class",
+    "location": {
+      "endLine": 3,
+      "startLine": 3,
+    },
+    "name": "DefaultClass",
+    "qualifiedName": "DefaultClass",
+    "visibility": "public",
+  },
+]
+`;
+
+exports[`Indexers > Symbol Extractor > should extract function declarations 1`] = `
+[
+  {
+    "codeChunk": "function testFunction(a: number): string {
+          return 'test';
+        }",
+    "docComment": undefined,
+    "exported": false,
+    "kind": "function",
+    "location": {
+      "endLine": 4,
+      "startLine": 2,
+    },
+    "name": "testFunction",
+    "qualifiedName": "testFunction",
+    "signature": "function testFunction(a: number): string",
+    "visibility": "public",
+  },
+]
+`;
+
+exports[`Symbol Extractor > should extract arrow functions 1`] = `
+[
+  {
+    "codeChunk": "const arrowFunc = (x: number) => x * 2;",
+    "docComment": undefined,
+    "exported": false,
+    "kind": "function",
+    "location": {
+      "endLine": 2,
+      "startLine": 2,
+    },
+    "name": "arrowFunc",
+    "qualifiedName": "arrowFunc",
+    "signature": "const arrowFunc = arrowFunc(x: number)",
+    "visibility": "public",
+  },
+]
+`;
+
+exports[`Symbol Extractor > should extract class declarations 1`] = `
+[
+  {
+    "codeChunk": "class TestClass {
+          constructor() {}
+          testMethod() {}
+        }",
+    "docComment": undefined,
+    "exported": false,
+    "kind": "class",
+    "location": {
+      "endLine": 5,
+      "startLine": 2,
+    },
+    "name": "TestClass",
+    "qualifiedName": "TestClass",
+    "visibility": "public",
+  },
+  {
+    "codeChunk": "constructor() {}",
+    "docComment": undefined,
+    "exported": false,
+    "kind": "method",
+    "location": {
+      "endLine": 3,
+      "startLine": 3,
+    },
+    "name": "constructor",
+    "qualifiedName": "TestClass.constructor",
+    "signature": "method constructor()",
+    "visibility": "public",
+  },
+  {
+    "codeChunk": "testMethod() {}",
+    "docComment": undefined,
+    "exported": false,
+    "kind": "method",
+    "location": {
+      "endLine": 4,
+      "startLine": 4,
+    },
+    "name": "testMethod",
+    "qualifiedName": "TestClass.testMethod",
+    "signature": "method testMethod()",
+    "visibility": "public",
+  },
+]
+`;
+
+exports[`Symbol Extractor > should extract export statements 1`] = `
+[
+  {
+    "codeChunk": "function exportedFunc() {}",
+    "docComment": undefined,
+    "exported": true,
+    "kind": "function",
+    "location": {
+      "endLine": 2,
+      "startLine": 2,
+    },
+    "name": "exportedFunc",
+    "qualifiedName": "exportedFunc",
+    "signature": "function exportedFunc()",
+    "visibility": "public",
+  },
+  {
+    "codeChunk": "class DefaultClass {}",
+    "docComment": undefined,
+    "exported": true,
+    "kind": "class",
+    "location": {
+      "endLine": 3,
+      "startLine": 3,
+    },
+    "name": "DefaultClass",
+    "qualifiedName": "DefaultClass",
+    "visibility": "public",
+  },
+]
+`;
+
+exports[`Symbol Extractor > should extract function declarations 1`] = `
+[
+  {
+    "codeChunk": "function testFunction(a: number): string {
+          return 'test';
+        }",
+    "docComment": undefined,
+    "exported": false,
+    "kind": "function",
+    "location": {
+      "endLine": 4,
+      "startLine": 2,
+    },
+    "name": "testFunction",
+    "qualifiedName": "testFunction",
+    "signature": "function testFunction(a: number): string",
+    "visibility": "public",
+  },
+]
+`;

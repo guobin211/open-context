@@ -1,0 +1,26 @@
+{
+  "name": "open-context",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "pnpm dev:all",
+    "dev:app": "tauri dev --no-watch",
+    "dev:web": "pnpm --filter open-web dev",
+    "dev:server": "pnpm --filter open-node dev",
+    "dev:all": "pnpm dev:app && pnpm dev:server",
+    "build:web": "pnpm --filter open-web build",
+    "build:server": "pnpm --filter open-node build",
+    "build:app": "tauri build",
+    "build:all": "pnpm build:server && pnpm build:app",
+    "preview": "pnpm --filter open-web preview",
+    "tauri": "tauri"
+  },
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.9.6",
+    "@types/react": "^19.2.8",
+    "@types/react-dom": "^19.2.3",
+    "typescript": "~5.8.3",
+    "vite": "^7.3.1"
+  }
+}
