@@ -91,7 +91,7 @@ export class GraphService {
     return { from: symbolId, edges };
   }
 
-  async getSymbol(symbolId: string): Promise<any | null> {
+  async getSymbol<T = any>(symbolId: string): Promise<T | null> {
     return this.db.getSymbol(symbolId);
   }
 

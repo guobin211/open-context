@@ -1,5 +1,3 @@
-use tauri_plugin_log::log;
-
 #[tauri::command]
 pub fn ping(timestamp: &str) -> String {
     log::info!("web::ping: {}", timestamp);

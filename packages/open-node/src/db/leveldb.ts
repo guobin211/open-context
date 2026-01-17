@@ -137,7 +137,7 @@ export class LevelDBService {
     return results;
   }
 
-  async getSymbol(symbolId: string): Promise<any | null> {
+  async getSymbol(symbolId: string): Promise<any> {
     return this.get(`symbol:${symbolId}`);
   }
 

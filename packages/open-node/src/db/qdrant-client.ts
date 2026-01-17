@@ -20,7 +20,7 @@ export class QdrantService {
       await this.client.getCollection(COLLECTION_NAME);
       logger.info({ collection: COLLECTION_NAME }, 'Qdrant collection exists');
     } catch (error) {
-      logger.info({ collection: COLLECTION_NAME }, 'Creating Qdrant collection');
+      logger.error({ collection: COLLECTION_NAME }, `Creating Qdrant collection error: ${error}`);
       await this.client.createCollection(COLLECTION_NAME, {
         vectors: {
           size: VECTOR_SIZE,

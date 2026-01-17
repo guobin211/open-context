@@ -1,7 +1,6 @@
 import Parser from 'tree-sitter';
 import TypeScript from 'tree-sitter-typescript';
 import JavaScript from 'tree-sitter-javascript';
-import logger from '../utils/logger';
 
 export class ASTParser {
   private tsParser: Parser;

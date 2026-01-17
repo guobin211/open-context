@@ -1,7 +1,6 @@
 import { Hono } from 'hono';
 import { JobService, RepoService } from '../services';
 import { getJobQueueInstance } from '../jobs';
-import { GraphService } from '../services';
 import { AppContext } from '../app';
 
 const indexRoutes = new Hono<AppContext>();

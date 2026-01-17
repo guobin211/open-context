@@ -1,6 +1,5 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { WorkspaceService } from '../../src/services/workspace-service';
-import { createMockWorkspace } from '../helpers';
 
 vi.mock('../../src/db/workspace-repository', () => ({
   WorkspaceRepository: vi.fn().mockImplementation(() => ({
@@ -22,7 +21,6 @@ describe('WorkspaceService', () => {
 
   describe('createWorkspace', () => {
     it('should create a new workspace', async () => {
-      const mockWorkspace = createMockWorkspace();
       const createDto = {
         name: 'test-workspace',
         description: 'Test workspace'
@@ -49,8 +47,6 @@ describe('WorkspaceService', () => {
 
   describe('getWorkspace', () => {
     it('should return workspace by id', async () => {
-      const mockWorkspace = createMockWorkspace();
-
       const result = await workspaceService.getWorkspace('ws_test_123');
 
       expect(result).toBeDefined();
@@ -65,7 +61,6 @@ describe('WorkspaceService', () => {
 
   describe('updateWorkspace', () => {
     it('should update workspace', async () => {
-      const mockWorkspace = createMockWorkspace();
       const updateDto = {
         name: 'updated-workspace'
       };

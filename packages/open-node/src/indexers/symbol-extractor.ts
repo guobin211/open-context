@@ -1,7 +1,6 @@
 import Parser from 'tree-sitter';
 import { ASTParser } from './ast-parser';
 import { SymbolKind, Visibility } from '../types';
-import logger from '../utils/logger';
 
 export interface ExtractedSymbol {
   name: string;

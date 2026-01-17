@@ -2,6 +2,7 @@ packages:
   - packages/*
 
 onlyBuiltDependencies:
+  - '@parcel/watcher'
   - classic-level
   - esbuild
   - msgpackr-extract

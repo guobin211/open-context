@@ -24,7 +24,9 @@ export class JobQueue {
   enqueue(job: Job): void {
     this.queue.push(job);
     logger.info({ jobId: job.jobId }, 'Job enqueued');
-    this.process();
+    this.process().catch((error) => {
+      logger.error({ error }, 'Job processing failed');
+    });
   }
 
   private async process(): Promise<void> {

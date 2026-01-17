@@ -14,12 +14,22 @@
     "build:app": "tauri build",
     "build:all": "pnpm build:server && pnpm build:app",
     "preview": "pnpm --filter open-web preview",
-    "tauri": "tauri"
+    "tauri": "tauri",
+    "fmt": "pnpm fmt:js && pnpm fmt:rs",
+    "fmt:js": "prettier -w . --log-level warn",
+    "fmt:rs": "cargo fmt --all",
+    "lint": "pnpm run lint:rs && pnpm run lint:js",
+    "lint:rs": "cargo clippy --all --fix --allow-dirty --allow-staged",
+    "lint:js": "oxlint . --type-aware --fix"
   },
   "devDependencies": {
     "@tauri-apps/cli": "^2.9.6",
     "@types/react": "^19.2.8",
     "@types/react-dom": "^19.2.3",
+    "oxlint": "^1.39.0",
+    "oxlint-tsgolint": "^0.10.1",
+    "prettier": "^3.8.0",
+    "prettier-plugin-tailwindcss": "^0.7.2",
     "typescript": "~5.8.3",
     "vite": "^7.3.1"
   }
