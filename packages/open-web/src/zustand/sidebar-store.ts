@@ -45,6 +45,21 @@ interface SidebarState {
   setActiveItem: (id: string) => void;
   toggleExpand: (id: string) => void;
   isExpanded: (id: string) => boolean;
+
+  // 工作空间管理
+  addSpace: (space: Omit<Space, 'id'>) => void;
+  updateSpace: (id: string, updates: Partial<Omit<Space, 'id'>>) => void;
+  deleteSpace: (id: string) => void;
+
+  // 笔记管理
+  addNote: (note: Omit<NavItem, 'id'>, parentId?: string) => void;
+  updateNote: (id: string, updates: Partial<Omit<NavItem, 'id'>>) => void;
+  deleteNote: (id: string) => void;
+
+  // 文件管理
+  addFile: (file: Omit<NavItem, 'id'>, parentId?: string) => void;
+  updateFile: (id: string, updates: Partial<Omit<NavItem, 'id'>>) => void;
+  deleteFile: (id: string) => void;
 }
 
 // Mock 空间数据
@@ -108,10 +123,10 @@ export const mockSpaces: Space[] = [
 
 // Mock 笔记数据
 export const mockNotes: NavItem[] = [
-  { 
-    id: 'my-notes', 
-    label: '我的笔记', 
-    icon: 'FileText', 
+  {
+    id: 'my-notes',
+    label: '我的笔记',
+    icon: 'FileText',
     type: 'note',
     children: [
       { id: 'work-notes', label: '工作笔记', icon: 'Briefcase', type: 'note' },
@@ -120,10 +135,10 @@ export const mockNotes: NavItem[] = [
       { id: 'learning-notes', label: '学习笔记', icon: 'BookOpen', type: 'note' }
     ]
   },
-  { 
-    id: 'favorites', 
-    label: '收藏', 
-    icon: 'Star', 
+  {
+    id: 'favorites',
+    label: '收藏',
+    icon: 'Star',
     type: 'note',
     children: [
       { id: 'fav-article-1', label: '技术文章收藏', icon: 'FileText', type: 'note' },
@@ -134,26 +149,26 @@ export const mockNotes: NavItem[] = [
 
 // Mock 文件数据
 export const mockFiles: NavItem[] = [
-  { 
-    id: 'all-files', 
-    label: '全部文件', 
-    icon: 'Folder', 
+  {
+    id: 'all-files',
+    label: '全部文件',
+    icon: 'Folder',
     type: 'file',
     children: [
-      { 
-        id: 'documents', 
-        label: '文档', 
-        icon: 'FileText', 
+      {
+        id: 'documents',
+        label: '文档',
+        icon: 'FileText',
         type: 'file',
         children: [
           { id: 'pdf-files', label: 'PDF文件', icon: 'FileText', type: 'file' },
           { id: 'word-files', label: 'Word文档', icon: 'FileText', type: 'file' }
         ]
       },
-      { 
-        id: 'images', 
-        label: '图片', 
-        icon: 'Image', 
+      {
+        id: 'images',
+        label: '图片',
+        icon: 'Image',
         type: 'file',
         children: [
           { id: 'png-files', label: 'PNG图片', icon: 'Image', type: 'file' },
@@ -165,10 +180,10 @@ export const mockFiles: NavItem[] = [
       { id: 'archives', label: '压缩包', icon: 'Archive', type: 'file' }
     ]
   },
-  { 
-    id: 'recent-files', 
-    label: '最近', 
-    icon: 'Clock', 
+  {
+    id: 'recent-files',
+    label: '最近',
+    icon: 'Clock',
     type: 'file',
     children: [
       { id: 'recent-doc-1', label: '项目文档.pdf', icon: 'FileText', type: 'file' },
@@ -178,9 +193,12 @@ export const mockFiles: NavItem[] = [
   }
 ];
 
+// 生成唯一 ID
+const generateId = () => Math.random().toString(36).substr(2, 9);
+
 export const useSidebarStore = create<SidebarState>((set, get) => ({
   activeItemId: 'claude-repo',
-  expandedIds: new Set(['agent', 'agent-repos']),
+  expandedIds: new Set(['agent', 'my-notes', 'all-files']),
   spaces: mockSpaces,
   notes: mockNotes,
   files: mockFiles,
@@ -195,5 +213,141 @@ export const useSidebarStore = create<SidebarState>((set, get) => ({
       }
       return { expandedIds: newExpandedIds };
     }),
-  isExpanded: (id: string) => get().expandedIds.has(id)
+  isExpanded: (id: string) => get().expandedIds.has(id),
+
+  // 工作空间管理
+  addSpace: (space: Omit<Space, 'id'>) => {
+    set((state) => ({
+      spaces: [...state.spaces, { ...space, id: generateId() }]
+    }));
+  },
+
+  updateSpace: (id: string, updates: Partial<Omit<Space, 'id'>>) => {
+    set((state) => ({
+      spaces: state.spaces.map((space) => (space.id === id ? { ...space, ...updates } : space))
+    }));
+  },
+
+  deleteSpace: (id: string) => {
+    set((state) => ({
+      spaces: state.spaces.filter((space) => space.id !== id),
+      activeItemId: state.activeItemId === id ? null : state.activeItemId
+    }));
+  },
+
+  // 笔记管理
+  addNote: (note: Omit<NavItem, 'id'>, parentId?: string) => {
+    set((state) => {
+      if (parentId) {
+        const addToChildren = (items: NavItem[]): NavItem[] => {
+          return items.map((item) => {
+            if (item.id === parentId) {
+              return {
+                ...item,
+                children: [...(item.children || []), { ...note, id: generateId() }]
+              };
+            }
+            if (item.children) {
+              return { ...item, children: addToChildren(item.children) };
+            }
+            return item;
+          });
+        };
+        return { notes: addToChildren(state.notes) };
+      }
+      return { notes: [...state.notes, { ...note, id: generateId() }] };
+    });
+  },
+
+  updateNote: (id: string, updates: Partial<Omit<NavItem, 'id'>>) => {
+    set((state) => {
+      const updateInTree = (items: NavItem[]): NavItem[] => {
+        return items.map((item) => {
+          if (item.id === id) {
+            return { ...item, ...updates };
+          }
+          if (item.children) {
+            return { ...item, children: updateInTree(item.children) };
+          }
+          return item;
+        });
+      };
+      return { notes: updateInTree(state.notes) };
+    });
+  },
+
+  deleteNote: (id: string) => {
+    set((state) => {
+      const deleteFromTree = (items: NavItem[]): NavItem[] => {
+        return items
+          .filter((item) => item.id !== id)
+          .map((item) => ({
+            ...item,
+            children: item.children ? deleteFromTree(item.children) : undefined
+          }));
+      };
+      return {
+        notes: deleteFromTree(state.notes),
+        activeItemId: state.activeItemId === id ? null : state.activeItemId
+      };
+    });
+  },
+
+  // 文件管理
+  addFile: (file: Omit<NavItem, 'id'>, parentId?: string) => {
+    set((state) => {
+      if (parentId) {
+        const addToChildren = (items: NavItem[]): NavItem[] => {
+          return items.map((item) => {
+            if (item.id === parentId) {
+              return {
+                ...item,
+                children: [...(item.children || []), { ...file, id: generateId() }]
+              };
+            }
+            if (item.children) {
+              return { ...item, children: addToChildren(item.children) };
+            }
+            return item;
+          });
+        };
+        return { files: addToChildren(state.files) };
+      }
+      return { files: [...state.files, { ...file, id: generateId() }] };
+    });
+  },
+
+  updateFile: (id: string, updates: Partial<Omit<NavItem, 'id'>>) => {
+    set((state) => {
+      const updateInTree = (items: NavItem[]): NavItem[] => {
+        return items.map((item) => {
+          if (item.id === id) {
+            return { ...item, ...updates };
+          }
+          if (item.children) {
+            return { ...item, children: updateInTree(item.children) };
+          }
+          return item;
+        });
+      };
+      return { files: updateInTree(state.files) };
+    });
+  },
+
+  deleteFile: (id: string) => {
+    set((state) => {
+      const deleteFromTree = (items: NavItem[]): NavItem[] => {
+        return items
+          .filter((item) => item.id !== id)
+          .map((item) => ({
+            ...item,
+            children: item.children ? deleteFromTree(item.children) : undefined
+          }));
+      };
+      return {
+        files: deleteFromTree(state.files),
+        activeItemId: state.activeItemId === id ? null : state.activeItemId
+      };
+    });
+  }
 }));

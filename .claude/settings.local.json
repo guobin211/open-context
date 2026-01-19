@@ -3,7 +3,18 @@
     "allow": [
       "Bash(pnpm dev:web)",
       "Bash(lsof:*)",
-      "Bash(pnpm exec tsc:*)"
+      "Bash(pnpm exec tsc:*)",
+      "Bash(cargo test:*)",
+      "Bash(cargo run:*)",
+      "Bash(cargo fmt:*)",
+      "Bash(cargo clippy:*)",
+      "Bash(cargo check:*)",
+      "Bash(pnpm --filter open-web run build:*)",
+      "Bash(xargs kill:*)",
+      "Bash(pnpm tsc:*)",
+      "Bash(pnpm oxlint)",
+      "Bash(ls:*)",
+      "Bash(pnpm --filter open-web build)"
     ]
   }
 }

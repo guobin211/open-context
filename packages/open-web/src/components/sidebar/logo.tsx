@@ -9,9 +9,7 @@ export function Logo() {
       >
         <Zap data-tauri-drag-region className="h-5 w-5 text-white" />
       </div>
-      <span className="text-base font-semibold text-gray-900">
-        OpenContext
-      </span>
+      <span className="text-base font-semibold text-gray-900">OpenContext</span>
     </div>
   );
 }

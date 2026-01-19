@@ -6,10 +6,12 @@
 /// 4. surrealdb
 /// 5. qdrant
 /// 6. llm service
+#[allow(dead_code)]
 pub struct AppRuntime {
     pub items: Vec<AppRuntimeItem>,
 }
 
+#[allow(dead_code)]
 pub struct AppRuntimeItem {
     pub name: String,
     pub version: String,
@@ -19,4 +21,5 @@ pub struct AppRuntimeItem {
     pub is_installed: bool,
 }
 
+#[allow(dead_code)]
 pub enum AppRuntimeError {}

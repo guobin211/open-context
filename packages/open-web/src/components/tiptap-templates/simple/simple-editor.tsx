@@ -220,13 +220,13 @@ export function SimpleEditor() {
       <EditorContext.Provider value={{ editor }}>
         <Toolbar
           ref={toolbarRef}
-          style={{
-            ...(isMobile
+          style={
+            isMobile
               ? {
                   bottom: `calc(100% - ${height - rect.y}px)`
                 }
-              : {})
-          }}
+              : {}
+          }
         >
           {mobileView === 'main' ? (
             <MainToolbarContent

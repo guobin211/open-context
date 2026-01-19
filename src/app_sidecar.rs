@@ -3,4 +3,5 @@
 /// 1、启动surrealdb进程
 /// 2、启动qdrant进程
 /// 3、启动nodejs进程
+#[allow(dead_code)]
 pub struct AppSidecar {}

@@ -44,9 +44,7 @@ export function NavItem({ id, label, icon, color, level = 0, hasChildren = false
         style={{ paddingLeft: `${12 + level * 16}px` }}
       >
         {hasChildren && (
-          <ChevronRight 
-            className={cn('h-3 w-3 shrink-0 transition-transform', isExpandedItem && 'rotate-90')} 
-          />
+          <ChevronRight className={cn('h-3 w-3 shrink-0 transition-transform', isExpandedItem && 'rotate-90')} />
         )}
         <Icon className="h-4 w-4 shrink-0" style={color ? { color } : undefined} />
         <span className="truncate">{label}</span>

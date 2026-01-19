@@ -1,6 +1,111 @@
+<!-- OPENSPEC:START -->
+
+# OpenSpec 使用说明
+
+这些说明适用于在此项目中工作的AI助手。
+
+## 语言偏好设置
+
+**默认使用中文**：除非明确说明使用英文，否则所有输出都应使用中文，包括：
+
+- 文档内容
+- 代码注释
+- 提交信息
+- 规范说明
+
+## 工作流程
+
+当请求满足以下条件时，始终打开`@/openspec/AGENTS.md`：
+
+- 提及规划或提案（如提案、规范、变更、计划等词语）
+- 引入新功能、重大变更、架构变更或大型性能/安全工作时
+- 听起来不明确，需要在编码前了解权威规范时
+
+使用`@/openspec/AGENTS.md`了解：
+
+- 如何创建和应用变更提案
+- 规范格式和约定
+- 项目结构和指南
+
+保持此托管块，以便'openspec-cn update'可以刷新说明。
+
+<!-- OPENSPEC:END -->
+
 # AGENTS.md
 
 本文件为在此仓库工作的 AI 编码代理提供指导。
+
+## 项目架构概述
+
+本项目是一个多模块协同的桌面应用，主要分为 3 个代码模块：
+
+### 核心模块
+
+| 模块                                  | 职责                                        | 技术栈                  |
+| ------------------------------------- | ------------------------------------------- | ----------------------- |
+| **tauri** (根目录 `src/`)             | 客户端桌面应用的壳，负责桌面相关的 API 操作 | Rust + Tauri            |
+| **open-node** (`packages/open-node/`) | 后台服务，负责构建索引、文件处理等后台任务  | Node.js + Hono          |
+| **open-web** (`packages/open-web/`)   | React 编写的 Web 端 UI，提供用户界面        | React + TanStack Router |
+
+### 交互流程
+
+```
+用户操作
+    ↓
+┌─────────────┐
+│  open-web   │  用户在 Web UI 上点击操作
+│  (前端)     │
+└──────┬──────┘
+       │ HTTP/WebSocket
+       ↓
+┌─────────────┐
+│   tauri     │  调用 Tauri 命令完成本地笔记创建
+│  (桌面壳)   │  和文件导入等 FS 类操作
+└──────┬──────┘
+       │ 启动服务
+       ↓
+┌─────────────┐
+│  open-node  │  启动 Node.js 后台服务
+│  (后台服务) │
+└──────┬──────┘
+       │ 返回服务地址 + Auth 权限
+       ↓
+┌─────────────┐
+│  open-web   │  Web 端接收服务地址和权限
+└──────┬──────┘
+       │ HTTP/WebSocket 交互
+       ↓
+┌─────────────┐
+│  open-node  │  Web 端与后台服务进行交互
+│  (后台服务) │  - HTTP: REST API 调用
+│             │  - WebSocket: 实时通信
+└─────────────┘
+       ↑
+       │ HTTP/WebSocket 交互
+       │
+┌─────────────┐
+│   tauri     │  Rust 端也与 Node 端进行交互
+│  (桌面壳)   │
+└─────────────┘
+```
+
+**流程说明**：
+
+1. **用户在 Web UI 上操作**：用户通过 React 前端（open-web）进行交互，点击创建笔记、导入文件等操作
+2. **Tauri 命令调用**：前端通过 Tauri 桥接调用 Rust 端命令，完成本地文件系统操作（FS 操作）
+3. **启动后台服务**：Rust 端负责启动 Node.js 后台服务（open-node）
+4. **返回服务凭证**：Rust 端将后台服务的地址和认证权限返回给 Web 端
+5. **Web 端与后台交互**：Web 端通过 HTTP REST API 和 WebSocket 与 Node.js 后台服务进行交互
+6. **Rust 端与后台交互**：Rust 端也通过 HTTP 和 WebSocket 与 Node.js 后台服务进行交互
+
+### 模块通信总结
+
+| 通信方向             | 协议           | 主要用途                |
+| -------------------- | -------------- | ----------------------- |
+| open-web → tauri     | Tauri IPC      | 本地 FS 操作、系统调用  |
+| tauri → open-node    | IPC 启动命令   | 启动/停止后台服务       |
+| open-web → open-node | HTTP/WebSocket | REST API 调用、实时通信 |
+| tauri → open-node    | HTTP/WebSocket | 服务管理、状态同步      |
 
 ## 命令
 
@@ -64,10 +169,10 @@ pnpm --filter open-node test:ui
 
 **导入规范:**
 
-- 同包内使用相对导入: `import { SymbolExtractor } from '../indexers'`
-- 前端使用绝对导入: `import { cn } from '@/lib/utils'` (指向 `packages/open-web/src/`)
+- open-node 使用相对导入: `import { SymbolExtractor } from '../indexers'`
+- open-web 使用绝对导入: `import { cn } from '@/lib/utils'` (指向 `packages/open-web/src/`)
 - 顺序: 外部库 → 内部模块
-- 类型导入与值导入混合使用 (无需显式 `import type`)
+- 类型导入: 优先混合使用，仅在复杂类型回环依赖时使用 `import type`
 
 **命名规范:**
 
@@ -83,7 +188,7 @@ pnpm --filter open-node test:ui
 **类型安全:**
 
 - 始终返回类型化 Promise: `Promise<Workspace | null>`
-- 公开方法显式返回类型, 内部允许推断
+- 公开方法显式返回类型，内部方法允许推断
 - 禁止 `any` 类型 (oxlint 阻止)
 - 禁止类型错误抑制 (`@ts-ignore`, `as any` 禁止)
 
@@ -96,17 +201,28 @@ pnpm --filter open-node test:ui
 
 **React 组件模式:**
 
+- **必须使用箭头函数**: `export const Button = ({ className, ...props }: ButtonProps) =>`
+- **禁止使用 function 声明**: 不要写 `function Button() { ... }`
 - Props 接口命名为 `{组件名}Props` (`ButtonProps`)
 - 使用 `cn()` 工具合并 Tailwind 类 (来自 `@/lib/utils`)
 - 使用 `...props` 解构以保持向前兼容
 - 使用 Radix UI 原语 + shadcn/ui 模式
 - Tiptap 组件: 分层架构 (extension → node → ui-primitive → ui → templates)
+- 使用 `forwardRef` 的组件: `export const Button = forwardRef<HTMLButtonElement, ButtonProps>(...)`
+- 使用 `memo` 的组件: `export const Icon = memo(({ ... }: Props) => ...)`
 
 **状态管理:**
 
-- **Zustand**: 客户端全局状态 (如 `userStore`)
+- **Zustand**: 客户端全局状态 (如 `documentStore`, `userStore`, `sidebarStore`)
 - **React Query**: 服务端状态和缓存
 - **Local state**: 组件特定状态
+
+**测试模式:**
+
+- 使用 `vi.mock()` 模拟依赖
+- 使用 `beforeEach()` 清理测试状态
+- 测试文件镜像 `src/` 结构到 `tests/`
+- 使用 Vitest 的 `describe`, `it`, `expect`, `beforeEach` API
 
 ### Rust (src/)
 
@@ -132,9 +248,9 @@ pnpm --filter open-node test:ui
 ```
 api/          → REST 端点 (Hono 路由)
 services/     → 业务逻辑
-db/           → 数据访问 (LevelDB, Qdrant)
+db/           → 数据访问 (LevelDB, Qdrant, SurrealDB)
 indexers/     → 代码解析 (tree-sitter)
-jobs/         → 异步任务
+jobs/         → 异步任务 (BullMQ)
 utils/        → 工具 (git, fs, logger, vector)
 types/        → TypeScript 定义
 ```
@@ -199,6 +315,7 @@ src/
 - **禁止空 catch 块**: 所有错误必须处理或重新抛出
 - **禁止直接样式编辑**: 前端视觉变更委托给 `frontend-ui-ux-engineer` 代理
 - **禁止删除失败的测试**: 修复根本原因, 不要删除测试
+- **禁止 function 声明**: React 组件必须使用箭头函数 `export const Component = () =>`，不要使用 `function Component() {}`
 
 ### 语言支持
 
@@ -218,3 +335,4 @@ src/
 - `packages/open-node/package.json`: Node.js 服务依赖
 - `packages/open-web/package.json`: 前端依赖
 - `tauri.conf.json`: Tauri 应用配置
+- `packages/open-node/vitest.config.ts`: Vitest 测试配置
