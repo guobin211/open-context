@@ -8,6 +8,7 @@ export interface NavItem {
   type: 'note' | 'file' | 'space' | 'conversation';
   children?: NavItem[];
   color?: string;
+  isGroup?: boolean;
 }
 
 export interface NoteGroup {
@@ -33,19 +34,10 @@ export const mockNoteGroups: NoteGroup[] = [
     label: '我的笔记',
     icon: 'FileText',
     items: [
-      {
-        id: 'note-1',
-        label: '工作笔记',
-        icon: 'Briefcase',
-        type: 'note',
-        children: [
-          { id: 'note-1-1', label: '项目A进展', icon: 'FileText', type: 'note' },
-          { id: 'note-1-2', label: '周报总结', icon: 'FileText', type: 'note' }
-        ]
-      },
-      { id: 'note-2', label: '会议纪要', icon: 'Users', type: 'note' },
-      { id: 'note-3', label: '代码片段', icon: 'Code', type: 'note' },
-      { id: 'note-4', label: '学习笔记', icon: 'BookOpen', type: 'note' }
+      { id: 'note-1', label: '工作笔记', isGroup: true, icon: 'Briefcase', type: 'note' },
+      { id: 'note-2', label: '会议纪要', isGroup: true, icon: 'Users', type: 'note' },
+      { id: 'note-3', label: '代码片段', isGroup: true, icon: 'Code', type: 'note' },
+      { id: 'note-4', label: '学习笔记', isGroup: true, icon: 'BookOpen', type: 'note' }
     ]
   },
   {

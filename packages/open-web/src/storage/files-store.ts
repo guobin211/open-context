@@ -70,30 +70,6 @@ export const mockFileGroups: FileGroup[] = [
         items: [{ id: 'file-aud-1', label: '会议录音.mp3', icon: 'Music', type: 'file' }]
       },
       {
-        id: 'cat-excel',
-        label: 'Excel',
-        icon: 'Table',
-        items: [{ id: 'file-xls-1', label: '数据统计.xlsx', icon: 'Table', type: 'file' }]
-      },
-      {
-        id: 'cat-word',
-        label: 'Word',
-        icon: 'FileText',
-        items: [{ id: 'file-word-1', label: '报告.docx', icon: 'FileText', type: 'file' }]
-      },
-      {
-        id: 'cat-ppt',
-        label: 'PPT',
-        icon: 'Presentation',
-        items: [{ id: 'file-ppt-1', label: '演示文稿.pptx', icon: 'Presentation', type: 'file' }]
-      },
-      {
-        id: 'cat-json',
-        label: 'JSON',
-        icon: 'FileCode',
-        items: [{ id: 'file-json-1', label: 'config.json', icon: 'FileCode', type: 'file' }]
-      },
-      {
         id: 'cat-other',
         label: '其他',
         icon: 'File',

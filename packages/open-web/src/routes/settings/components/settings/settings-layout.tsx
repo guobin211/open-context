@@ -7,7 +7,6 @@ import { ServerSettings } from './server-settings';
 import { CloudSettings } from './cloud-settings';
 import { AIProviderSettings } from './ai-provider-settings';
 import { ShortcutsSettings } from './shortcuts-settings';
-import { Sidebar } from '../../../../components/layout/sidebar';
 import { cn } from '../../../../lib/utils';
 
 const SettingsLayout = () => {
@@ -77,15 +76,9 @@ const SettingsLayout = () => {
 
   return (
     <div className="flex h-screen overflow-hidden">
-      <Sidebar />
-
       <aside className="w-56 shrink-0 border-r border-gray-200 bg-gray-50">
-        <div className="flex h-16 items-center justify-center border-b border-gray-200">
-          <span className="font-semibold text-gray-700">设置</span>
-        </div>
         <SettingsMenu settingsMenuItems={settingsMenuItems} iconMap={iconMap} />
       </aside>
-
       <main className="flex-1 overflow-hidden bg-white">
         <header className="flex h-16 items-center justify-between border-b border-gray-200 px-6">
           <h1 className="text-xl font-semibold text-gray-900">{activeItem?.label}</h1>

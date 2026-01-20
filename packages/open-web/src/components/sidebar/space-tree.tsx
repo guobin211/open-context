@@ -1,19 +1,3 @@
-import {
-  ChevronRight,
-  Box,
-  FileText,
-  Code,
-  GitBranch,
-  Folder,
-  File,
-  Plus,
-  MoreVertical,
-  Pencil,
-  Trash
-} from 'lucide-react';
-import { cn } from '@/lib/utils';
-import { useSidebarStore } from '../../storage/sidebar-store';
-import { useWorkspaceStore, type Space, type SpaceResource } from '../../storage/workspace-store';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import {
   DropdownMenu,
@@ -21,8 +5,24 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
-import { InputDialog, ConfirmDialog } from './dialogs';
-import { useInputDialog, useConfirmDialog } from '@/hooks/use-dialog';
+import { useConfirmDialog, useInputDialog } from '@/hooks/use-dialog';
+import { cn } from '@/lib/utils';
+import {
+  Box,
+  ChevronRight,
+  Code,
+  File,
+  FileText,
+  Folder,
+  GitBranch,
+  MoreVertical,
+  Pencil,
+  Plus,
+  Trash
+} from 'lucide-react';
+import { useSidebarStore } from '../../storage/sidebar-store';
+import { type Space, type SpaceResource, useWorkspaceStore } from '../../storage/workspace-store';
+import { ConfirmDialog, InputDialog } from './dialogs';
 
 const iconMap: Record<string, React.ComponentType<{ className?: string; style?: React.CSSProperties }>> = {
   Box,
@@ -34,27 +34,9 @@ const iconMap: Record<string, React.ComponentType<{ className?: string; style?: 
 };
 
 export function SpaceTree() {
-  const { spaces, addSpace } = useWorkspaceStore();
+  const { spaces } = useWorkspaceStore();
   const inputDialog = useInputDialog();
   const confirmDialog = useConfirmDialog();
-
-  const handleAddSpace = async () => {
-    const name = await inputDialog.show({
-      title: '新建工作空间',
-      defaultValue: ''
-    });
-
-    if (name) {
-      addSpace({
-        label: name,
-        icon: 'Box',
-        color: '#3B82F6',
-        repos: [],
-        docs: [],
-        files: []
-      });
-    }
-  };
 
   return (
     <>
@@ -62,13 +44,6 @@ export function SpaceTree() {
         {spaces.map((space) => (
           <SpaceItem key={space.id} space={space} inputDialog={inputDialog} confirmDialog={confirmDialog} />
         ))}
-        <button
-          onClick={handleAddSpace}
-          className="cursor flex w-full items-center justify-center gap-1 rounded-md px-2 py-1.5 text-sm text-gray-500 hover:bg-gray-100 hover:text-gray-700"
-        >
-          <Plus className="h-4 w-4" />
-          <span>添加工作空间</span>
-        </button>
       </div>
       <InputDialog {...inputDialog} />
       <ConfirmDialog {...confirmDialog} />
@@ -209,7 +184,7 @@ interface ResourceGroupProps {
   addLabel: string;
 }
 
-function ResourceGroup({ groupId, title, resources, addLabel, spaceId }: ResourceGroupProps) {
+function ResourceGroup({ groupId, title, resources, spaceId }: ResourceGroupProps) {
   const { isExpanded, toggleExpand } = useSidebarStore();
   const expanded = isExpanded(groupId);
 
@@ -227,10 +202,6 @@ function ResourceGroup({ groupId, title, resources, addLabel, spaceId }: Resourc
           {resources.map((resource) => (
             <ResourceItem key={resource.id} resource={resource} spaceId={spaceId} level={0} />
           ))}
-          <button className="cursor flex w-full items-center gap-1 rounded px-2 py-1 text-xs text-gray-400 hover:bg-gray-100 hover:text-gray-600">
-            <Plus className="h-3 w-3" />
-            <span>{addLabel}</span>
-          </button>
         </div>
       </CollapsibleContent>
     </Collapsible>
@@ -243,43 +214,12 @@ interface ResourceItemProps {
   spaceId: string;
 }
 
-function ResourceItem({ resource, level, spaceId }: ResourceItemProps) {
-  const { activeItemId, setActiveItem, isExpanded, toggleExpand } = useSidebarStore();
+function ResourceItem({ resource, level }: ResourceItemProps) {
+  const { activeItemId, setActiveItem } = useSidebarStore();
   const isActive = activeItemId === resource.id;
-  const hasChildren = resource.children && resource.children.length > 0;
-  const expanded = isExpanded(resource.id);
   const Icon = iconMap[resource.icon] || File;
 
   const iconColor = resource.type === 'repo' ? '#F59E0B' : resource.type === 'doc' ? '#3B82F6' : undefined;
-
-  if (hasChildren) {
-    return (
-      <Collapsible open={expanded} onOpenChange={() => toggleExpand(resource.id)}>
-        <CollapsibleTrigger asChild>
-          <button
-            className={cn(
-              'flex w-full items-center gap-1 rounded px-1 py-1 text-sm transition-colors',
-              isActive ? 'bg-blue-100 text-blue-700' : 'text-gray-700 hover:bg-gray-100'
-            )}
-            style={{ paddingLeft: `${4 + level * 12}px` }}
-          >
-            <ChevronRight
-              className={cn('h-3 w-3 shrink-0 text-gray-400 transition-transform', expanded && 'rotate-90')}
-            />
-            <Icon className="h-4 w-4 shrink-0" style={iconColor ? { color: iconColor } : undefined} />
-            <span className="truncate text-xs">{resource.label}</span>
-          </button>
-        </CollapsibleTrigger>
-        <CollapsibleContent>
-          <div className="space-y-0.5">
-            {resource.children?.map((child) => (
-              <ResourceItem key={child.id} resource={child} spaceId={spaceId} level={level + 1} />
-            ))}
-          </div>
-        </CollapsibleContent>
-      </Collapsible>
-    );
-  }
 
   return (
     <button

@@ -104,29 +104,16 @@ interface FileCategorySectionProps {
   confirmDialog: ReturnType<typeof useConfirmDialog>;
 }
 
-function FileCategorySection({ category, inputDialog, confirmDialog }: FileCategorySectionProps) {
-  const { isExpanded, toggleExpand } = useSidebarStore();
-  const expanded = isExpanded(category.id);
+function FileCategorySection({ category }: FileCategorySectionProps) {
   const Icon = iconMap[category.icon] || File;
-
   return (
     <div>
       <div
         className="cursor flex items-center gap-1 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-gray-100"
-        onClick={() => toggleExpand(category.id)}
       >
-        <ChevronRight className={cn('h-3 w-3 shrink-0 text-gray-400 transition-transform', expanded && 'rotate-90')} />
         <Icon className="h-4 w-4 shrink-0" />
         <span className="flex-1 truncate text-gray-600">{category.label}</span>
       </div>
-      {expanded && (
-        <div className="ml-4 space-y-0.5">
-          {category.items.map((item) => (
-            <FileItem key={item.id} item={item} inputDialog={inputDialog} confirmDialog={confirmDialog} />
-          ))}
-          {category.items.length === 0 && <div className="px-2 py-2 text-xs text-gray-400">暂无文件</div>}
-        </div>
-      )}
     </div>
   );
 }

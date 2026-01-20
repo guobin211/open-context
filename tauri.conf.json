@@ -13,9 +13,9 @@
     "macOSPrivateApi": true,
     "windows": [
       {
-        "title": "open-context",
-        "width": 800,
-        "height": 600,
+        "title": "",
+        "width": 1027,
+        "height": 720,
         "titleBarStyle": "Overlay",
         "hiddenTitle": true,
         "transparent": true
