@@ -1,6 +1,6 @@
 import { getLevelDBInstance } from './leveldb';
 import { IndexJobResult } from '../types';
-import { generateNanoId } from '../utils/id';
+import { generateUUID } from '../utils/id';
 
 export class JobRepository {
   private db = getLevelDBInstance();
@@ -8,7 +8,7 @@ export class JobRepository {
 
   async create(repoId: string, mode: 'full' | 'incremental'): Promise<IndexJobResult> {
     const job: IndexJobResult = {
-      jobId: `job_${generateNanoId()}`,
+      jobId: `job_${generateUUID()}`,
       status: 'queued',
       progress: 0
     };

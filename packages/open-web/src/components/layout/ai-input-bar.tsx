@@ -12,8 +12,8 @@ import {
   ArrowUp,
   Blocks
 } from 'lucide-react';
-import { ContextTag } from './context-tag';
-import { ToolbarButton } from './toolbar-button';
+import { ContextTag } from '../../routes/files/components/context-tag';
+import { ToolbarButton } from '../../routes/files/components/toolbar-button';
 
 export function AIInputBar() {
   const [message, setMessage] = useState('');

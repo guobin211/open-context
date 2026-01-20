@@ -1,5 +1,6 @@
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { Logo, SearchInput, NavSection, SpaceTree, NoteTree, FileTree, BottomActions } from '@/components/sidebar';
+import { ScrollArea } from '../ui/scroll-area';
+import { Logo, SearchInput, NavSection, SpaceTree, NoteTree, FileTree, BottomActions } from '../sidebar';
+import { ConversationTree } from '../sidebar/conversation-tree';
 
 export function Sidebar() {
   return (
@@ -9,6 +10,10 @@ export function Sidebar() {
 
       <ScrollArea className="min-h-0 flex-1">
         <div className="space-y-4 p-2">
+          <NavSection title="会话" type="chat">
+            <ConversationTree />
+          </NavSection>
+
           <NavSection title="笔记" type="note">
             <NoteTree />
           </NavSection>

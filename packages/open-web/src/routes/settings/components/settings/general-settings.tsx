@@ -1,4 +1,4 @@
-import { useSettingsStore } from '../../zustand/settings-store';
+import { useSettingsStore } from '../../../../storage/settings-store';
 
 const GeneralSettings = () => {
   const { config, setConfig } = useSettingsStore();

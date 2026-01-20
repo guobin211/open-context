@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react';
-import { ScrollArea } from '@/components/ui/scroll-area';
-import { ContentHeader, AIInputBar } from '@/components/content';
+import { ScrollArea } from '../ui/scroll-area';
+import { ContentHeader } from './content-header';
+import { AIInputBar } from './ai-input-bar';
 
 interface ContentAreaProps {
   children: ReactNode;

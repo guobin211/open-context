@@ -12,7 +12,8 @@ import {
   Trash
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useSidebarStore, type Space, type SpaceResource } from '@/zustand/sidebar-store';
+import { useSidebarStore } from '../../storage/sidebar-store';
+import { useWorkspaceStore, type Space, type SpaceResource } from '../../storage/workspace-store';
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
 import {
   DropdownMenu,
@@ -33,7 +34,7 @@ const iconMap: Record<string, React.ComponentType<{ className?: string; style?: 
 };
 
 export function SpaceTree() {
-  const { spaces, addSpace } = useSidebarStore();
+  const { spaces, addSpace } = useWorkspaceStore();
   const inputDialog = useInputDialog();
   const confirmDialog = useConfirmDialog();
 
@@ -63,7 +64,7 @@ export function SpaceTree() {
         ))}
         <button
           onClick={handleAddSpace}
-          className="flex w-full items-center justify-center gap-1 rounded-md px-2 py-1.5 text-sm text-gray-500 hover:bg-gray-100 hover:text-gray-700"
+          className="cursor flex w-full items-center justify-center gap-1 rounded-md px-2 py-1.5 text-sm text-gray-500 hover:bg-gray-100 hover:text-gray-700"
         >
           <Plus className="h-4 w-4" />
           <span>添加工作空间</span>
@@ -82,7 +83,8 @@ interface SpaceItemProps {
 }
 
 function SpaceItem({ space, inputDialog, confirmDialog }: SpaceItemProps) {
-  const { isExpanded, toggleExpand, updateSpace, deleteSpace, activeItemId } = useSidebarStore();
+  const { isExpanded, toggleExpand, activeItemId } = useSidebarStore();
+  const { updateSpace, deleteSpace } = useWorkspaceStore();
   const expanded = isExpanded(space.id);
   const isActive = activeItemId === space.id;
   const Icon = iconMap[space.icon] || Box;
@@ -115,7 +117,7 @@ function SpaceItem({ space, inputDialog, confirmDialog }: SpaceItemProps) {
       <CollapsibleTrigger asChild>
         <div
           className={cn(
-            'group flex w-full items-center gap-1 rounded-md px-2 py-1.5 text-sm transition-colors',
+            'group cursor flex w-full items-center gap-1 rounded-md px-2 py-1.5 text-sm transition-colors',
             isActive && 'bg-blue-50'
           )}
         >
@@ -186,7 +188,7 @@ function SpaceItem({ space, inputDialog, confirmDialog }: SpaceItemProps) {
             {/* 空状态时显示添加按钮 */}
             {!hasContent && (
               <div className="py-2 text-center text-xs text-gray-400">
-                <button className="flex w-full items-center justify-center gap-1 rounded px-2 py-1 hover:bg-gray-100">
+                <button className="cursor py flex w-full items-center justify-center gap-1 rounded px-2 py-1 hover:bg-gray-100">
                   <Plus className="h-3 w-3" />
                   <span>添加内容</span>
                 </button>
@@ -214,7 +216,7 @@ function ResourceGroup({ groupId, title, resources, addLabel, spaceId }: Resourc
   return (
     <Collapsible open={expanded} onOpenChange={() => toggleExpand(groupId)}>
       <CollapsibleTrigger asChild>
-        <button className="flex w-full items-center gap-1 rounded px-1 py-1 text-xs text-gray-500 hover:bg-gray-100">
+        <button className="cursor flex w-full items-center gap-1 rounded px-1 py-1 text-xs text-gray-500 hover:bg-gray-100">
           <ChevronRight className={cn('h-3 w-3 shrink-0 transition-transform', expanded && 'rotate-90')} />
           <span>{title}</span>
           <span className="ml-auto text-gray-400">{resources.length}</span>
@@ -225,7 +227,7 @@ function ResourceGroup({ groupId, title, resources, addLabel, spaceId }: Resourc
           {resources.map((resource) => (
             <ResourceItem key={resource.id} resource={resource} spaceId={spaceId} level={0} />
           ))}
-          <button className="flex w-full items-center gap-1 rounded px-2 py-1 text-xs text-gray-400 hover:bg-gray-100 hover:text-gray-600">
+          <button className="cursor flex w-full items-center gap-1 rounded px-2 py-1 text-xs text-gray-400 hover:bg-gray-100 hover:text-gray-600">
             <Plus className="h-3 w-3" />
             <span>{addLabel}</span>
           </button>

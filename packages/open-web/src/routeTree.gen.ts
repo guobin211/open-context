@@ -9,130 +9,159 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as SettingsRouteImport } from './routes/settings'
-import { Route as SearchRouteImport } from './routes/search'
-import { Route as FilesRouteImport } from './routes/files'
-import { Route as EditorRouteImport } from './routes/editor'
-import { Route as ChatRouteImport } from './routes/chat'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as WorkspaceIndexRouteImport } from './routes/workspace/index'
+import { Route as SettingsIndexRouteImport } from './routes/settings/index'
+import { Route as NotebookIndexRouteImport } from './routes/notebook/index'
+import { Route as FilesIndexRouteImport } from './routes/files/index'
+import { Route as ChatIndexRouteImport } from './routes/chat/index'
+import { Route as WorkspaceIdRouteImport } from './routes/workspace/$id'
+import { Route as NotebookIdRouteImport } from './routes/notebook/$id'
+import { Route as FilesIdRouteImport } from './routes/files/$id'
+import { Route as ChatIdRouteImport } from './routes/chat/$id'
 
-const SettingsRoute = SettingsRouteImport.update({
-  id: '/settings',
-  path: '/settings',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const SearchRoute = SearchRouteImport.update({
-  id: '/search',
-  path: '/search',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const FilesRoute = FilesRouteImport.update({
-  id: '/files',
-  path: '/files',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const EditorRoute = EditorRouteImport.update({
-  id: '/editor',
-  path: '/editor',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ChatRoute = ChatRouteImport.update({
-  id: '/chat',
-  path: '/chat',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WorkspaceIndexRoute = WorkspaceIndexRouteImport.update({
+  id: '/workspace/',
+  path: '/workspace/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsIndexRoute = SettingsIndexRouteImport.update({
+  id: '/settings/',
+  path: '/settings/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NotebookIndexRoute = NotebookIndexRouteImport.update({
+  id: '/notebook/',
+  path: '/notebook/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FilesIndexRoute = FilesIndexRouteImport.update({
+  id: '/files/',
+  path: '/files/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ChatIndexRoute = ChatIndexRouteImport.update({
+  id: '/chat/',
+  path: '/chat/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const WorkspaceIdRoute = WorkspaceIdRouteImport.update({
+  id: '/workspace/$id',
+  path: '/workspace/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const NotebookIdRoute = NotebookIdRouteImport.update({
+  id: '/notebook/$id',
+  path: '/notebook/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const FilesIdRoute = FilesIdRouteImport.update({
+  id: '/files/$id',
+  path: '/files/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ChatIdRoute = ChatIdRouteImport.update({
+  id: '/chat/$id',
+  path: '/chat/$id',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
-  '/chat': typeof ChatRoute
-  '/editor': typeof EditorRoute
-  '/files': typeof FilesRoute
-  '/search': typeof SearchRoute
-  '/settings': typeof SettingsRoute
+  '/chat/$id': typeof ChatIdRoute
+  '/files/$id': typeof FilesIdRoute
+  '/notebook/$id': typeof NotebookIdRoute
+  '/workspace/$id': typeof WorkspaceIdRoute
+  '/chat': typeof ChatIndexRoute
+  '/files': typeof FilesIndexRoute
+  '/notebook': typeof NotebookIndexRoute
+  '/settings': typeof SettingsIndexRoute
+  '/workspace': typeof WorkspaceIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
-  '/chat': typeof ChatRoute
-  '/editor': typeof EditorRoute
-  '/files': typeof FilesRoute
-  '/search': typeof SearchRoute
-  '/settings': typeof SettingsRoute
+  '/chat/$id': typeof ChatIdRoute
+  '/files/$id': typeof FilesIdRoute
+  '/notebook/$id': typeof NotebookIdRoute
+  '/workspace/$id': typeof WorkspaceIdRoute
+  '/chat': typeof ChatIndexRoute
+  '/files': typeof FilesIndexRoute
+  '/notebook': typeof NotebookIndexRoute
+  '/settings': typeof SettingsIndexRoute
+  '/workspace': typeof WorkspaceIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
-  '/chat': typeof ChatRoute
-  '/editor': typeof EditorRoute
-  '/files': typeof FilesRoute
-  '/search': typeof SearchRoute
-  '/settings': typeof SettingsRoute
+  '/chat/$id': typeof ChatIdRoute
+  '/files/$id': typeof FilesIdRoute
+  '/notebook/$id': typeof NotebookIdRoute
+  '/workspace/$id': typeof WorkspaceIdRoute
+  '/chat/': typeof ChatIndexRoute
+  '/files/': typeof FilesIndexRoute
+  '/notebook/': typeof NotebookIndexRoute
+  '/settings/': typeof SettingsIndexRoute
+  '/workspace/': typeof WorkspaceIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/chat' | '/editor' | '/files' | '/search' | '/settings'
+  fullPaths:
+    | '/'
+    | '/chat/$id'
+    | '/files/$id'
+    | '/notebook/$id'
+    | '/workspace/$id'
+    | '/chat'
+    | '/files'
+    | '/notebook'
+    | '/settings'
+    | '/workspace'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/chat' | '/editor' | '/files' | '/search' | '/settings'
+  to:
+    | '/'
+    | '/chat/$id'
+    | '/files/$id'
+    | '/notebook/$id'
+    | '/workspace/$id'
+    | '/chat'
+    | '/files'
+    | '/notebook'
+    | '/settings'
+    | '/workspace'
   id:
     | '__root__'
     | '/'
-    | '/chat'
-    | '/editor'
-    | '/files'
-    | '/search'
-    | '/settings'
+    | '/chat/$id'
+    | '/files/$id'
+    | '/notebook/$id'
+    | '/workspace/$id'
+    | '/chat/'
+    | '/files/'
+    | '/notebook/'
+    | '/settings/'
+    | '/workspace/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
-  ChatRoute: typeof ChatRoute
-  EditorRoute: typeof EditorRoute
-  FilesRoute: typeof FilesRoute
-  SearchRoute: typeof SearchRoute
-  SettingsRoute: typeof SettingsRoute
+  ChatIdRoute: typeof ChatIdRoute
+  FilesIdRoute: typeof FilesIdRoute
+  NotebookIdRoute: typeof NotebookIdRoute
+  WorkspaceIdRoute: typeof WorkspaceIdRoute
+  ChatIndexRoute: typeof ChatIndexRoute
+  FilesIndexRoute: typeof FilesIndexRoute
+  NotebookIndexRoute: typeof NotebookIndexRoute
+  SettingsIndexRoute: typeof SettingsIndexRoute
+  WorkspaceIndexRoute: typeof WorkspaceIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/settings': {
-      id: '/settings'
-      path: '/settings'
-      fullPath: '/settings'
-      preLoaderRoute: typeof SettingsRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/search': {
-      id: '/search'
-      path: '/search'
-      fullPath: '/search'
-      preLoaderRoute: typeof SearchRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/files': {
-      id: '/files'
-      path: '/files'
-      fullPath: '/files'
-      preLoaderRoute: typeof FilesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/editor': {
-      id: '/editor'
-      path: '/editor'
-      fullPath: '/editor'
-      preLoaderRoute: typeof EditorRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/chat': {
-      id: '/chat'
-      path: '/chat'
-      fullPath: '/chat'
-      preLoaderRoute: typeof ChatRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/': {
       id: '/'
       path: '/'
@@ -140,16 +169,83 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/workspace/': {
+      id: '/workspace/'
+      path: '/workspace'
+      fullPath: '/workspace'
+      preLoaderRoute: typeof WorkspaceIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings/': {
+      id: '/settings/'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/notebook/': {
+      id: '/notebook/'
+      path: '/notebook'
+      fullPath: '/notebook'
+      preLoaderRoute: typeof NotebookIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/files/': {
+      id: '/files/'
+      path: '/files'
+      fullPath: '/files'
+      preLoaderRoute: typeof FilesIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/chat/': {
+      id: '/chat/'
+      path: '/chat'
+      fullPath: '/chat'
+      preLoaderRoute: typeof ChatIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/workspace/$id': {
+      id: '/workspace/$id'
+      path: '/workspace/$id'
+      fullPath: '/workspace/$id'
+      preLoaderRoute: typeof WorkspaceIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/notebook/$id': {
+      id: '/notebook/$id'
+      path: '/notebook/$id'
+      fullPath: '/notebook/$id'
+      preLoaderRoute: typeof NotebookIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/files/$id': {
+      id: '/files/$id'
+      path: '/files/$id'
+      fullPath: '/files/$id'
+      preLoaderRoute: typeof FilesIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/chat/$id': {
+      id: '/chat/$id'
+      path: '/chat/$id'
+      fullPath: '/chat/$id'
+      preLoaderRoute: typeof ChatIdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
-  ChatRoute: ChatRoute,
-  EditorRoute: EditorRoute,
-  FilesRoute: FilesRoute,
-  SearchRoute: SearchRoute,
-  SettingsRoute: SettingsRoute,
+  ChatIdRoute: ChatIdRoute,
+  FilesIdRoute: FilesIdRoute,
+  NotebookIdRoute: NotebookIdRoute,
+  WorkspaceIdRoute: WorkspaceIdRoute,
+  ChatIndexRoute: ChatIndexRoute,
+  FilesIndexRoute: FilesIndexRoute,
+  NotebookIndexRoute: NotebookIndexRoute,
+  SettingsIndexRoute: SettingsIndexRoute,
+  WorkspaceIndexRoute: WorkspaceIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

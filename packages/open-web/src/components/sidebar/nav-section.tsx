@@ -8,9 +8,12 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { InputDialog } from './dialogs';
 import { useInputDialog } from '@/hooks/use-dialog';
-import { useSidebarStore } from '@/zustand/sidebar-store';
+import { useNotebookStore } from '../../storage/notebook-store';
+import { useFilesStore } from '../../storage/files-store';
+import { useWorkspaceStore } from '../../storage/workspace-store';
+import { useSidebarChatStore } from '../../storage/sidebar-chat-store';
 
-type SectionType = 'note' | 'file' | 'space';
+type SectionType = 'chat' | 'note' | 'file' | 'space';
 
 interface NavSectionProps {
   title: string;
@@ -20,19 +23,22 @@ interface NavSectionProps {
 
 export function NavSection({ title, type, children }: NavSectionProps) {
   const inputDialog = useInputDialog();
-  const { addNote, addFile, addSpace } = useSidebarStore();
+  const { addNote } = useNotebookStore();
+  const { addFile } = useFilesStore();
+  const { addSpace } = useWorkspaceStore();
+  const { addConversation } = useSidebarChatStore();
 
   const handleAdd = async (actionType: string) => {
     const name = await inputDialog.show({
       title:
-        actionType === 'note'
-          ? '新建笔记'
-          : actionType === 'folder-note'
-            ? '新建笔记文件夹'
-            : actionType === 'file'
-              ? '上传文件'
-              : actionType === 'folder-file'
-                ? '新建文件文件夹'
+        actionType === 'conversation'
+          ? '新建会话'
+          : actionType === 'note'
+            ? '新建笔记'
+            : actionType === 'folder-note'
+              ? '新建笔记文件夹'
+              : actionType === 'file'
+                ? '上传文件'
                 : '新建工作空间',
       defaultValue: ''
     });
@@ -40,6 +46,9 @@ export function NavSection({ title, type, children }: NavSectionProps) {
     if (!name) return;
 
     switch (actionType) {
+      case 'conversation':
+        addConversation({ label: name, icon: 'MessageSquare', type: 'conversation' });
+        break;
       case 'note':
         addNote({ label: name, icon: 'FileText', type: 'note' });
         break;
@@ -48,9 +57,6 @@ export function NavSection({ title, type, children }: NavSectionProps) {
         break;
       case 'file':
         addFile({ label: name, icon: 'File', type: 'file' });
-        break;
-      case 'folder-file':
-        addFile({ label: name, icon: 'Folder', type: 'file', children: [] });
         break;
       case 'space':
         addSpace({
@@ -68,22 +74,29 @@ export function NavSection({ title, type, children }: NavSectionProps) {
   return (
     <>
       <div className="py-2">
-        <div className="group flex items-center justify-between px-3 pb-1">
-          <span className="text-xs font-medium text-gray-500">{title}</span>
+        <div className="cursor group flex items-center justify-between px-3 pb-1">
+          <span className="cursor text-xs font-medium text-gray-500">{title}</span>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="flex h-5 w-5 items-center justify-center rounded text-gray-400 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-gray-200 hover:text-gray-600">
+              <button className="cursor flex h-5 w-5 items-center justify-center rounded text-gray-400 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-gray-200 hover:text-gray-600">
                 <MoreHorizontal className="h-3.5 w-3.5" />
               </button>
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end" className="w-40">
+              {type === 'chat' && (
+                <DropdownMenuItem onClick={() => handleAdd('conversation')} className="cursor gap-2 text-sm">
+                  <FilePlus className="h-4 w-4" />
+                  <span>新建会话</span>
+                </DropdownMenuItem>
+              )}
+
               {type === 'note' && (
                 <>
-                  <DropdownMenuItem onClick={() => handleAdd('note')} className="gap-2 text-sm">
+                  <DropdownMenuItem onClick={() => handleAdd('note')} className="cursor gap-2 text-sm">
                     <FilePlus className="h-4 w-4" />
                     <span>新建笔记</span>
                   </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleAdd('folder-note')} className="gap-2 text-sm">
+                  <DropdownMenuItem onClick={() => handleAdd('folder-note')} className="cursor gap-2 text-sm">
                     <FolderPlus className="h-4 w-4" />
                     <span>新建文件夹</span>
                   </DropdownMenuItem>
@@ -91,20 +104,14 @@ export function NavSection({ title, type, children }: NavSectionProps) {
               )}
 
               {type === 'file' && (
-                <>
-                  <DropdownMenuItem onClick={() => handleAdd('file')} className="gap-2 text-sm">
-                    <FilePlus className="h-4 w-4" />
-                    <span>上传文件</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleAdd('folder-file')} className="gap-2 text-sm">
-                    <FolderPlus className="h-4 w-4" />
-                    <span>新建文件夹</span>
-                  </DropdownMenuItem>
-                </>
+                <DropdownMenuItem onClick={() => handleAdd('file')} className="cursor gap-2 text-sm">
+                  <FilePlus className="h-4 w-4" />
+                  <span>导入文件</span>
+                </DropdownMenuItem>
               )}
 
               {type === 'space' && (
-                <DropdownMenuItem onClick={() => handleAdd('space')} className="gap-2 text-sm">
+                <DropdownMenuItem onClick={() => handleAdd('space')} className="cursor gap-2 text-sm">
                   <Box className="h-4 w-4" />
                   <span>新建空间</span>
                 </DropdownMenuItem>

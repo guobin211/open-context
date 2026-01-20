@@ -44,7 +44,7 @@ import type {
   ThemeMode,
   UpdateAvailablePayload,
   WindowFocusedPayload
-} from '@/types/app-events.types';
+} from '../lib/app-events';
 
 /**
  * 通用事件监听 Hook

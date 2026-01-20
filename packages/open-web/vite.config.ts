@@ -8,7 +8,8 @@ import { defineConfig } from 'vite';
 export default defineConfig(async () => ({
   plugins: [
     tanstackRouter({
-      target: 'react'
+      target: 'react',
+      routeFileIgnorePattern: 'components|hooks|utils'
     }),
     tailwindcss(),
     codeInspectorPlugin({

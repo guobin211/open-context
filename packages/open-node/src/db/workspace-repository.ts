@@ -1,6 +1,6 @@
 import { getLevelDBInstance } from './leveldb';
 import { Workspace, CreateWorkspaceDto, UpdateWorkspaceDto } from '../types';
-import { generateNanoId } from '../utils/id';
+import { generateUUID } from '../utils/id';
 
 export class WorkspaceRepository {
   private db = getLevelDBInstance();
@@ -8,7 +8,7 @@ export class WorkspaceRepository {
 
   async create(dto: CreateWorkspaceDto): Promise<Workspace> {
     const workspace: Workspace = {
-      id: `ws_${generateNanoId()}`,
+      id: `ws_${generateUUID()}`,
       name: dto.name,
       description: dto.description,
       createdAt: Date.now(),

@@ -1,14 +1,7 @@
 import { randomUUID } from 'crypto';
-import { customAlphabet } from 'nanoid';
 
 export function generateUUID(): string {
   return randomUUID();
-}
-
-const nanoid = customAlphabet('0123456789abcdefghijklmnopqrstuvwxyz', 16);
-
-export function generateNanoId(): string {
-  return nanoid();
 }
 
 export function generateSymbolId(params: {

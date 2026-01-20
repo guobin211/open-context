@@ -1,4 +1,4 @@
-import { useDocumentStore } from '@/zustand/document-store';
+import { useDocumentStore } from '../../../storage/document-store';
 import { DocumentTitle } from './document-title';
 import { CodeBlock } from './code-block';
 import { JSX } from 'react';

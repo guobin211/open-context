@@ -5,23 +5,23 @@ import {
   Clock,
   Image,
   Video,
-  Headphones,
+  Music,
   Archive,
   File,
+  Table,
+  Presentation,
+  FileCode,
   MoreVertical,
   Pencil,
-  Trash,
-  FilePlus,
-  FolderPlus
+  Trash
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useSidebarStore, type NavItem } from '@/zustand/sidebar-store';
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/components/ui/collapsible';
+import { useSidebarStore } from '../../storage/sidebar-store';
+import { useFilesStore, type NavItem, type FileGroup, type FileCategory } from '../../storage/files-store';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
-  DropdownMenuSeparator,
   DropdownMenuTrigger
 } from '@/components/ui/dropdown-menu';
 import { InputDialog, ConfirmDialog } from './dialogs';
@@ -33,21 +33,24 @@ const iconMap: Record<string, React.ComponentType<{ className?: string }>> = {
   Clock,
   Image,
   Video,
-  Headphones,
+  Music,
   Archive,
-  File
+  File,
+  Table,
+  Presentation,
+  FileCode
 };
 
 export function FileTree() {
-  const { files } = useSidebarStore();
+  const { fileGroups } = useFilesStore();
   const inputDialog = useInputDialog();
   const confirmDialog = useConfirmDialog();
 
   return (
     <>
-      <div className="space-y-0.5">
-        {files.map((item) => (
-          <FileItem key={item.id} item={item} level={0} inputDialog={inputDialog} confirmDialog={confirmDialog} />
+      <div className="space-y-2">
+        {fileGroups.map((group) => (
+          <FileGroupSection key={group.id} group={group} inputDialog={inputDialog} confirmDialog={confirmDialog} />
         ))}
       </div>
       <InputDialog {...inputDialog} />
@@ -56,38 +59,93 @@ export function FileTree() {
   );
 }
 
-interface FileItemProps {
-  item: NavItem;
-  level: number;
+interface FileGroupSectionProps {
+  group: FileGroup;
   inputDialog: ReturnType<typeof useInputDialog>;
   confirmDialog: ReturnType<typeof useConfirmDialog>;
 }
 
-function FileItem({ item, level, inputDialog, confirmDialog }: FileItemProps) {
-  const { activeItemId, setActiveItem, isExpanded, toggleExpand, addFile, updateFile, deleteFile } = useSidebarStore();
+function FileGroupSection({ group, inputDialog, confirmDialog }: FileGroupSectionProps) {
+  const { isExpanded, toggleExpand } = useSidebarStore();
+  const expanded = isExpanded(group.id);
+
+  return (
+    <div>
+      <div
+        className="cursor flex items-center gap-1.5 rounded-md px-2 py-1.5 text-sm text-gray-600 hover:bg-gray-100"
+        onClick={() => toggleExpand(group.id)}
+      >
+        <ChevronRight className={cn('h-4 w-4 shrink-0 text-gray-400 transition-transform', expanded && 'rotate-90')} />
+        <span className="flex-1 font-medium">{group.label}</span>
+      </div>
+      {expanded && (
+        <div className="mt-1 ml-2 space-y-1">
+          {group.categories && group.categories.length > 0
+            ? group.categories.map((category) => (
+                <FileCategorySection
+                  key={category.id}
+                  category={category}
+                  inputDialog={inputDialog}
+                  confirmDialog={confirmDialog}
+                />
+              ))
+            : group.items.map((item) => (
+                <FileItem key={item.id} item={item} inputDialog={inputDialog} confirmDialog={confirmDialog} />
+              ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
+interface FileCategorySectionProps {
+  category: FileCategory;
+  inputDialog: ReturnType<typeof useInputDialog>;
+  confirmDialog: ReturnType<typeof useConfirmDialog>;
+}
+
+function FileCategorySection({ category, inputDialog, confirmDialog }: FileCategorySectionProps) {
+  const { isExpanded, toggleExpand } = useSidebarStore();
+  const expanded = isExpanded(category.id);
+  const Icon = iconMap[category.icon] || File;
+
+  return (
+    <div>
+      <div
+        className="cursor flex items-center gap-1 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-gray-100"
+        onClick={() => toggleExpand(category.id)}
+      >
+        <ChevronRight className={cn('h-3 w-3 shrink-0 text-gray-400 transition-transform', expanded && 'rotate-90')} />
+        <Icon className="h-4 w-4 shrink-0" />
+        <span className="flex-1 truncate text-gray-600">{category.label}</span>
+      </div>
+      {expanded && (
+        <div className="ml-4 space-y-0.5">
+          {category.items.map((item) => (
+            <FileItem key={item.id} item={item} inputDialog={inputDialog} confirmDialog={confirmDialog} />
+          ))}
+          {category.items.length === 0 && <div className="px-2 py-2 text-xs text-gray-400">暂无文件</div>}
+        </div>
+      )}
+    </div>
+  );
+}
+
+interface FileItemProps {
+  item: NavItem;
+  inputDialog: ReturnType<typeof useInputDialog>;
+  confirmDialog: ReturnType<typeof useConfirmDialog>;
+}
+
+function FileItem({ item, inputDialog, confirmDialog }: FileItemProps) {
+  const { activeItemId, setActiveItem } = useSidebarStore();
+  const { updateFile, deleteFile } = useFilesStore();
   const isActive = activeItemId === item.id;
-  const hasChildren = item.children && item.children.length > 0;
-  const expanded = isExpanded(item.id);
   const Icon = iconMap[item.icon] || File;
-
-  const handleAdd = async (type: string) => {
-    const name = await inputDialog.show({
-      title: type === 'file' ? '上传文件' : '新建文件夹',
-      defaultValue: ''
-    });
-
-    if (name) {
-      if (type === 'file') {
-        addFile({ label: name, icon: 'File', type: 'file' }, item.id);
-      } else if (type === 'folder') {
-        addFile({ label: name, icon: 'Folder', type: 'file', children: [] }, item.id);
-      }
-    }
-  };
 
   const handleEdit = async () => {
     const name = await inputDialog.show({
-      title: '编辑名称',
+      title: '重命名文件',
       defaultValue: item.label
     });
 
@@ -98,7 +156,7 @@ function FileItem({ item, level, inputDialog, confirmDialog }: FileItemProps) {
 
   const handleDelete = async () => {
     const confirmed = await confirmDialog.show({
-      message: `确定要删除 "${item.label}" 吗？`
+      message: `确定要删除文件 "${item.label}" 吗？`
     });
 
     if (confirmed) {
@@ -106,105 +164,38 @@ function FileItem({ item, level, inputDialog, confirmDialog }: FileItemProps) {
     }
   };
 
-  if (hasChildren) {
-    return (
-      <Collapsible open={expanded} onOpenChange={() => toggleExpand(item.id)}>
-        <CollapsibleTrigger asChild>
-          <div className="group flex w-full items-center gap-1 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-gray-100">
-            <ChevronRight
-              className={cn('h-3 w-3 shrink-0 text-gray-400 transition-transform', expanded && 'rotate-90')}
-            />
-            <Icon className="h-4 w-4 shrink-0" />
-            <span className="flex-1 truncate">{item.label}</span>
-
-            {
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <button
-                    className="opacity-0 transition-opacity group-hover:opacity-100"
-                    onClick={(e) => e.stopPropagation()}
-                  >
-                    <MoreVertical className="h-4 w-4 shrink-0 text-gray-400 hover:text-gray-600" />
-                  </button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end" className="w-36">
-                  <DropdownMenuItem onClick={() => handleAdd('file')} className="gap-2 text-sm">
-                    <FilePlus className="h-4 w-4" />
-                    <span>上传文件</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={() => handleAdd('folder')} className="gap-2 text-sm">
-                    <FolderPlus className="h-4 w-4" />
-                    <span>新建文件夹</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuSeparator />
-                  <DropdownMenuItem onClick={handleEdit} className="gap-2 text-sm">
-                    <Pencil className="h-4 w-4" />
-                    <span>编辑</span>
-                  </DropdownMenuItem>
-                  <DropdownMenuItem onClick={handleDelete} className="gap-2 text-sm text-red-600">
-                    <Trash className="h-4 w-4" />
-                    <span>删除</span>
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
-            }
-          </div>
-        </CollapsibleTrigger>
-        <CollapsibleContent>
-          <div className="space-y-0.5">
-            {item.children?.map((child) => (
-              <FileItem
-                key={child.id}
-                item={child}
-                level={level + 1}
-                inputDialog={inputDialog}
-                confirmDialog={confirmDialog}
-              />
-            ))}
-          </div>
-        </CollapsibleContent>
-      </Collapsible>
-    );
-  }
-
   return (
     <div
       className={cn(
-        'group flex w-full items-center gap-1 rounded-md px-2 py-1.5 text-sm transition-colors',
-        isActive && 'bg-blue-50'
+        'group cursor flex w-full items-center gap-1 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-gray-100',
+        isActive && 'bg-blue-50 hover:bg-blue-50'
       )}
+      onClick={() => setActiveItem(item.id)}
     >
       <div className="h-3 w-3 shrink-0" />
       <Icon className="h-4 w-4 shrink-0" />
-      <span
-        className={cn('flex-1 truncate', isActive && 'font-medium text-blue-600')}
-        onClick={() => setActiveItem(item.id)}
-      >
-        {item.label}
-      </span>
+      <span className={cn('flex-1 truncate', isActive && 'font-medium text-blue-600')}>{item.label}</span>
 
-      {
-        <DropdownMenu>
-          <DropdownMenuTrigger asChild>
-            <button
-              className="opacity-0 transition-opacity group-hover:opacity-100"
-              onClick={(e) => e.stopPropagation()}
-            >
-              <MoreVertical className="h-4 w-4 shrink-0 text-gray-400 hover:text-gray-600" />
-            </button>
-          </DropdownMenuTrigger>
-          <DropdownMenuContent align="end" className="w-36">
-            <DropdownMenuItem onClick={handleEdit} className="gap-2 text-sm">
-              <Pencil className="h-4 w-4" />
-              <span>编辑</span>
-            </DropdownMenuItem>
-            <DropdownMenuItem onClick={handleDelete} className="gap-2 text-sm text-red-600">
-              <Trash className="h-4 w-4" />
-              <span>删除</span>
-            </DropdownMenuItem>
-          </DropdownMenuContent>
-        </DropdownMenu>
-      }
+      <DropdownMenu>
+        <DropdownMenuTrigger asChild>
+          <button
+            className={cn('opacity-0 transition-opacity group-hover:opacity-100', isActive && 'opacity-100')}
+            onClick={(e) => e.stopPropagation()}
+          >
+            <MoreVertical className="h-4 w-4 shrink-0 text-gray-400 hover:text-gray-600" />
+          </button>
+        </DropdownMenuTrigger>
+        <DropdownMenuContent align="end" className="w-36">
+          <DropdownMenuItem onClick={handleEdit} className="gap-2 text-sm">
+            <Pencil className="h-4 w-4" />
+            <span>重命名</span>
+          </DropdownMenuItem>
+          <DropdownMenuItem onClick={handleDelete} className="gap-2 text-sm text-red-600">
+            <Trash className="h-4 w-4" />
+            <span>删除</span>
+          </DropdownMenuItem>
+        </DropdownMenuContent>
+      </DropdownMenu>
     </div>
   );
 }

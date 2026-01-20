@@ -1,6 +1,6 @@
 import { create } from 'zustand';
 import { persist } from 'zustand/middleware';
-import type { AppConfig } from '@/types/settings.types';
+import type { AppConfig } from '../lib/app-settings';
 
 interface SettingsStore {
   config: AppConfig;

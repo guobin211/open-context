@@ -6,8 +6,8 @@ import {
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator
-} from '@/components/ui/breadcrumb';
-import { useDocumentStore } from '@/zustand/document-store';
+} from '../ui/breadcrumb';
+import { useDocumentStore } from '../../storage/document-store';
 
 export function ContentHeader() {
   const { currentDocument, syncStatus } = useDocumentStore();

@@ -1,6 +1,6 @@
 import { FileText, Star, Folder, Clock, Box, Code, ChevronRight } from 'lucide-react';
 import { cn } from '@/lib/utils';
-import { useSidebarStore } from '@/zustand/sidebar-store';
+import { useSidebarStore } from '../../storage/sidebar-store';
 
 const iconMap: Record<string, React.ComponentType<{ className?: string; style?: React.CSSProperties }>> = {
   FileText,

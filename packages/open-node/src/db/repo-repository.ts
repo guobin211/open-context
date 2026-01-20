@@ -1,6 +1,6 @@
 import { getLevelDBInstance } from './leveldb';
 import { Repository, CreateRepositoryDto, UpdateRepositoryDto } from '../types';
-import { generateNanoId } from '../utils/id';
+import { generateUUID } from '../utils/id';
 
 export class RepoRepository {
   private db = getLevelDBInstance();
@@ -8,7 +8,7 @@ export class RepoRepository {
 
   async create(workspaceId: string, dto: CreateRepositoryDto): Promise<Repository> {
     const repo: Repository = {
-      id: `repo_${generateNanoId()}`,
+      id: `repo_${generateUUID()}`,
       workspaceId,
       name: dto.name,
       url: dto.gitUrl,

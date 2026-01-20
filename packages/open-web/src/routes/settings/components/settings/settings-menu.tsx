@@ -1,6 +1,6 @@
-import type { SettingsMenuItem } from '../../types/settings.types';
+import type { SettingsMenuItem } from '../../../../lib/app-settings';
 import { Settings as SettingsIcon } from 'lucide-react';
-import { cn } from '../../lib/utils';
+import { cn } from '../../../../lib/utils';
 
 interface SettingsMenuProps {
   items: SettingsMenuItem[];

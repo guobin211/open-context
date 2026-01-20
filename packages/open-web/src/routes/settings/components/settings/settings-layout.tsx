@@ -1,7 +1,7 @@
 import { X, Settings, Palette, Database, Cloud, BrainCircuit, Server, ToggleLeft, Key } from 'lucide-react';
-import { useSettingsStore } from '../../zustand/settings-store';
+import { useSettingsStore } from '../../../../storage/settings-store';
 import { GeneralSettings } from './general-settings';
-import { cn } from '../../lib/utils';
+import { cn } from '../../../../lib/utils';
 
 const SettingsLayout = () => {
   const { config } = useSettingsStore();

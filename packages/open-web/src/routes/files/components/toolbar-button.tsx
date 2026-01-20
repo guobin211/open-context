@@ -1,6 +1,6 @@
 import type { ReactNode } from 'react';
-import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '@/components/ui/tooltip';
-import { cn } from '@/lib/utils';
+import { Tooltip, TooltipContent, TooltipTrigger, TooltipProvider } from '../../../components/ui/tooltip';
+import { cn } from '../../../lib/utils';
 
 interface ToolbarButtonProps {
   icon: ReactNode;
