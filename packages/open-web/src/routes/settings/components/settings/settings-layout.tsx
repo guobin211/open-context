@@ -1,6 +1,13 @@
-import { X, Settings, Palette, Database, Cloud, BrainCircuit, Server, ToggleLeft, Key } from 'lucide-react';
+import { X, Settings, Palette, Database, Cloud, BrainCircuit, Server, Key } from 'lucide-react';
 import { useSettingsStore } from '../../../../storage/settings-store';
 import { GeneralSettings } from './general-settings';
+import { AppearanceSettings } from './appearance-settings';
+import { StorageSettings } from './storage-settings';
+import { ServerSettings } from './server-settings';
+import { CloudSettings } from './cloud-settings';
+import { AIProviderSettings } from './ai-provider-settings';
+import { ShortcutsSettings } from './shortcuts-settings';
+import { Sidebar } from '../../../../components/layout/sidebar';
 import { cn } from '../../../../lib/utils';
 
 const SettingsLayout = () => {
@@ -13,7 +20,6 @@ const SettingsLayout = () => {
     Cloud,
     BrainCircuit,
     Server,
-    ToggleLeft,
     Key
   };
 
@@ -36,7 +42,7 @@ const SettingsLayout = () => {
       description: '主题、配色方案'
     },
     {
-      id: 'data',
+      id: 'storage',
       label: '数据存储',
       icon: 'Database',
       description: '本地数据存储路径'
@@ -48,8 +54,8 @@ const SettingsLayout = () => {
       description: 'COS 云存储配置'
     },
     {
-      id: 'models',
-      label: '模型设置',
+      id: 'ai',
+      label: 'AI 提供商',
       icon: 'BrainCircuit',
       description: '本地和云端模型配置'
     },
@@ -60,47 +66,41 @@ const SettingsLayout = () => {
       description: 'Open-Node 服务配置'
     },
     {
-      id: 'services',
-      label: '服务开关',
-      icon: 'ToggleLeft',
-      description: 'MCP 和 HTTP 服务开关'
-    },
-    {
-      id: 'auth',
-      label: '鉴权设置',
+      id: 'shortcuts',
+      label: '快捷键',
       icon: 'Key',
-      description: 'API 密钥管理'
+      description: '键盘快捷键配置'
     }
   ];
 
-  const activeItem = settingsMenuItems.find((item) => item.id === config.activeCategory);
+  const activeItem = settingsMenuItems.find((item) => item.id === config._internal.activeCategory);
 
   return (
-    <div className="flex h-screen bg-white">
-      <div className="flex w-full">
-        <aside className="w-56 shrink-0 border-r border-gray-200 bg-gray-50">
-          <div className="flex h-16 items-center justify-center border-b border-gray-200">
-            <span className="font-semibold text-gray-700">设置</span>
-          </div>
-          <SettingsMenu settingsMenuItems={settingsMenuItems} iconMap={iconMap} />
-        </aside>
+    <div className="flex h-screen overflow-hidden">
+      <Sidebar />
 
-        <main className="flex-1 overflow-hidden">
-          <header className="flex h-16 items-center justify-between border-b border-gray-200 px-6">
-            <h1 className="text-xl font-semibold text-gray-900">{activeItem?.label}</h1>
-            <button
-              className="rounded-md p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700"
-              onClick={() => window.history.back()}
-            >
-              <X className="h-5 w-5" />
-            </button>
-          </header>
+      <aside className="w-56 shrink-0 border-r border-gray-200 bg-gray-50">
+        <div className="flex h-16 items-center justify-center border-b border-gray-200">
+          <span className="font-semibold text-gray-700">设置</span>
+        </div>
+        <SettingsMenu settingsMenuItems={settingsMenuItems} iconMap={iconMap} />
+      </aside>
 
-          <div className="h-[calc(100vh-4rem)] overflow-auto p-6">
-            <SettingsContent />
-          </div>
-        </main>
-      </div>
+      <main className="flex-1 overflow-hidden bg-white">
+        <header className="flex h-16 items-center justify-between border-b border-gray-200 px-6">
+          <h1 className="text-xl font-semibold text-gray-900">{activeItem?.label}</h1>
+          <button
+            className="rounded-md p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700"
+            onClick={() => window.history.back()}
+          >
+            <X className="h-5 w-5" />
+          </button>
+        </header>
+
+        <div className="h-[calc(100vh-4rem)] overflow-auto p-6">
+          <SettingsContent />
+        </div>
+      </main>
     </div>
   );
 };
@@ -117,12 +117,12 @@ const SettingsMenu = ({
   return (
     <nav className="flex flex-col gap-1 p-3">
       {settingsMenuItems.map((item) => {
-        const isActive = config.activeCategory === item.id;
+        const isActive = config._internal.activeCategory === item.id;
         const IconComponent = iconMap[item.icon];
         return (
           <button
             key={item.id}
-            onClick={() => setConfig({ activeCategory: item.id })}
+            onClick={() => setConfig({ _internal: { activeCategory: item.id as any } })}
             className={cn(
               'flex w-full items-center gap-3 rounded-md px-3 py-2.5 text-left text-sm transition-colors',
               isActive ? 'bg-blue-50 font-medium text-blue-600' : 'text-gray-700 hover:bg-gray-100'
@@ -137,35 +137,25 @@ const SettingsMenu = ({
   );
 };
 
-// 临时占位组件
-const PlaceholderSettings = ({ title }: { title: string }) => (
-  <div className="space-y-6">
-    <h2 className="mb-4 text-lg font-semibold">{title}</h2>
-    <p className="text-gray-500">此功能正在开发中...</p>
-  </div>
-);
-
 const SettingsContent = () => {
   const { config } = useSettingsStore();
 
   const renderContent = () => {
-    switch (config.activeCategory) {
+    switch (config._internal.activeCategory) {
       case 'general':
         return <GeneralSettings />;
       case 'appearance':
-        return <PlaceholderSettings title="外观设置" />;
-      case 'data':
-        return <PlaceholderSettings title="数据存储" />;
+        return <AppearanceSettings />;
+      case 'storage':
+        return <StorageSettings />;
       case 'cloud':
-        return <PlaceholderSettings title="云端存储" />;
-      case 'models':
-        return <PlaceholderSettings title="模型设置" />;
+        return <CloudSettings />;
+      case 'ai':
+        return <AIProviderSettings />;
       case 'server':
-        return <PlaceholderSettings title="服务器设置" />;
-      case 'services':
-        return <PlaceholderSettings title="服务开关" />;
-      case 'auth':
-        return <PlaceholderSettings title="鉴权设置" />;
+        return <ServerSettings />;
+      case 'shortcuts':
+        return <ShortcutsSettings />;
       default:
         return <GeneralSettings />;
     }
