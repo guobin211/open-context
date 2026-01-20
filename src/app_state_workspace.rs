@@ -3,33 +3,34 @@ use rusqlite::{Result as SqliteResult, params};
 
 use crate::app_state::{DatabaseManager, Workspace};
 
-/// Workspace management operations
 impl DatabaseManager {
-    /// Create a new workspace
     pub fn create_workspace(&self, workspace: &Workspace) -> SqliteResult<()> {
         let conn_arc = self.conn();
         let conn = conn_arc.lock().unwrap();
         conn.execute(
-            "INSERT INTO workspaces (id, name, description, created_at, updated_at, is_active)
-             VALUES (?1, ?2, ?3, ?4, ?5, ?6)",
+            "INSERT INTO workspaces (id, name, description, icon, color, sort_order, is_active, is_archived, created_at, updated_at)
+             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10)",
             params![
                 workspace.id,
                 workspace.name,
                 workspace.description,
+                workspace.icon,
+                workspace.color,
+                workspace.sort_order,
+                workspace.is_active as i32,
+                workspace.is_archived as i32,
                 workspace.created_at,
                 workspace.updated_at,
-                workspace.is_active as i32,
             ],
         )?;
         Ok(())
     }
 
-    /// Get workspace by ID
     pub fn get_workspace(&self, id: &str) -> SqliteResult<Option<Workspace>> {
         let conn_arc = self.conn();
         let conn = conn_arc.lock().unwrap();
         let mut stmt = conn.prepare(
-            "SELECT id, name, description, created_at, updated_at, is_active
+            "SELECT id, name, description, icon, color, sort_order, is_active, is_archived, created_at, updated_at
              FROM workspaces WHERE id = ?1",
         )?;
 
@@ -39,22 +40,25 @@ impl DatabaseManager {
                 id: row.get(0)?,
                 name: row.get(1)?,
                 description: row.get(2)?,
-                created_at: row.get(3)?,
-                updated_at: row.get(4)?,
-                is_active: row.get::<_, i32>(5)? != 0,
+                icon: row.get(3)?,
+                color: row.get(4)?,
+                sort_order: row.get(5)?,
+                is_active: row.get::<_, i32>(6)? != 0,
+                is_archived: row.get::<_, i32>(7)? != 0,
+                created_at: row.get(8)?,
+                updated_at: row.get(9)?,
             }))
         } else {
             Ok(None)
         }
     }
 
-    /// List all workspaces
     pub fn list_workspaces(&self) -> SqliteResult<Vec<Workspace>> {
         let conn_arc = self.conn();
         let conn = conn_arc.lock().unwrap();
         let mut stmt = conn.prepare(
-            "SELECT id, name, description, created_at, updated_at, is_active
-             FROM workspaces ORDER BY updated_at DESC",
+            "SELECT id, name, description, icon, color, sort_order, is_active, is_archived, created_at, updated_at
+             FROM workspaces WHERE is_archived = 0 ORDER BY sort_order ASC, updated_at DESC",
         )?;
 
         let rows = stmt.query_map([], |row| {
@@ -62,9 +66,13 @@ impl DatabaseManager {
                 id: row.get(0)?,
                 name: row.get(1)?,
                 description: row.get(2)?,
-                created_at: row.get(3)?,
-                updated_at: row.get(4)?,
-                is_active: row.get::<_, i32>(5)? != 0,
+                icon: row.get(3)?,
+                color: row.get(4)?,
+                sort_order: row.get(5)?,
+                is_active: row.get::<_, i32>(6)? != 0,
+                is_archived: row.get::<_, i32>(7)? != 0,
+                created_at: row.get(8)?,
+                updated_at: row.get(9)?,
             })
         })?;
 
@@ -75,7 +83,6 @@ impl DatabaseManager {
         Ok(workspaces)
     }
 
-    /// Update workspace
     pub fn update_workspace(&self, workspace: &Workspace) -> SqliteResult<()> {
         let conn_arc = self.conn();
         let conn = conn_arc.lock().unwrap();
@@ -83,20 +90,23 @@ impl DatabaseManager {
 
         conn.execute(
             "UPDATE workspaces
-             SET name = ?1, description = ?2, updated_at = ?3, is_active = ?4
-             WHERE id = ?5",
+             SET name = ?1, description = ?2, icon = ?3, color = ?4, sort_order = ?5, is_active = ?6, is_archived = ?7, updated_at = ?8
+             WHERE id = ?9",
             params![
                 workspace.name,
                 workspace.description,
-                updated_at,
+                workspace.icon,
+                workspace.color,
+                workspace.sort_order,
                 workspace.is_active as i32,
+                workspace.is_archived as i32,
+                updated_at,
                 workspace.id,
             ],
         )?;
         Ok(())
     }
 
-    /// Delete workspace
     pub fn delete_workspace(&self, id: &str) -> SqliteResult<()> {
         let conn_arc = self.conn();
         let conn = conn_arc.lock().unwrap();
@@ -104,12 +114,11 @@ impl DatabaseManager {
         Ok(())
     }
 
-    /// Get active workspace
     pub fn get_active_workspace(&self) -> SqliteResult<Option<Workspace>> {
         let conn_arc = self.conn();
         let conn = conn_arc.lock().unwrap();
         let mut stmt = conn.prepare(
-            "SELECT id, name, description, created_at, updated_at, is_active
+            "SELECT id, name, description, icon, color, sort_order, is_active, is_archived, created_at, updated_at
              FROM workspaces WHERE is_active = 1 LIMIT 1",
         )?;
 
@@ -119,66 +128,68 @@ impl DatabaseManager {
                 id: row.get(0)?,
                 name: row.get(1)?,
                 description: row.get(2)?,
-                created_at: row.get(3)?,
-                updated_at: row.get(4)?,
+                icon: row.get(3)?,
+                color: row.get(4)?,
+                sort_order: row.get(5)?,
                 is_active: true,
+                is_archived: row.get::<_, i32>(7)? != 0,
+                created_at: row.get(8)?,
+                updated_at: row.get(9)?,
             }))
         } else {
             Ok(None)
         }
     }
 
-    /// Set active workspace (deactivates all others)
     pub fn set_active_workspace(&self, id: &str) -> SqliteResult<()> {
         let conn_arc = self.conn();
         let conn = conn_arc.lock().unwrap();
-
-        // Deactivate all workspaces
         conn.execute("UPDATE workspaces SET is_active = 0", [])?;
-
-        // Activate the specified workspace
-        conn.execute(
-            "UPDATE workspaces SET is_active = 1 WHERE id = ?1",
-            params![id],
-        )?;
-
+        conn.execute("UPDATE workspaces SET is_active = 1 WHERE id = ?1", params![id])?;
         Ok(())
     }
 
-    /// Count resources in a workspace
-    pub fn count_workspace_resources(
-        &self,
-        workspace_id: &str,
-    ) -> SqliteResult<WorkspaceResourceCount> {
+    pub fn archive_workspace(&self, id: &str, archived: bool) -> SqliteResult<()> {
+        let conn_arc = self.conn();
+        let conn = conn_arc.lock().unwrap();
+        let updated_at = Utc::now().timestamp_millis();
+        conn.execute(
+            "UPDATE workspaces SET is_archived = ?1, updated_at = ?2 WHERE id = ?3",
+            params![archived as i32, updated_at, id],
+        )?;
+        Ok(())
+    }
+
+    pub fn count_workspace_resources(&self, workspace_id: &str) -> SqliteResult<WorkspaceResourceCount> {
         let conn_arc = self.conn();
         let conn = conn_arc.lock().unwrap();
 
         let notes_count: i32 = conn.query_row(
-            "SELECT COUNT(*) FROM notes WHERE workspace_id = ?1",
+            "SELECT COUNT(*) FROM notes WHERE workspace_id = ?1 AND is_archived = 0",
             params![workspace_id],
             |row| row.get(0),
         )?;
 
         let files_count: i32 = conn.query_row(
-            "SELECT COUNT(*) FROM imported_files WHERE workspace_id = ?1",
+            "SELECT COUNT(*) FROM imported_files WHERE workspace_id = ?1 AND is_archived = 0",
             params![workspace_id],
             |row| row.get(0),
         )?;
 
         let dirs_count: i32 = conn.query_row(
-            "SELECT COUNT(*) FROM imported_directories WHERE workspace_id = ?1",
+            "SELECT COUNT(*) FROM imported_directories WHERE workspace_id = ?1 AND is_archived = 0",
             params![workspace_id],
             |row| row.get(0),
         )?;
 
         let repos_count: i32 = conn.query_row(
-            "SELECT COUNT(*) FROM git_repositories WHERE workspace_id = ?1",
+            "SELECT COUNT(*) FROM git_repositories WHERE workspace_id = ?1 AND is_archived = 0",
             params![workspace_id],
             |row| row.get(0),
         )?;
 
         let links_count: i32 = conn.query_row(
-            "SELECT COUNT(*) FROM web_links WHERE workspace_id = ?1",
+            "SELECT COUNT(*) FROM web_links WHERE workspace_id = ?1 AND is_archived = 0",
             params![workspace_id],
             |row| row.get(0),
         )?;
@@ -193,7 +204,6 @@ impl DatabaseManager {
     }
 }
 
-/// Workspace resource count
 #[derive(Debug, Clone)]
 pub struct WorkspaceResourceCount {
     pub notes: i32,
@@ -210,18 +220,14 @@ mod tests {
     use std::env;
 
     fn setup_test_db() -> DatabaseManager {
-        let test_db_path =
-            env::temp_dir().join(format!("test_workspace_{}.db", uuid::Uuid::new_v4()));
+        let test_db_path = env::temp_dir().join(format!("test_workspace_{}.db", uuid::Uuid::new_v4()));
         DatabaseManager::new(test_db_path).unwrap()
     }
 
     #[test]
     fn test_create_and_get_workspace() {
         let db = setup_test_db();
-        let workspace = Workspace::new(
-            "Test Workspace".to_string(),
-            Some("Test description".to_string()),
-        );
+        let workspace = Workspace::new("Test Workspace".to_string(), Some("Test description".to_string()));
 
         db.create_workspace(&workspace).unwrap();
         let retrieved = db.get_workspace(&workspace.id).unwrap();

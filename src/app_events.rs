@@ -167,6 +167,55 @@ pub enum AppEvent {
     NetworkStatusChanged { online: bool, timestamp: i64 },
 
     // ============================================
+    // 任务事件
+    // ============================================
+    /// 任务创建
+    TaskCreated {
+        task_id: String,
+        task_type: String,
+        timestamp: i64,
+    },
+
+    /// 任务开始执行
+    TaskStarted {
+        task_id: String,
+        task_type: String,
+        timestamp: i64,
+    },
+
+    /// 任务进度更新
+    TaskProgress {
+        task_id: String,
+        task_type: String,
+        progress: u8,
+        message: Option<String>,
+        timestamp: i64,
+    },
+
+    /// 任务完成
+    TaskCompleted {
+        task_id: String,
+        task_type: String,
+        result: Option<serde_json::Value>,
+        timestamp: i64,
+    },
+
+    /// 任务失败
+    TaskFailed {
+        task_id: String,
+        task_type: String,
+        error: String,
+        timestamp: i64,
+    },
+
+    /// 任务取消
+    TaskCancelled {
+        task_id: String,
+        task_type: String,
+        timestamp: i64,
+    },
+
+    // ============================================
     // 自定义事件
     // ============================================
     /// 自定义事件（用于扩展）
@@ -275,6 +324,12 @@ impl AppEvent {
             | Self::UpdateAvailable { timestamp, .. }
             | Self::UpdateDownloaded { timestamp, .. }
             | Self::NetworkStatusChanged { timestamp, .. }
+            | Self::TaskCreated { timestamp, .. }
+            | Self::TaskStarted { timestamp, .. }
+            | Self::TaskProgress { timestamp, .. }
+            | Self::TaskCompleted { timestamp, .. }
+            | Self::TaskFailed { timestamp, .. }
+            | Self::TaskCancelled { timestamp, .. }
             | Self::Custom { timestamp, .. } => *timestamp,
         }
     }
@@ -309,6 +364,12 @@ impl AppEvent {
             Self::UpdateAvailable { .. } => "update:available".to_string(),
             Self::UpdateDownloaded { .. } => "update:downloaded".to_string(),
             Self::NetworkStatusChanged { .. } => "network:status_changed".to_string(),
+            Self::TaskCreated { .. } => "task:created".to_string(),
+            Self::TaskStarted { .. } => "task:started".to_string(),
+            Self::TaskProgress { .. } => "task:progress".to_string(),
+            Self::TaskCompleted { .. } => "task:completed".to_string(),
+            Self::TaskFailed { .. } => "task:failed".to_string(),
+            Self::TaskCancelled { .. } => "task:cancelled".to_string(),
             Self::Custom { name, .. } => name.clone(),
         }
     }

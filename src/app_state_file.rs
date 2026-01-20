@@ -43,12 +43,15 @@ impl DatabaseManager {
             Ok(Some(ImportedFile {
                 id: row.get(0)?,
                 workspace_id: row.get(1)?,
+                parent_directory_id: None,
                 name: row.get(2)?,
                 original_path: std::path::PathBuf::from(row.get::<_, String>(3)?),
                 stored_path: std::path::PathBuf::from(row.get::<_, String>(4)?),
                 file_type: row.get(5)?,
                 size_bytes: row.get(6)?,
                 mime_type: row.get(7)?,
+                checksum: None,
+                is_archived: false,
                 created_at: row.get(8)?,
                 updated_at: row.get(9)?,
             }))
@@ -70,12 +73,15 @@ impl DatabaseManager {
             Ok(ImportedFile {
                 id: row.get(0)?,
                 workspace_id: row.get(1)?,
+                parent_directory_id: None,
                 name: row.get(2)?,
                 original_path: std::path::PathBuf::from(row.get::<_, String>(3)?),
                 stored_path: std::path::PathBuf::from(row.get::<_, String>(4)?),
                 file_type: row.get(5)?,
                 size_bytes: row.get(6)?,
                 mime_type: row.get(7)?,
+                checksum: None,
+                is_archived: false,
                 created_at: row.get(8)?,
                 updated_at: row.get(9)?,
             })
@@ -157,11 +163,13 @@ impl DatabaseManager {
             Ok(Some(ImportedDirectory {
                 id: row.get(0)?,
                 workspace_id: row.get(1)?,
+                parent_id: None,
                 name: row.get(2)?,
                 original_path: std::path::PathBuf::from(row.get::<_, String>(3)?),
                 stored_path: std::path::PathBuf::from(row.get::<_, String>(4)?),
                 file_count: row.get(5)?,
                 total_size_bytes: row.get(6)?,
+                is_archived: false,
                 created_at: row.get(7)?,
                 updated_at: row.get(8)?,
             }))
@@ -186,11 +194,13 @@ impl DatabaseManager {
             Ok(ImportedDirectory {
                 id: row.get(0)?,
                 workspace_id: row.get(1)?,
+                parent_id: None,
                 name: row.get(2)?,
                 original_path: std::path::PathBuf::from(row.get::<_, String>(3)?),
                 stored_path: std::path::PathBuf::from(row.get::<_, String>(4)?),
                 file_count: row.get(5)?,
                 total_size_bytes: row.get(6)?,
+                is_archived: false,
                 created_at: row.get(7)?,
                 updated_at: row.get(8)?,
             })

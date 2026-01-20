@@ -33,7 +33,6 @@ interface WorkspaceState {
 
 const generateId = () => uuidv4();
 
-
 // Mock 空间数据
 export const mockSpaces: Space[] = [
   {
@@ -92,7 +91,6 @@ export const mockSpaces: Space[] = [
     files: []
   }
 ];
-
 
 export const useWorkspaceStore = create<WorkspaceState>((set) => ({
   spaces: mockSpaces,

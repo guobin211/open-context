@@ -9,6 +9,7 @@ mod app_state_file;
 mod app_state_note;
 mod app_state_repo_link;
 mod app_state_workspace;
+pub mod app_task;
 
 // ==================== Tauri Command Exports ====================
 use app_commands::{
@@ -24,6 +25,8 @@ use app_commands::{
     get_all_files,
     // Note commands
     get_all_notes,
+    get_favorited_notes,
+    get_notes_by_type,
     // Repository commands
     get_all_repositories,
     // Workspace commands
@@ -34,20 +37,33 @@ use app_commands::{
     get_workspace,
     // System command
     ping,
+    search_notes,
+    set_note_favorite,
+    toggle_note_favorite,
     update_file,
     update_note,
     update_repository,
     update_workspace,
+    // Task commands
+    cancel_task,
+    cleanup_tasks,
+    clone_repository_task,
+    get_task,
+    import_files_task,
+    index_repository_task,
+    list_tasks,
 };
 
 // ==================== Event Exports ====================
 
 // ==================== State Management Exports ====================
 use app_state::AppState;
+use app_task::TaskManager;
 
 /// Run the application
 pub fn run() {
     let app_state = AppState::new().expect("Failed to initialize app state");
+    let task_manager = TaskManager::new();
 
     tauri::Builder::default()
         .plugin(tauri_plugin_fs::init())
@@ -64,6 +80,7 @@ pub fn run() {
         .plugin(tauri_plugin_autostart::Builder::new().build())
         .plugin(tauri_plugin_opener::init())
         .manage(app_state)
+        .manage(task_manager)
         .invoke_handler(tauri::generate_handler![
             // Workspace commands
             get_all_workspaces,
@@ -77,6 +94,11 @@ pub fn run() {
             create_note,
             update_note,
             delete_note,
+            search_notes,
+            get_notes_by_type,
+            toggle_note_favorite,
+            set_note_favorite,
+            get_favorited_notes,
             // File commands
             get_all_files,
             get_file,
@@ -89,6 +111,14 @@ pub fn run() {
             create_repository,
             update_repository,
             delete_repository,
+            // Task commands
+            get_task,
+            list_tasks,
+            cancel_task,
+            cleanup_tasks,
+            clone_repository_task,
+            index_repository_task,
+            import_files_task,
             // System command
             ping,
         ])

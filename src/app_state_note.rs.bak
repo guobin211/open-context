@@ -104,6 +104,9 @@ impl DatabaseManager {
                 created_at: row.get(8)?,
                 updated_at: row.get(9)?,
             })
+                created_at: row.get(8)?,
+                updated_at: row.get(9)?,
+            })
         })?;
 
         let mut notes = Vec::new();
@@ -148,6 +151,9 @@ impl DatabaseManager {
                 is_pinned: false,
                 is_archived: false,
                 last_viewed_at: None,
+                created_at: row.get(8)?,
+                updated_at: row.get(9)?,
+            })
                 created_at: row.get(8)?,
                 updated_at: row.get(9)?,
             })
@@ -228,6 +234,9 @@ impl DatabaseManager {
                 is_pinned: false,
                 is_archived: false,
                 last_viewed_at: None,
+                created_at: row.get(8)?,
+                updated_at: row.get(9)?,
+            })
                 created_at: row.get(8)?,
                 updated_at: row.get(9)?,
             })
@@ -322,6 +331,9 @@ impl DatabaseManager {
                 is_pinned: false,
                 is_archived: false,
                 last_viewed_at: None,
+                created_at: row.get(8)?,
+                updated_at: row.get(9)?,
+            })
                 created_at: row.get(8)?,
                 updated_at: row.get(9)?,
             })

@@ -201,8 +201,10 @@ pnpm --filter open-node test:ui
 
 **React 组件模式:**
 
-- **必须使用箭头函数**: `export const Button = ({ className, ...props }: ButtonProps) =>`
-- **禁止使用 function 声明**: 不要写 `function Button() { ... }`
+- **组件声明**: 允许使用两种形式
+  - 箭头函数: `export const Button = ({ className, ...props }: ButtonProps) =>`
+  - function 声明: `export function Button() { ... }`
+  - shadcn/ui 组件使用 function 声明，业务组件推荐使用箭头函数
 - Props 接口命名为 `{组件名}Props` (`ButtonProps`)
 - 使用 `cn()` 工具合并 Tailwind 类 (来自 `@/lib/utils`)
 - 使用 `...props` 解构以保持向前兼容
@@ -211,18 +213,28 @@ pnpm --filter open-node test:ui
 - 使用 `forwardRef` 的组件: `export const Button = forwardRef<HTMLButtonElement, ButtonProps>(...)`
 - 使用 `memo` 的组件: `export const Icon = memo(({ ... }: Props) => ...)`
 
+**路由模式:**
+
+- 使用 TanStack Router 文件系统路由 (位于 `src/routes/`)
+- 路由导出: `export const Route = createFileRoute('/')({ component: RouteComponent })`
+- 根路由: `__root.tsx`，使用 `createRootRoute` 和 `Outlet`
+- 类型安全导航和参数访问
+
 **状态管理:**
 
-- **Zustand**: 客户端全局状态 (如 `documentStore`, `userStore`, `sidebarStore`)
-- **React Query**: 服务端状态和缓存
+- **Zustand**: 客户端全局状态 (位于 `src/storage/`，如 `workspace-store.ts`, `document-store.ts`, `sidebar-store.ts`)
+- **React Query**: 服务端状态和缓存 (通过 `QueryProvider` 提供)
 - **Local state**: 组件特定状态
+
+**国际化:**
+
+- 使用 i18next 和 react-i18next
+- 语言文件位于 `src/i18n/locales/` (zh-CN, en, ja, ko, zh-TW)
+- 支持自动语言检测和手动切换
 
 **测试模式:**
 
-- 使用 `vi.mock()` 模拟依赖
-- 使用 `beforeEach()` 清理测试状态
-- 测试文件镜像 `src/` 结构到 `tests/`
-- 使用 Vitest 的 `describe`, `it`, `expect`, `beforeEach` API
+- open 当前无测试配置 (测试仅在 open-node 中)
 
 ### Rust (src/)
 
@@ -283,7 +295,7 @@ export class WorkspaceService {
 - 文件系统路由在 `src/routes/`
 - `__root.tsx` 是带 Providers 的根布局
 - 使用 `createFileRoute` 或 `createRootRoute`
-- 类型安全导航
+- 类型安全导航和参数访问
 
 **组件结构:**
 
@@ -291,13 +303,16 @@ export class WorkspaceService {
 src/
 ├── components/
 │   ├── ui/              # shadcn/ui 组件 (通过 index.tsx 桶导出)
-│   └── tiptap-*/        # 富文本编辑器层级
+│   ├── tiptap-*/        # 富文本编辑器层级 (extension, icons, node, ui, ui-primitive, templates)
+│   ├── layout/          # 布局组件
+│   └── sidebar/         # 侧边栏组件
 ├── routes/              # 文件系统路由
-├── context/             # Context Providers
-├── zustand/             # Zustand stores
+├── context/             # Context Providers (global-context, query-provider)
+├── storage/             # Zustand stores (workspace-store, document-store, sidebar-store 等)
 ├── hooks/               # 自定义 hooks (use- 前缀)
+├── services/            # 服务层 (http-services, tauri-services)
 ├── lib/                 # 工具 (cn(), utils.ts)
-└── i18n/                # 国际化
+└── i18n/                # 国际化 (locales/ 目录包含 zh-CN, en, ja, ko, zh-TW)
 ```
 
 **样式:**

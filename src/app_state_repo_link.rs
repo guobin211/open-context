@@ -1,7 +1,7 @@
 use chrono::Utc;
 use rusqlite::{Result as SqliteResult, params};
 
-use crate::app_state::{DatabaseManager, GitRepository, WebLink};
+use crate::app_state::{DatabaseManager, GitRepository, WebLink, CloneStatus, IndexStatus};
 
 /// Git repository management operations
 impl DatabaseManager {
@@ -47,8 +47,15 @@ impl DatabaseManager {
                 remote_url: row.get(3)?,
                 local_path: std::path::PathBuf::from(row.get::<_, String>(4)?),
                 branch: row.get(5)?,
+                default_branch: None,
                 last_commit_hash: row.get(6)?,
                 last_synced_at: row.get(7)?,
+                clone_status: CloneStatus::Pending,
+                clone_progress: 0,
+                index_status: IndexStatus::NotIndexed,
+                indexed_at: None,
+                file_count: 0,
+                is_archived: false,
                 created_at: row.get(8)?,
                 updated_at: row.get(9)?,
             }))
@@ -74,8 +81,15 @@ impl DatabaseManager {
                 remote_url: row.get(3)?,
                 local_path: std::path::PathBuf::from(row.get::<_, String>(4)?),
                 branch: row.get(5)?,
+                default_branch: None,
                 last_commit_hash: row.get(6)?,
                 last_synced_at: row.get(7)?,
+                clone_status: CloneStatus::Pending,
+                clone_progress: 0,
+                index_status: IndexStatus::NotIndexed,
+                indexed_at: None,
+                file_count: 0,
+                is_archived: false,
                 created_at: row.get(8)?,
                 updated_at: row.get(9)?,
             })
@@ -175,7 +189,12 @@ impl DatabaseManager {
                 url: row.get(3)?,
                 description: row.get(4)?,
                 favicon_url: row.get(5)?,
+                thumbnail_url: None,
                 tags,
+                is_favorited: false,
+                is_archived: false,
+                visit_count: 0,
+                last_visited_at: None,
                 created_at: row.get(7)?,
                 updated_at: row.get(8)?,
             }))
@@ -204,7 +223,12 @@ impl DatabaseManager {
                 url: row.get(3)?,
                 description: row.get(4)?,
                 favicon_url: row.get(5)?,
+                thumbnail_url: None,
                 tags,
+                is_favorited: false,
+                is_archived: false,
+                visit_count: 0,
+                last_visited_at: None,
                 created_at: row.get(7)?,
                 updated_at: row.get(8)?,
             })
@@ -273,7 +297,12 @@ impl DatabaseManager {
                 url: row.get(3)?,
                 description: row.get(4)?,
                 favicon_url: row.get(5)?,
+                thumbnail_url: None,
                 tags,
+                is_favorited: false,
+                is_archived: false,
+                visit_count: 0,
+                last_visited_at: None,
                 created_at: row.get(7)?,
                 updated_at: row.get(8)?,
             })
