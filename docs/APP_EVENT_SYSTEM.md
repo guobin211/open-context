@@ -154,7 +154,7 @@ import {
   useServiceStatus,
   useNotifications,
   useUpdateCheck,
-  useNetworkStatus,
+  useNetworkStatus
 } from '@/hooks/use-app-events';
 
 function Dashboard() {
@@ -252,13 +252,10 @@ import { APP_EVENT_NAMES } from '@/types/app-events.types';
 import type { ThemeChangedPayload } from '@/types/app-events.types';
 
 function ThemeToggle() {
-  useAppEvent<ThemeChangedPayload>(
-    APP_EVENT_NAMES.THEME_CHANGED,
-    (payload) => {
-      // payload 自动推断为 ThemeChangedPayload
-      console.log('New theme:', payload.theme);
-    }
-  );
+  useAppEvent<ThemeChangedPayload>(APP_EVENT_NAMES.THEME_CHANGED, (payload) => {
+    // payload 自动推断为 ThemeChangedPayload
+    console.log('New theme:', payload.theme);
+  });
 
   return <button>Toggle Theme</button>;
 }

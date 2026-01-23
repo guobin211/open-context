@@ -227,10 +227,7 @@ let nodes = read_dir_on_demand(dir_path).await?;
 ```tsx
 import { FileTree } from '@/components/file-tree';
 
-<FileTree
-  rootPath="/path/to/folder"
-  onSelect={(path) => console.log(path)}
-/>
+<FileTree rootPath="/path/to/folder" onSelect={(path) => console.log(path)} />;
 ```
 
 - 递归渲染，按需加载子节点

@@ -42,23 +42,23 @@
 
 ## 子目录规范
 
-| 子目录       | 用途          | 路径示例                     | 文件类型                     |
-| ------------ | ------------- | ---------------------------- |--------------------------|
-| `cache/`     | 临时缓存数据  | `~/.open-context/cache/`     | `.cache`, `.store.json`  |
-| `config/`    | 应用配置      | `~/.open-context/config/`    | `config.json`            |
+| 子目录       | 用途          | 路径示例                     | 文件类型                   |
+| ------------ | ------------- | ---------------------------- | -------------------------- |
+| `cache/`     | 临时缓存数据  | `~/.open-context/cache/`     | `.cache`, `.store.json`    |
+| `config/`    | 应用配置      | `~/.open-context/config/`    | `config.json`              |
 | `database/`  | 数据库文件    | `~/.open-context/database/`  | `.db`, LevelDB/Qdrant 数据 |
-| `notebook/`  | 笔记数据      | `~/.open-context/notebook/`  | `.json`, `.md`           |
-| `session/`   | 会话数据      | `~/.open-context/session/`   | `.json`                  |
-| `workspace/` | 工作空间数据  | `~/.open-context/workspace/` | `.json`                  |
-| `files/`     | 文件索引数据  | `~/.open-context/files/`     | `.json`, `.db`           |
-| `logs/`      | 应用日志      | `~/.open-context/logs/`      | `.log`                   |
-| `plugins/`   | 插件配置      | `~/.open-context/plugins/`   | `.json`, `.md`           |
-| `commands/`  | 命令历史/配置 | `~/.open-context/commands/`  | `.json`                  |
-| `skills/`    | Skills 数据   | `~/.open-context/skills/`    | `.json`, `.md`           |
-| `todos/`     | Todo 数据     | `~/.open-context/todos/`     | `.json`                  |
-| `projects/`  | 项目数据      | `~/.open-context/projects/`  | `.json`                  |
-| `rules/`     | 规则数据      | `~/.open-context/rules/`     | `.json`, `.md`           |
-| `hooks/`     | Hooks 配置    | `~/.open-context/hooks/`     | `.json`                  |
+| `notebook/`  | 笔记数据      | `~/.open-context/notebook/`  | `.json`, `.md`             |
+| `session/`   | 会话数据      | `~/.open-context/session/`   | `.json`                    |
+| `workspace/` | 工作空间数据  | `~/.open-context/workspace/` | `.json`                    |
+| `files/`     | 文件索引数据  | `~/.open-context/files/`     | `.json`, `.db`             |
+| `logs/`      | 应用日志      | `~/.open-context/logs/`      | `.log`                     |
+| `plugins/`   | 插件配置      | `~/.open-context/plugins/`   | `.json`, `.md`             |
+| `commands/`  | 命令历史/配置 | `~/.open-context/commands/`  | `.json`                    |
+| `skills/`    | Skills 数据   | `~/.open-context/skills/`    | `.json`, `.md`             |
+| `todos/`     | Todo 数据     | `~/.open-context/todos/`     | `.json`                    |
+| `projects/`  | 项目数据      | `~/.open-context/projects/`  | `.json`                    |
+| `rules/`     | 规则数据      | `~/.open-context/rules/`     | `.json`, `.md`             |
+| `hooks/`     | Hooks 配置    | `~/.open-context/hooks/`     | `.json`                    |
 
 ## 应用配置（config.json）
 
@@ -79,22 +79,19 @@
     "url": "http://localhost:6333",
     "embedding_dim": 1024
   },
-  "log_level": "info",
-  "workspaces_dir": "/Users/username/.open-context/workspace"
+  "log_level": "info"
 }
 ```
 
 ### 配置项说明
 
-| 配置项                     | 类型     | 默认值                              | 说明                       |
-| -------------------------- | -------- | ----------------------------------- | -------------------------- |
-| `version`                  | String   | 自动从 `Cargo.toml` 读取            | 应用版本号                 |
-| `node_server.port`         | u16      | `4500`                              | Node.js 后端服务器监听端口 |
-| `node_server.auto_start`   | bool     | `true`                              | 是否自动启动 Node.js 服务  |
-| `qdrant.url`               | String   | `"http://localhost:6333"`           | Qdrant 向量数据库连接地址  |
-| `qdrant.embedding_dim`     | usize    | `1024`                              | 向量嵌入维度               |
-| `log_level`                | String   | `"info"`                            | 日志级别                   |
-| `workspaces_dir`           | PathBuf  | `~/.open-context/workspace`         | 工作空间数据存储目录       |
+| 配置项                   | 类型   | 默认值                    | 说明                       |
+| ------------------------ | ------ | ------------------------- | -------------------------- |
+| `version`                | String | 自动从 `Cargo.toml` 读取  | 应用版本号                 |
+| `node_server.port`       | u16    | `4500`                    | Node.js 后端服务器监听端口 |
+| `node_server.auto_start` | bool   | `true`                    | 是否自动启动 Node.js 服务  |
+| `qdrant.url`             | String | `"http://localhost:6333"` | Qdrant 向量数据库连接地址  |
+| `log_level`              | String | `"info"`                  | 日志级别                   |
 
 **log_level 可选值**：`"trace"`, `"debug"`, `"info"`, `"warn"`, `"error"`
 
@@ -107,130 +104,6 @@
 3. **修改配置目录**：更改配置文件存储位置
 4. **线程安全**：使用 `ConfigManager` 提供并发安全的配置访问
 5. **初始化目录**：自动创建应用所需的目录结构
-
-## Rust 使用示例
-
-### 1. 基本用法：加载和保存配置
-
-```rust
-use open_context_lib::app_config::AppConfig;
-
-fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let mut config = AppConfig::load()?;
-
-    println!("Node server port: {}", config.node_server.port);
-    println!("Qdrant URL: {}", config.qdrant.url);
-
-    config.node_server.port = 5000;
-    config.save()?;
-
-    Ok(())
-}
-```
-
-### 2. 使用便捷方法修改配置
-
-```rust
-use open_context_lib::app_config::AppConfig;
-
-fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let mut config = AppConfig::load()?;
-
-    config.set_node_server_port(5000)?;
-    config.set_node_server_auto_start(false)?;
-    config.set_qdrant_url("http://192.168.1.100:6333".to_string())?;
-    config.set_qdrant_embedding_dim(768)?;
-    config.set_log_level("debug".to_string())?;
-    config.set_workspaces_dir("/custom/path/workspaces".into())?;
-
-    Ok(())
-}
-```
-
-### 3. 使用 ConfigManager（推荐用于多线程环境）
-
-```rust
-use open_context_lib::app_config::ConfigManager;
-use std::sync::Arc;
-
-fn main() -> Result<(), Box<dyn std::error::Error>> {
-    let manager = Arc::new(ConfigManager::new()?);
-
-    let config = manager.get();
-    println!("Current port: {}", config.node_server.port);
-
-    manager.update(|cfg| {
-        cfg.node_server.port = 6000;
-        cfg.log_level = "debug".to_string();
-        Ok(())
-    })?;
-
-    let manager_clone = Arc::clone(&manager);
-    std::thread::spawn(move || {
-        let config = manager_clone.get();
-        println!("Port in thread: {}", config.node_server.port);
-    });
-
-    manager.reload()?;
-
-    Ok(())
-}
-```
-
-### 4. 在 Tauri 应用中使用
-
-```rust
-use open_context_lib::app_config::ConfigManager;
-use tauri::Manager;
-use std::sync::Arc;
-
-pub struct AppConfigState(pub Arc<ConfigManager>);
-
-#[tauri::command]
-fn get_config(state: tauri::State<AppConfigState>) -> Result<String, String> {
-    let config = state.0.get();
-    serde_json::to_string_pretty(&config).map_err(|e| e.to_string())
-}
-
-#[tauri::command]
-fn update_node_port(state: tauri::State<AppConfigState>, port: u16) -> Result<(), String> {
-    state.0.update(|cfg| {
-        cfg.node_server.port = port;
-        Ok(())
-    }).map_err(|e| e.to_string())
-}
-
-#[cfg_attr(mobile, tauri::mobile_entry_point)]
-pub fn run() {
-    tauri::Builder::default()
-        .setup(|app| {
-            open_context_lib::app_config::init_app_dirs()
-                .map_err(|e| format!("Failed to init app dirs: {}", e))?;
-
-            let config_manager = ConfigManager::new()
-                .map_err(|e| format!("Failed to load config: {}", e))?;
-
-            app.manage(AppConfigState(Arc::new(config_manager)));
-
-            Ok(())
-        })
-        .invoke_handler(tauri::generate_handler![get_config, update_node_port])
-        .run(tauri::generate_context!())
-        .expect("error while running tauri application");
-}
-```
-
-### 5. 初始化应用目录结构
-
-```rust
-use open_context_lib::app_config::init_app_dirs;
-
-fn main() -> Result<(), Box<dyn std::error::Error>> {
-    init_app_dirs()?;
-    println!("Application directories initialized successfully!");
-    Ok(())
-}
-```
 
 ## 路径拼接规范
 
@@ -321,15 +194,15 @@ async function main() {
 
 ### Tauri Store 文件
 
-| 模块                | Store 文件                 | 路径                                             | 状态      |
-| ------------------- | -------------------------- | ------------------------------------------------ | --------- |
-| Chat Store          | `chat-store.store.json`    | `~/.open-context/cache/chat-store.store.json`    | ✅ 已配置 |
-| Right Sidebar Store | `right-sidebar.store.json` | `~/.open-context/cache/right-sidebar.store.json` | ✅ 已配置 |
-| Notebook Store      | `notebook-store.store.json`| `~/.open-context/cache/notebook-store.store.json`| ⏳ 待迁移 |
-| Files Store         | `files-store.store.json`   | `~/.open-context/cache/files-store.store.json`   | ⏳ 待迁移 |
-| Workspace Store     | `workspace-store.store.json`| `~/.open-context/cache/workspace-store.store.json`| ⏳ 待迁移 |
-| Tabs Store          | `tabs-store.store.json`    | `~/.open-context/cache/tabs-store.store.json`    | ⏳ 待迁移 |
-| Sidebar Store       | `sidebar-store.store.json` | `~/.open-context/cache/sidebar-store.store.json` | ⏳ 待迁移 |
+| 模块                | Store 文件                   | 路径                                               | 状态      |
+| ------------------- | ---------------------------- | -------------------------------------------------- | --------- |
+| Chat Store          | `chat-store.store.json`      | `~/.open-context/cache/chat-store.store.json`      | ✅ 已配置 |
+| Right Sidebar Store | `right-sidebar.store.json`   | `~/.open-context/cache/right-sidebar.store.json`   | ✅ 已配置 |
+| Notebook Store      | `notebook-store.store.json`  | `~/.open-context/cache/notebook-store.store.json`  | ⏳ 待迁移 |
+| Files Store         | `files-store.store.json`     | `~/.open-context/cache/files-store.store.json`     | ⏳ 待迁移 |
+| Workspace Store     | `workspace-store.store.json` | `~/.open-context/cache/workspace-store.store.json` | ⏳ 待迁移 |
+| Tabs Store          | `tabs-store.store.json`      | `~/.open-context/cache/tabs-store.store.json`      | ⏳ 待迁移 |
+| Sidebar Store       | `sidebar-store.store.json`   | `~/.open-context/cache/sidebar-store.store.json`   | ⏳ 待迁移 |
 
 ### 文件命名规范
 
@@ -516,8 +389,8 @@ cargo test --lib app_config
 
 ## 版本历史
 
-| 版本  | 日期       | 变更说明                                                     |
-| ----- | ---------- | ------------------------------------------------------------ |
-| 2.0.0 | 2026-01-22 | 合并配置管理和存储规范，统一存储路径到 `~/.open-context/`   |
-| 1.1.0 | 2026-01-22 | 移除 tauri 目录，Tauri Store 文件迁移到 cache 目录           |
-| 1.0.0 | 2026-01-22 | 初始版本                                                     |
+| 版本  | 日期       | 变更说明                                                  |
+| ----- | ---------- | --------------------------------------------------------- |
+| 2.0.0 | 2026-01-22 | 合并配置管理和存储规范，统一存储路径到 `~/.open-context/` |
+| 1.1.0 | 2026-01-22 | 移除 tauri 目录，Tauri Store 文件迁移到 cache 目录        |
+| 1.0.0 | 2026-01-22 | 初始版本                                                  |

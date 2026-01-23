@@ -1,0 +1,20 @@
+diff --git a/package.json b/package.json
+index ee74645e73dbe32734e6cd64b5453a4d20911d86..b7d98667a126d72abef74603874f9873025e490b 100644
+--- a/package.json
++++ b/package.json
+@@ -13,7 +13,6 @@
+   },
+   "type": "module",
+   "engines": {
+-    "node": ">=16.0.0"
+   },
+   "scripts": {
+     "build": "rollup -c",
+@@ -34,7 +33,6 @@
+   "author": "Mikael Brevik",
+   "license": "MIT",
+   "peerDependencies": {
+-    "marked": ">=1 <16"
+   },
+   "dependencies": {
+     "ansi-escapes": "^7.0.0",

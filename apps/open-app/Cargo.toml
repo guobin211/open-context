@@ -1,0 +1,82 @@
+[package]
+name = "open-app"
+version = "0.1.0"
+description = "A Agent Context and RAG System"
+authors = ["michaelbguo@tencent.com"]
+edition = "2024"
+resolver = "3"
+
+[[bin]]
+name = "open-app"
+path = "src/main.rs"
+
+[lib]
+name = "open_app_lib"
+path = "src/lib.rs"
+crate-type = ["staticlib", "cdylib", "rlib"]
+
+[build-dependencies]
+dotenv = { workspace = true }
+tauri-build = { version = "2", features = [] }
+
+[dependencies]
+anyhow = { workspace = true }
+chrono = { workspace = true }
+dirs = { workspace = true }
+dotenv = { workspace = true }
+serde = { workspace = true }
+serde_json = { workspace = true }
+log = { workspace = true }
+git2 = { workspace = true }
+walkdir = { workspace = true }
+lazy_static = { workspace = true }
+portable-pty = { workspace = true }
+rusqlite = { workspace = true }
+uuid = { workspace = true }
+tokio = { workspace = true }
+notify = { workspace = true }
+ignore = { workspace = true }
+
+# tauri
+tauri = { version = "2", features = [
+    "macos-private-api",
+    "tray-icon",
+    "image-png",
+] }
+tauri-plugin-opener = "2"
+tauri-plugin-clipboard-manager = "2"
+tauri-plugin-dialog = "2"
+tauri-plugin-fs = "2"
+tauri-plugin-log = "2"
+tauri-plugin-os = "2"
+tauri-plugin-persisted-scope = "2"
+tauri-plugin-store = "2"
+tauri-plugin-shell = "2"
+tauri-plugin-localhost = "2"
+tauri-plugin-process = "2"
+tauri-plugin-upload = "2"
+tauri-plugin-cache = "0.1.6"
+tauri-plugin-tcp = "0.1"
+tauri-plugin-udp = "0.1"
+
+[target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
+tauri-remote-ui = "1.0.1-alpha.8"
+tauri-plugin-autostart = "2"
+tauri-plugin-global-shortcut = "2"
+tauri-plugin-positioner = "2"
+tauri-plugin-updater = "2"
+tauri-plugin-window-state = "2"
+window-vibrancy = "0.7.1"
+tauri-plugin-fs-pro = "2"
+tauri-plugin-single-instance = "2"
+tauri-plugin-macos-permissions = "2"
+tauri-plugin-prevent-default = "4"
+tauri-plugin-screenshots = "2"
+tauri-plugin-notification = "2"
+tauri-nspanel = { git = "https://github.com/ahkohd/tauri-nspanel", branch = "v2.1" }
+tauri-plugin-nspopover = { git = "https://github.com/freethinkel/tauri-nspopover-plugin.git", version = "4.0.0" }
+
+[features]
+# this feature is used for production builds or when `devPath` points to the filesystem
+# DO NOT REMOVE!!
+custom-protocol = ["tauri/custom-protocol"]
