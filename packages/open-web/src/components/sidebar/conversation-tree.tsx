@@ -1,4 +1,4 @@
-import { MoreVertical, Pencil, Trash, Star, ChevronRight } from 'lucide-react';
+import { MoreVertical, Pencil, Trash, Star, Folder, RefreshCw } from 'lucide-react';
 import { useNavigate } from '@tanstack/react-router';
 import { cn } from '@/lib/utils';
 import { useSidebarStore } from '../../storage/sidebar-store';
@@ -12,14 +12,14 @@ import {
 import { InputDialog, ConfirmDialog } from './dialogs';
 import { useInputDialog, useConfirmDialog } from '@/hooks/use-dialog';
 
-export function ConversationTree() {
+export const ConversationTree = () => {
   const { conversationGroups } = useSidebarChatStore();
   const inputDialog = useInputDialog();
   const confirmDialog = useConfirmDialog();
 
   return (
     <>
-      <div className="space-y-2">
+      <div className="space-y-0.5 pl-2">
         {conversationGroups.map((group) => (
           <ConversationGroupSection
             key={group.id}
@@ -33,7 +33,7 @@ export function ConversationTree() {
       <ConfirmDialog {...confirmDialog} />
     </>
   );
-}
+};
 
 interface ConversationGroupSectionProps {
   group: ConversationGroup;
@@ -41,30 +41,16 @@ interface ConversationGroupSectionProps {
   confirmDialog: ReturnType<typeof useConfirmDialog>;
 }
 
-function ConversationGroupSection({ group, inputDialog, confirmDialog }: ConversationGroupSectionProps) {
-  const { isExpanded, toggleExpand } = useSidebarStore();
-  const expanded = isExpanded(group.id);
-
+const ConversationGroupSection = ({ group, inputDialog, confirmDialog }: ConversationGroupSectionProps) => {
   return (
-    <div>
-      <div
-        className="cursor flex items-center gap-1.5 rounded-md px-2 py-1.5 text-sm text-gray-600 hover:bg-gray-100"
-        onClick={() => toggleExpand(group.id)}
-      >
-        <ChevronRight className={cn('h-4 w-4 shrink-0 text-gray-400 transition-transform', expanded && 'rotate-90')} />
-        <span className="flex-1 font-medium">{group.label}</span>
-      </div>
-      {expanded && (
-        <div className="mt-1 ml-2 space-y-0.5">
-          {group.items.map((item) => (
-            <ConversationItem key={item.id} item={item} inputDialog={inputDialog} confirmDialog={confirmDialog} />
-          ))}
-          {group.items.length === 0 && <div className="px-2 py-4 text-center text-xs text-gray-400">暂无会话</div>}
-        </div>
-      )}
+    <div className="space-y-0.5">
+      {group.items.map((item) => (
+        <ConversationItem key={item.id} item={item} inputDialog={inputDialog} confirmDialog={confirmDialog} />
+      ))}
+      {group.items.length === 0 && <div className="px-2 py-4 text-center text-xs text-gray-400">暂无会话</div>}
     </div>
   );
-}
+};
 
 interface ConversationItemProps {
   item: NavItem;
@@ -72,7 +58,7 @@ interface ConversationItemProps {
   confirmDialog: ReturnType<typeof useConfirmDialog>;
 }
 
-function ConversationItem({ item, inputDialog, confirmDialog }: ConversationItemProps) {
+const ConversationItem = ({ item, inputDialog, confirmDialog }: ConversationItemProps) => {
   const navigate = useNavigate();
   const { activeItemId, setActiveItem } = useSidebarStore();
   const { updateConversation, deleteConversation, toggleFavoriteConversation } = useSidebarChatStore();
@@ -108,15 +94,24 @@ function ConversationItem({ item, inputDialog, confirmDialog }: ConversationItem
     toggleFavoriteConversation(item.id);
   };
 
+  // 根据会话类型选择图标
+  const getIcon = () => {
+    if (item.label.toLowerCase().includes('refactor') || item.label.toLowerCase().includes('login')) {
+      return <Folder className="h-4 w-4 text-amber-500" />;
+    }
+    return <RefreshCw className="h-4 w-4 text-gray-400" />;
+  };
+
   return (
     <div
       className={cn(
         'cursor group flex w-full items-center gap-2 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-gray-100',
-        isActive && 'bg-blue-50 hover:bg-blue-50'
+        isActive && 'bg-primary/10 text-primary hover:bg-primary/10'
       )}
       onClick={handleClick}
     >
-      <span className={cn('flex-1 truncate', isActive && 'font-medium text-blue-600')}>{item.label}</span>
+      {getIcon()}
+      <span className={cn('flex-1 truncate text-gray-700', isActive && 'text-primary font-medium')}>{item.label}</span>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <button
@@ -143,4 +138,4 @@ function ConversationItem({ item, inputDialog, confirmDialog }: ConversationItem
       </DropdownMenu>
     </div>
   );
-}
+};

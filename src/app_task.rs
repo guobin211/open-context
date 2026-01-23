@@ -166,14 +166,14 @@ impl TaskManager {
 
     pub fn cancel(&self, task_id: &str) -> bool {
         let mut tasks = self.tasks.lock().unwrap();
-        if let Some(task) = tasks.get_mut(task_id) {
-            if task.status == TaskStatus::Pending || task.status == TaskStatus::Running {
-                let now = Utc::now().timestamp_millis();
-                task.status = TaskStatus::Cancelled;
-                task.updated_at = now;
-                task.completed_at = Some(now);
-                return true;
-            }
+        if let Some(task) = tasks.get_mut(task_id)
+            && (task.status == TaskStatus::Pending || task.status == TaskStatus::Running)
+        {
+            let now = Utc::now().timestamp_millis();
+            task.status = TaskStatus::Cancelled;
+            task.updated_at = now;
+            task.completed_at = Some(now);
+            return true;
         }
         false
     }

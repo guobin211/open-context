@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react';
-import { MoreHorizontal, FolderPlus, FilePlus, Box } from 'lucide-react';
+import { useState } from 'react';
+import { MoreHorizontal, FolderPlus, FilePlus, Box, ChevronRight, ChevronDown } from 'lucide-react';
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -19,9 +20,11 @@ interface NavSectionProps {
   title: string;
   type: SectionType;
   children: ReactNode;
+  defaultExpanded?: boolean;
 }
 
-export function NavSection({ title, type, children }: NavSectionProps) {
+export const NavSection = ({ title, type, children, defaultExpanded = false }: NavSectionProps) => {
+  const [isExpanded, setIsExpanded] = useState(defaultExpanded);
   const inputDialog = useInputDialog();
   const { addNote } = useNotebookStore();
   const { addFile } = useFilesStore();
@@ -73,12 +76,25 @@ export function NavSection({ title, type, children }: NavSectionProps) {
 
   return (
     <>
-      <div className="py-2">
-        <div className="cursor group flex items-center justify-between px-3 pb-1">
-          <span className="cursor text-xs font-medium text-gray-500">{title}</span>
+      <div className="py-1">
+        <div
+          className="cursor group flex items-center justify-between rounded-md px-2 py-1.5 hover:bg-gray-100"
+          onClick={() => setIsExpanded(!isExpanded)}
+        >
+          <div className="flex items-center gap-1.5">
+            {isExpanded ? (
+              <ChevronDown className="h-3.5 w-3.5 text-gray-400" />
+            ) : (
+              <ChevronRight className="h-3.5 w-3.5 text-gray-400" />
+            )}
+            <span className="text-xs font-medium text-gray-600">{title}</span>
+          </div>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
-              <button className="cursor flex h-5 w-5 items-center justify-center rounded text-gray-400 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-gray-200 hover:text-gray-600">
+              <button
+                className="cursor flex h-5 w-5 items-center justify-center rounded text-gray-400 opacity-0 transition-opacity group-hover:opacity-100 hover:bg-gray-200 hover:text-gray-600"
+                onClick={(e) => e.stopPropagation()}
+              >
                 <MoreHorizontal className="h-3.5 w-3.5" />
               </button>
             </DropdownMenuTrigger>
@@ -119,9 +135,9 @@ export function NavSection({ title, type, children }: NavSectionProps) {
             </DropdownMenuContent>
           </DropdownMenu>
         </div>
-        <div className="space-y-0.5">{children}</div>
+        {isExpanded && <div className="mt-1 space-y-0.5">{children}</div>}
       </div>
       <InputDialog {...inputDialog} />
     </>
   );
-}
+};

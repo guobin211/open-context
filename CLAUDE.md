@@ -37,18 +37,21 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## 项目概述
 
-Open-Context 是一个开源的笔记、文件、工作空间管理工具，旨在帮助 AI Agent 更好地理解和利用上下文信息。
+Open-Context 是一个开源的 AI Agent 上下文管理工具，提供对话、笔记、文件、工作空间一体化的协作环境。
 
 **核心功能**：
 
-- 🗂️ 多工作空间管理
-- 📝 6 种笔记类型（富文本、Markdown、代码、表格、思维导图、流程图）
-- 📁 文件管理与云端同步
-- 🔍 向量检索（Qdrant）+ 依赖关系图
-- 🔄 完整的事件系统
-- 🌐 MCP 协议支持
+- 💬 对话管理 - 多会话对话、消息历史记录、智能上下文追踪
+- 📝 笔记系统 - 多类型笔记支持（富文本、Markdown）、笔记收藏、分类管理
+- 📁 文件管理 - 本地文件夹浏览、文件预览、最近文件记录
+- 🗂️ 工作空间 - Git 仓库管理、文档组织、资源聚合
+- 🔍 RAG 检索 - 向量检索（Qdrant）+ 依赖关系图
+- 🔄 事件系统 - 完整的前后端通信机制
+- 🌐 MCP 协议支持 - 对外提供标准化服务接口
 
 **技术架构**：Tauri (Rust) + Node.js RAG 引擎 + React 前端
+
+**UI 特点**：VS Code 风格三栏布局，多标签页管理，现代化交互
 
 详细介绍请参考 [README.md](./README.md)。
 
@@ -56,28 +59,43 @@ Open-Context 是一个开源的笔记、文件、工作空间管理工具，旨�
 
 ```
 open-context/
-├── src/                    # Rust 源码（Tauri 后端）
-│   ├── app_state*.rs        # 状态管理和数据模型
-│   ├── app_events.rs        # 事件系统
-│   ├── app_config.rs        # 配置管理
-│   └── app_commands.rs      # Tauri IPC 命令
+├── src/                           # Rust 源码（Tauri 后端）
+│   ├── app_state*.rs              # 状态管理和数据模型
+│   ├── app_events.rs              # 事件系统定义
+│   ├── app_config.rs              # 配置管理
+│   ├── app_commands.rs            # Tauri IPC 命令
+│   ├── app_file_tree.rs           # 文件树管理（缓存、监听）
+│   ├── app_file_tree_commands.rs  # 文件树 Tauri 命令
+│   ├── app_task.rs                # 任务调度系统
+│   └── main.rs                    # 应用入口
 │
 ├── packages/
-│   ├── open-web/            # React 前端
+│   ├── open-web/                  # React 前端
 │   │   └── src/
-│   │       ├── components/  # UI 组件
-│   │       ├── hooks/       # React Hooks
-│   │       └── routes/      # TanStack Router
+│   │       ├── components/        # UI 组件
+│   │       │   ├── layout/        # 布局组件（三栏布局）
+│   │       │   ├── sidebar/       # 侧边栏组件（树形结构）
+│   │       │   ├── file-tree/     # 文件树组件（递归、右键菜单）
+│   │       │   ├── files/         # 文件视图组件
+│   │       │   ├── welcome/       # 欢迎页组件
+│   │       │   └── ui/            # shadcn/ui 基础组件
+│   │       ├── routes/            # TanStack Router（文件系统路由）
+│   │       ├── storage/           # Zustand 状态管理（11 个 store）
+│   │       ├── services/          # 前端服务层
+│   │       └── hooks/             # React Hooks
 │   │
-│   └── open-node/           # Node.js 后端（RAG 引擎）
+│   └── open-node/                 # Node.js 后端（RAG 引擎）
 │       └── src/
-│           ├── services/    # 业务服务
-│           ├── indexers/    # 代码索引器
-│           └── db/          # 数据库层
+│           ├── services/          # 业务服务
+│           ├── indexers/          # 代码索引器（tree-sitter）
+│           ├── db/                # 数据库层（LevelDB, Qdrant）
+│           ├── api/               # REST API 端点
+│           └── types/             # TypeScript 类型定义
 │
-├── docs/                    # 技术文档
-├── examples/                # 代码示例
-└── tests/                   # 测试文件
+├── docs/                          # 技术文档
+├── openspec/                      # OpenSpec 变更提案
+├── examples/                      # 代码示例
+└── tests/                         # 测试文件
 ```
 
 ### 文件命名规范
@@ -102,17 +120,20 @@ open-context/
 
 - **桌面外壳**：应用窗口管理、系统集成、IPC 通信
 - **核心模块**：
-  - `app_state*.rs`：基于 SQLite 的状态管理（6 种数据模型，30+ CRUD 操作）
+  - `app_state*.rs`：基于 SQLite 的状态管理（工作空间、笔记、文件、对话、仓库链接）
   - `app_events.rs` + `app_event_emitter.rs`：事件系统（27+ 种事件，多窗口支持）
   - `app_config.rs`：应用配置管理（线程安全、热重载）
-  - `app_commands.rs`：Tauri IPC 命令
+  - `app_commands.rs`：Tauri IPC 命令（CRUD 操作、文件读写）
+  - `app_file_tree.rs`：文件树管理（5 分钟缓存、notify 监听、跨平台隐藏文件检测）
+  - `app_file_tree_commands.rs`：文件树 Tauri 命令（按需加载、监听）
+  - `app_task.rs`：任务调度系统（后台任务管理）
 
 **详细文档**：
 
-- [事件系统文档](./docs/EVENT_SYSTEM.md)
-- [状态管理文档](./docs/APP_STATE_USAGE.md)
+- [事件系统文档](docs/APP_EVENT_SYSTEM.md)
 - [配置管理文档](./docs/APP_CONFIG_USAGE.md)
-- [Tauri 命令参考](./docs/TAURI_COMMANDS.md)
+- [Tauri 命令参考](docs/APP_TAURI_COMMANDS.md)
+- [配色方案](docs/APP_COLOR_PALETTE.md)
 
 ### 2. Node.js 后端 (packages/open-node)
 
@@ -131,8 +152,26 @@ open-context/
 
 - **技术栈**：React 19、Vite、TypeScript、Tailwind CSS 4、shadcn/ui、Tiptap
 - **路由**：TanStack Router（文件系统路由，自动生成 `routeTree.gen.ts`）
-- **状态管理**：Zustand（客户端）+ React Query（服务端）
-- **富文本编辑器**：完整的 Tiptap 集成（extension → node → ui-primitive → ui → templates）
+- **状态管理**：
+  - `chat-store.ts` - 对话会话、消息管理
+  - `notebook-store.ts` - 笔记组织、收藏管理
+  - `files-store.ts` - 文件分组、最近文件
+  - `workspace-store.ts` - 工作空间、资源管理
+  - `tabs-store.ts` - 标签页管理（最多 10 个）
+  - `sidebar-store.ts` - 侧边栏展开/收起
+  - `right-sidebar-store.ts` - 右侧 Explorer 面板
+- **UI 布局**：
+  - `main-layout.tsx` - 三栏布局容器
+  - `top-search-bar.tsx` - 顶部搜索栏
+  - `sidebar.tsx` - 左侧栏（对话树、笔记树、资源树）
+  - `content-area.tsx` - 中间内容区（标签页 + AI 输入栏）
+  - `explorer-panel.tsx` - 右侧 Explorer 面板（文件夹树）
+  - `status-bar.tsx` - 底部状态栏
+- **文件树组件**：
+  - `file-tree.tsx` - 递归文件树（延迟加载、虚拟滚动）
+  - `file-tree-context-menu.tsx` - 右键菜单
+  - `breadcrumb.tsx` - 面包屑导航
+  - `file-search.tsx` - 文件搜索
 - **国际化**：i18next（支持简体中文、繁体中文、English、日本語、한국어）
 
 ## 核心数据流
@@ -165,22 +204,39 @@ function MyComponent() {
 }
 ```
 
-详细文档：[docs/EVENT_SYSTEM.md](./docs/EVENT_SYSTEM.md)
+详细文档：[docs/APP_EVENT_SYSTEM.md](docs/APP_EVENT_SYSTEM.md)
 
-### 状态管理工作流
+### 文件树工作流
 
-**创建工作空间**：
+**后端加载（Rust）**：
 
 ```rust
-use open_context_lib::{AppState, Workspace};
+use open_context_lib::app_file_tree::read_dir_on_demand;
 
-let app_state = AppState::new()?;
-let workspace = Workspace::new("项目名称".to_string(), None);
-app_state.db().create_workspace(&workspace)?;
-app_state.db().set_active_workspace(&workspace.id)?;
+let nodes = read_dir_on_demand(dir_path).await?;
 ```
 
-详细文档：[docs/APP_STATE_USAGE.md](./docs/APP_STATE_USAGE.md)
+- 5 分钟缓存机制（避免频繁扫描）
+- 使用 `ignore` crate（自动忽略 .gitignore 文件）
+- notify 监听文件系统变化
+- 跨平台隐藏文件检测（Windows FILE_ATTRIBUTE_HIDDEN，Unix 点开头）
+- 50ms 防抖（避免频繁触发）
+
+**前端渲染（React）**：
+
+```tsx
+import { FileTree } from '@/components/file-tree';
+
+<FileTree
+  rootPath="/path/to/folder"
+  onSelect={(path) => console.log(path)}
+/>
+```
+
+- 递归渲染，按需加载子节点
+- 右键菜单（复制路径、在 Finder/Explorer 打开、删除）
+- 面包屑导航 + 文件搜索
+- 使用 Tauri `invoke` 调用后端 API
 
 ### RAG 索引流程
 
@@ -262,13 +318,12 @@ pnpm fmt:js         # JavaScript/TypeScript (Prettier)
 
 ### 数据存储位置
 
-所有数据存储在 `~/.config/open-context/`（可通过 `OPEN_CONTEXT_CONFIG_DIR` 环境变量自定义）：
+所有数据存储在 `~/.config/open-context/`（可通过 `OPEN_CONTEXT_CONFIG_DIR` 环境变量自定义），另外前端状态持久化使用 Tauri Store，存储在 `~/.open-context/cache/` 下。
 
 ```
 ~/.config/open-context/
 ├── config.json          # 全局配置
-├── app_state.db         # SQLite 数据库（工作空间、笔记、文件）
-├── store.bin            # Tauri Store（前端状态持久化）
+├── app_state.db         # SQLite 数据库（工作空间、笔记、文件、对话）
 ├── leveldb/             # LevelDB 数据库
 │   ├── main/            # 主数据库（符号、元数据）
 │   ├── edges/           # 正向边（依赖关系）
@@ -280,6 +335,9 @@ pnpm fmt:js         # JavaScript/TypeScript (Prettier)
         ├── repos/       # Git 仓库缓存
         ├── files/       # 文件资源
         └── notes/       # 笔记数据
+
+~/.open-context/cache/
+└── store.bin            # Tauri Store（前端状态持久化）
 ```
 
 ### 数据库技术栈
@@ -343,7 +401,7 @@ Node.js 服务器运行在 `http://localhost:4500`：
 - `/query/code` - 代码搜索（向量 + 图）
 - `/graph/*` - 依赖关系图查询
 
-详细 API 文档：[docs/TAURI_COMMANDS.md](./docs/TAURI_COMMANDS.md)
+详细 API 文档：[docs/TAURI_COMMANDS.md](docs/APP_TAURI_COMMANDS.md)
 
 ## 开发实践
 
@@ -415,12 +473,18 @@ Node.js 服务器运行在 `http://localhost:4500`：
 - **语言支持**：仅实现了 TypeScript/JavaScript 索引
 - **Rust 后端**：
   - ✅ 事件系统、状态管理、配置管理已完整实现
+  - ✅ 文件树管理（缓存、监听）已完整实现
+  - ✅ 任务调度系统已完整实现
   - ⏳ Tauri 与 Node.js IPC 功能待实现
   - ⏳ 进程管理器（app_sidecar.rs）待实现
 - **前端**：
   - ✅ UI 框架、事件系统 Hooks 已完整实现
+  - ✅ 三栏布局（左侧栏、中间区、右侧 Explorer）已实现
+  - ✅ 文件树组件（递归、右键菜单）已实现
+  - ✅ 标签页系统（多标签管理）已实现
+  - ✅ 欢迎页已实现
   - ⏳ 与 Node.js RAG 服务的 API 集成待完成
-  - ⏳ 笔记功能前端实现待完成
+  - ⏳ 笔记富文本编辑器集成待完成
 - **Node.js 后端**：
   - ✅ RAG 引擎已实现
   - ⏳ 使用简单的内存队列（BullMQ 已导入但未使用）
@@ -448,13 +512,15 @@ Node.js 服务器运行在 `http://localhost:4500`：
 ### 核心文档
 
 - [README.md](./README.md) - 项目概述和快速开始
-- [EVENT_SYSTEM.md](./docs/EVENT_SYSTEM.md) - 事件系统完整文档
-- [APP_STATE_USAGE.md](./docs/APP_STATE_USAGE.md) - 状态管理使用指南
+- [EVENT_SYSTEM.md](docs/APP_EVENT_SYSTEM.md) - 事件系统完整文档
 - [APP_CONFIG_USAGE.md](./docs/APP_CONFIG_USAGE.md) - 配置管理使用指南
-- [TAURI_COMMANDS.md](./docs/TAURI_COMMANDS.md) - Tauri IPC 命令参考
+- [TAURI_COMMANDS.md](docs/APP_TAURI_COMMANDS.md) - Tauri IPC 命令参考
+- [APP_COLOR_PALETTE.md](docs/APP_COLOR_PALETTE.md) - 应用配色方案
+- [OpenSpec 变更提案](openspec/) - 功能提案和设计文档
 
 ### 代码示例
 
 - [examples/event_usage.rs](./examples/event_usage.rs) - 事件系统示例
 - [examples/config_usage.rs](./examples/config_usage.rs) - 配置管理示例
 - [packages/open-web/src/components/event-demo.tsx](./packages/open-web/src/components/event-demo.tsx) - React 事件示例
+- [packages/open-web/src/components/file-tree/file-tree-demo.tsx](./packages/open-web/src/components/file-tree/file-tree-demo.tsx) - 文件树示例

@@ -145,7 +145,10 @@ impl DatabaseManager {
         let conn_arc = self.conn();
         let conn = conn_arc.lock().unwrap();
         conn.execute("UPDATE workspaces SET is_active = 0", [])?;
-        conn.execute("UPDATE workspaces SET is_active = 1 WHERE id = ?1", params![id])?;
+        conn.execute(
+            "UPDATE workspaces SET is_active = 1 WHERE id = ?1",
+            params![id],
+        )?;
         Ok(())
     }
 
@@ -160,7 +163,10 @@ impl DatabaseManager {
         Ok(())
     }
 
-    pub fn count_workspace_resources(&self, workspace_id: &str) -> SqliteResult<WorkspaceResourceCount> {
+    pub fn count_workspace_resources(
+        &self,
+        workspace_id: &str,
+    ) -> SqliteResult<WorkspaceResourceCount> {
         let conn_arc = self.conn();
         let conn = conn_arc.lock().unwrap();
 
@@ -220,14 +226,18 @@ mod tests {
     use std::env;
 
     fn setup_test_db() -> DatabaseManager {
-        let test_db_path = env::temp_dir().join(format!("test_workspace_{}.db", uuid::Uuid::new_v4()));
+        let test_db_path =
+            env::temp_dir().join(format!("test_workspace_{}.db", uuid::Uuid::new_v4()));
         DatabaseManager::new(test_db_path).unwrap()
     }
 
     #[test]
     fn test_create_and_get_workspace() {
         let db = setup_test_db();
-        let workspace = Workspace::new("Test Workspace".to_string(), Some("Test description".to_string()));
+        let workspace = Workspace::new(
+            "Test Workspace".to_string(),
+            Some("Test description".to_string()),
+        );
 
         db.create_workspace(&workspace).unwrap();
         let retrieved = db.get_workspace(&workspace.id).unwrap();

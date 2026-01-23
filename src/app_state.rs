@@ -562,43 +562,106 @@ impl DatabaseManager {
         // workspaces migrations
         let _ = conn.execute("ALTER TABLE workspaces ADD COLUMN icon TEXT", []);
         let _ = conn.execute("ALTER TABLE workspaces ADD COLUMN color TEXT", []);
-        let _ = conn.execute("ALTER TABLE workspaces ADD COLUMN sort_order INTEGER NOT NULL DEFAULT 0", []);
-        let _ = conn.execute("ALTER TABLE workspaces ADD COLUMN is_archived INTEGER NOT NULL DEFAULT 0", []);
+        let _ = conn.execute(
+            "ALTER TABLE workspaces ADD COLUMN sort_order INTEGER NOT NULL DEFAULT 0",
+            [],
+        );
+        let _ = conn.execute(
+            "ALTER TABLE workspaces ADD COLUMN is_archived INTEGER NOT NULL DEFAULT 0",
+            [],
+        );
 
         // notes migrations
         let _ = conn.execute("ALTER TABLE notes ADD COLUMN parent_id TEXT", []);
         let _ = conn.execute("ALTER TABLE notes ADD COLUMN summary TEXT", []);
-        let _ = conn.execute("ALTER TABLE notes ADD COLUMN word_count INTEGER NOT NULL DEFAULT 0", []);
-        let _ = conn.execute("ALTER TABLE notes ADD COLUMN sort_order INTEGER NOT NULL DEFAULT 0", []);
-        let _ = conn.execute("ALTER TABLE notes ADD COLUMN is_favorited INTEGER NOT NULL DEFAULT 0", []);
-        let _ = conn.execute("ALTER TABLE notes ADD COLUMN is_pinned INTEGER NOT NULL DEFAULT 0", []);
-        let _ = conn.execute("ALTER TABLE notes ADD COLUMN is_archived INTEGER NOT NULL DEFAULT 0", []);
+        let _ = conn.execute(
+            "ALTER TABLE notes ADD COLUMN word_count INTEGER NOT NULL DEFAULT 0",
+            [],
+        );
+        let _ = conn.execute(
+            "ALTER TABLE notes ADD COLUMN sort_order INTEGER NOT NULL DEFAULT 0",
+            [],
+        );
+        let _ = conn.execute(
+            "ALTER TABLE notes ADD COLUMN is_favorited INTEGER NOT NULL DEFAULT 0",
+            [],
+        );
+        let _ = conn.execute(
+            "ALTER TABLE notes ADD COLUMN is_pinned INTEGER NOT NULL DEFAULT 0",
+            [],
+        );
+        let _ = conn.execute(
+            "ALTER TABLE notes ADD COLUMN is_archived INTEGER NOT NULL DEFAULT 0",
+            [],
+        );
         let _ = conn.execute("ALTER TABLE notes ADD COLUMN last_viewed_at INTEGER", []);
 
         // imported_files migrations
-        let _ = conn.execute("ALTER TABLE imported_files ADD COLUMN parent_directory_id TEXT", []);
+        let _ = conn.execute(
+            "ALTER TABLE imported_files ADD COLUMN parent_directory_id TEXT",
+            [],
+        );
         let _ = conn.execute("ALTER TABLE imported_files ADD COLUMN checksum TEXT", []);
-        let _ = conn.execute("ALTER TABLE imported_files ADD COLUMN is_archived INTEGER NOT NULL DEFAULT 0", []);
+        let _ = conn.execute(
+            "ALTER TABLE imported_files ADD COLUMN is_archived INTEGER NOT NULL DEFAULT 0",
+            [],
+        );
 
         // imported_directories migrations
-        let _ = conn.execute("ALTER TABLE imported_directories ADD COLUMN parent_id TEXT", []);
-        let _ = conn.execute("ALTER TABLE imported_directories ADD COLUMN is_archived INTEGER NOT NULL DEFAULT 0", []);
+        let _ = conn.execute(
+            "ALTER TABLE imported_directories ADD COLUMN parent_id TEXT",
+            [],
+        );
+        let _ = conn.execute(
+            "ALTER TABLE imported_directories ADD COLUMN is_archived INTEGER NOT NULL DEFAULT 0",
+            [],
+        );
 
         // git_repositories migrations
-        let _ = conn.execute("ALTER TABLE git_repositories ADD COLUMN default_branch TEXT", []);
-        let _ = conn.execute("ALTER TABLE git_repositories ADD COLUMN clone_status TEXT NOT NULL DEFAULT 'pending'", []);
-        let _ = conn.execute("ALTER TABLE git_repositories ADD COLUMN clone_progress INTEGER NOT NULL DEFAULT 0", []);
+        let _ = conn.execute(
+            "ALTER TABLE git_repositories ADD COLUMN default_branch TEXT",
+            [],
+        );
+        let _ = conn.execute(
+            "ALTER TABLE git_repositories ADD COLUMN clone_status TEXT NOT NULL DEFAULT 'pending'",
+            [],
+        );
+        let _ = conn.execute(
+            "ALTER TABLE git_repositories ADD COLUMN clone_progress INTEGER NOT NULL DEFAULT 0",
+            [],
+        );
         let _ = conn.execute("ALTER TABLE git_repositories ADD COLUMN index_status TEXT NOT NULL DEFAULT 'not_indexed'", []);
-        let _ = conn.execute("ALTER TABLE git_repositories ADD COLUMN indexed_at INTEGER", []);
-        let _ = conn.execute("ALTER TABLE git_repositories ADD COLUMN file_count INTEGER NOT NULL DEFAULT 0", []);
-        let _ = conn.execute("ALTER TABLE git_repositories ADD COLUMN is_archived INTEGER NOT NULL DEFAULT 0", []);
+        let _ = conn.execute(
+            "ALTER TABLE git_repositories ADD COLUMN indexed_at INTEGER",
+            [],
+        );
+        let _ = conn.execute(
+            "ALTER TABLE git_repositories ADD COLUMN file_count INTEGER NOT NULL DEFAULT 0",
+            [],
+        );
+        let _ = conn.execute(
+            "ALTER TABLE git_repositories ADD COLUMN is_archived INTEGER NOT NULL DEFAULT 0",
+            [],
+        );
 
         // web_links migrations
         let _ = conn.execute("ALTER TABLE web_links ADD COLUMN thumbnail_url TEXT", []);
-        let _ = conn.execute("ALTER TABLE web_links ADD COLUMN is_favorited INTEGER NOT NULL DEFAULT 0", []);
-        let _ = conn.execute("ALTER TABLE web_links ADD COLUMN is_archived INTEGER NOT NULL DEFAULT 0", []);
-        let _ = conn.execute("ALTER TABLE web_links ADD COLUMN visit_count INTEGER NOT NULL DEFAULT 0", []);
-        let _ = conn.execute("ALTER TABLE web_links ADD COLUMN last_visited_at INTEGER", []);
+        let _ = conn.execute(
+            "ALTER TABLE web_links ADD COLUMN is_favorited INTEGER NOT NULL DEFAULT 0",
+            [],
+        );
+        let _ = conn.execute(
+            "ALTER TABLE web_links ADD COLUMN is_archived INTEGER NOT NULL DEFAULT 0",
+            [],
+        );
+        let _ = conn.execute(
+            "ALTER TABLE web_links ADD COLUMN visit_count INTEGER NOT NULL DEFAULT 0",
+            [],
+        );
+        let _ = conn.execute(
+            "ALTER TABLE web_links ADD COLUMN last_visited_at INTEGER",
+            [],
+        );
 
         Ok(())
     }
@@ -606,44 +669,110 @@ impl DatabaseManager {
     /// Create database indexes
     fn create_indexes(&self, conn: &Connection) -> SqliteResult<()> {
         // Workspaces indexes
-        conn.execute("CREATE INDEX IF NOT EXISTS idx_workspaces_active ON workspaces(is_active)", [])?;
-        conn.execute("CREATE INDEX IF NOT EXISTS idx_workspaces_archived ON workspaces(is_archived)", [])?;
-        conn.execute("CREATE INDEX IF NOT EXISTS idx_workspaces_sort ON workspaces(sort_order)", [])?;
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_workspaces_active ON workspaces(is_active)",
+            [],
+        )?;
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_workspaces_archived ON workspaces(is_archived)",
+            [],
+        )?;
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_workspaces_sort ON workspaces(sort_order)",
+            [],
+        )?;
 
         // Notes indexes
-        conn.execute("CREATE INDEX IF NOT EXISTS idx_notes_workspace ON notes(workspace_id)", [])?;
-        conn.execute("CREATE INDEX IF NOT EXISTS idx_notes_parent ON notes(parent_id)", [])?;
-        conn.execute("CREATE INDEX IF NOT EXISTS idx_notes_type ON notes(workspace_id, note_type)", [])?;
-        conn.execute("CREATE INDEX IF NOT EXISTS idx_notes_favorited ON notes(workspace_id, is_favorited)", [])?;
-        conn.execute("CREATE INDEX IF NOT EXISTS idx_notes_pinned ON notes(workspace_id, is_pinned)", [])?;
-        conn.execute("CREATE INDEX IF NOT EXISTS idx_notes_archived ON notes(workspace_id, is_archived)", [])?;
-        conn.execute("CREATE INDEX IF NOT EXISTS idx_notes_updated ON notes(workspace_id, updated_at DESC)", [])?;
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_notes_workspace ON notes(workspace_id)",
+            [],
+        )?;
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_notes_parent ON notes(parent_id)",
+            [],
+        )?;
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_notes_type ON notes(workspace_id, note_type)",
+            [],
+        )?;
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_notes_favorited ON notes(workspace_id, is_favorited)",
+            [],
+        )?;
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_notes_pinned ON notes(workspace_id, is_pinned)",
+            [],
+        )?;
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_notes_archived ON notes(workspace_id, is_archived)",
+            [],
+        )?;
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_notes_updated ON notes(workspace_id, updated_at DESC)",
+            [],
+        )?;
         conn.execute("CREATE INDEX IF NOT EXISTS idx_notes_viewed ON notes(workspace_id, last_viewed_at DESC)", [])?;
 
         // Imported files indexes
-        conn.execute("CREATE INDEX IF NOT EXISTS idx_files_workspace ON imported_files(workspace_id)", [])?;
-        conn.execute("CREATE INDEX IF NOT EXISTS idx_files_parent ON imported_files(parent_directory_id)", [])?;
-        conn.execute("CREATE INDEX IF NOT EXISTS idx_files_type ON imported_files(workspace_id, file_type)", [])?;
-        conn.execute("CREATE INDEX IF NOT EXISTS idx_files_checksum ON imported_files(checksum)", [])?;
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_files_workspace ON imported_files(workspace_id)",
+            [],
+        )?;
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_files_parent ON imported_files(parent_directory_id)",
+            [],
+        )?;
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_files_type ON imported_files(workspace_id, file_type)",
+            [],
+        )?;
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_files_checksum ON imported_files(checksum)",
+            [],
+        )?;
         conn.execute("CREATE INDEX IF NOT EXISTS idx_files_archived ON imported_files(workspace_id, is_archived)", [])?;
 
         // Imported directories indexes
-        conn.execute("CREATE INDEX IF NOT EXISTS idx_dirs_workspace ON imported_directories(workspace_id)", [])?;
-        conn.execute("CREATE INDEX IF NOT EXISTS idx_dirs_parent ON imported_directories(parent_id)", [])?;
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_dirs_workspace ON imported_directories(workspace_id)",
+            [],
+        )?;
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_dirs_parent ON imported_directories(parent_id)",
+            [],
+        )?;
         conn.execute("CREATE INDEX IF NOT EXISTS idx_dirs_archived ON imported_directories(workspace_id, is_archived)", [])?;
 
         // Git repositories indexes
-        conn.execute("CREATE INDEX IF NOT EXISTS idx_repos_workspace ON git_repositories(workspace_id)", [])?;
-        conn.execute("CREATE INDEX IF NOT EXISTS idx_repos_clone_status ON git_repositories(clone_status)", [])?;
-        conn.execute("CREATE INDEX IF NOT EXISTS idx_repos_index_status ON git_repositories(index_status)", [])?;
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_repos_workspace ON git_repositories(workspace_id)",
+            [],
+        )?;
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_repos_clone_status ON git_repositories(clone_status)",
+            [],
+        )?;
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_repos_index_status ON git_repositories(index_status)",
+            [],
+        )?;
         conn.execute("CREATE INDEX IF NOT EXISTS idx_repos_archived ON git_repositories(workspace_id, is_archived)", [])?;
 
         // Web links indexes
-        conn.execute("CREATE INDEX IF NOT EXISTS idx_links_workspace ON web_links(workspace_id)", [])?;
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_links_workspace ON web_links(workspace_id)",
+            [],
+        )?;
         conn.execute("CREATE INDEX IF NOT EXISTS idx_links_favorited ON web_links(workspace_id, is_favorited)", [])?;
-        conn.execute("CREATE INDEX IF NOT EXISTS idx_links_archived ON web_links(workspace_id, is_archived)", [])?;
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_links_archived ON web_links(workspace_id, is_archived)",
+            [],
+        )?;
         conn.execute("CREATE INDEX IF NOT EXISTS idx_links_visited ON web_links(workspace_id, last_visited_at DESC)", [])?;
-        conn.execute("CREATE INDEX IF NOT EXISTS idx_links_url ON web_links(url)", [])?;
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_links_url ON web_links(url)",
+            [],
+        )?;
 
         Ok(())
     }

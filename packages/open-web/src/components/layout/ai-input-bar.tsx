@@ -1,94 +1,40 @@
 import { useState } from 'react';
-import {
-  Quote,
-  Paperclip,
-  Lightbulb,
-  AtSign,
-  Zap,
-  MessageSquare,
-  Code,
-  Camera,
-  Eraser,
-  ArrowUp,
-  Blocks
-} from 'lucide-react';
-import { ContextTag } from '../../routes/files/components/context-tag';
-import { ToolbarButton } from '../../routes/files/components/toolbar-button';
+import { Mic } from 'lucide-react';
 
-export function AIInputBar() {
+export const AIInputBar = () => {
   const [message, setMessage] = useState('');
-  const [contextTags, setContextTags] = useState([{ id: '1', label: 'node' }]);
 
-  const removeTag = (id: string) => {
-    setContextTags(contextTags.filter((tag) => tag.id !== id));
-  };
-
-  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
-      // 发送消息逻辑
       console.log('Send message:', message);
       setMessage('');
     }
   };
 
   return (
-    <div className="border-t border-gray-200 bg-white p-4">
+    <div className="border-t border-gray-100 bg-white px-6 py-3">
       <div className="mx-auto max-w-4xl">
-        <div className="rounded-xl bg-gray-100 p-3">
-          {/* 上下文标签区 */}
-          {contextTags.length > 0 && (
-            <div className="mb-2 flex flex-wrap gap-2">
-              {contextTags.map((tag) => (
-                <ContextTag key={tag.id} label={tag.label} onRemove={() => removeTag(tag.id)} />
-              ))}
-            </div>
-          )}
+        <div className="flex items-center gap-3 rounded-lg border border-gray-200 bg-gray-50 px-4 py-2">
+          {/* Mode 标签 */}
+          <span className="shrink-0 rounded bg-blue-100 px-2 py-0.5 text-xs font-medium text-blue-700">NODE</span>
 
           {/* 输入框 */}
-          <textarea
+          <input
+            type="text"
             value={message}
             onChange={(e) => setMessage(e.target.value)}
             onKeyDown={handleKeyDown}
-            placeholder="在这里输入消息，按 Enter 发送"
-            className="min-h-15 w-full resize-none bg-transparent text-sm text-gray-900 placeholder-gray-500 focus:outline-none"
-            rows={2}
+            placeholder="Type a command or ask Copilot..."
+            className="min-w-0 flex-1 bg-transparent text-sm text-gray-700 placeholder-gray-400 outline-none"
           />
 
-          {/* 底部工具栏 */}
-          <div className="flex items-center justify-between pt-2">
-            <div className="flex items-center gap-0.5">
-              <ToolbarButton icon={<Quote className="h-4 w-4" />} tooltip="插入引用" />
-              <ToolbarButton icon={<Paperclip className="h-4 w-4" />} tooltip="附件" />
-              <ToolbarButton
-                icon={<Lightbulb className="h-4 w-4" />}
-                tooltip="DeepSeek"
-                className="text-orange-500 hover:text-orange-600"
-              />
-              <ToolbarButton
-                icon={<span className="text-sm font-bold">G</span>}
-                tooltip="Google 搜索"
-                className="text-blue-500 hover:text-blue-600"
-              />
-              <ToolbarButton
-                icon={<Blocks className="h-4 w-4" />}
-                tooltip="MCP"
-                className="text-emerald-500 hover:text-emerald-600"
-              />
-              <ToolbarButton icon={<AtSign className="h-4 w-4" />} tooltip="@提及" />
-              <ToolbarButton icon={<Zap className="h-4 w-4" />} tooltip="快捷操作" />
-              <ToolbarButton icon={<MessageSquare className="h-4 w-4" />} tooltip="知识库" />
-              <ToolbarButton icon={<Code className="h-4 w-4" />} tooltip="代码" />
-              <ToolbarButton icon={<Camera className="h-4 w-4" />} tooltip="截图" />
-              <ToolbarButton icon={<Eraser className="h-4 w-4" />} tooltip="清除" />
-            </div>
-
-            <button className="flex h-8 w-8 items-center justify-center rounded-full bg-linear-to-br from-emerald-400 to-emerald-600 text-white shadow-md transition-transform hover:scale-105">
-              <ArrowUp className="h-4 w-4" />
-            </button>
-          </div>
+          {/* 语音按钮 */}
+          <button className="shrink-0 rounded p-1 text-gray-400 transition-colors hover:bg-gray-100 hover:text-gray-600">
+            <Mic className="h-4 w-4" />
+          </button>
         </div>
       </div>
     </div>
   );
-}
+};

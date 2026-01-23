@@ -108,9 +108,7 @@ function FileCategorySection({ category }: FileCategorySectionProps) {
   const Icon = iconMap[category.icon] || File;
   return (
     <div>
-      <div
-        className="cursor flex items-center gap-1 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-gray-100"
-      >
+      <div className="cursor flex items-center gap-1 rounded-md px-2 py-1.5 text-sm transition-colors hover:bg-gray-100">
         <Icon className="h-4 w-4 shrink-0" />
         <span className="flex-1 truncate text-gray-600">{category.label}</span>
       </div>

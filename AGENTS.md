@@ -1,36 +1,3 @@
-<!-- OPENSPEC:START -->
-
-# OpenSpec 使用说明
-
-这些说明适用于在此项目中工作的AI助手。
-
-## 语言偏好设置
-
-**默认使用中文**：除非明确说明使用英文，否则所有输出都应使用中文，包括：
-
-- 文档内容
-- 代码注释
-- 提交信息
-- 规范说明
-
-## 工作流程
-
-当请求满足以下条件时，始终打开`@/openspec/AGENTS.md`：
-
-- 提及规划或提案（如提案、规范、变更、计划等词语）
-- 引入新功能、重大变更、架构变更或大型性能/安全工作时
-- 听起来不明确，需要在编码前了解权威规范时
-
-使用`@/openspec/AGENTS.md`了解：
-
-- 如何创建和应用变更提案
-- 规范格式和约定
-- 项目结构和指南
-
-保持此托管块，以便'openspec-cn update'可以刷新说明。
-
-<!-- OPENSPEC:END -->
-
 # AGENTS.md
 
 本文件为在此仓库工作的 AI 编码代理提供指导。
@@ -96,7 +63,7 @@
 3. **启动后台服务**：Rust 端负责启动 Node.js 后台服务（open-node）
 4. **返回服务凭证**：Rust 端将后台服务的地址和认证权限返回给 Web 端
 5. **Web 端与后台交互**：Web 端通过 HTTP REST API 和 WebSocket 与 Node.js 后台服务进行交互
-6. **Rust 端与后台交互**：Rust 端也通过 HTTP 和 WebSocket 与 Node.js 后台服务进行交互
+6. **Rust 端与后台交互**：Rust 端也通过 HTTP 和 WebSocket 与 Node.js 后端服务进行交互
 
 ### 模块通信总结
 
@@ -132,7 +99,7 @@ pnpm build:app      # 构建 Tauri 桌面应用
 ```bash
 # 检查并修复所有代码
 pnpm lint           # 运行 Rust (clippy) 和 JavaScript (oxlint) 检查
-pnpm lint:rs        # Cargo clippy 自动修复
+pnpm lint:rs       ` # Cargo clippy 自动修复
 pnpm lint:js        # Oxlint TypeScript 感知检查器自动修复
 
 # 格式化所有代码
@@ -238,7 +205,7 @@ pnpm --filter open-node test:ui
 
 ### Rust (src/)
 
-**命名规范:**
+**`命名规范:**
 
 - 模块: snake_case (`mod app_commands`)
 - 函数: snake_case (`pub fn run()`)
@@ -312,7 +279,7 @@ src/
 ├── hooks/               # 自定义 hooks (use- 前缀)
 ├── services/            # 服务层 (http-services, tauri-services)
 ├── lib/                 # 工具 (cn(), utils.ts)
-└── i18n/                # 国际化 (locales/ 目录包含 zh-CN, en, ja, ko, zh-TW)
+└── i18n/                # 国际化 (locales/ 目录包含 zh-CN, en, ja ko, zh-TW)
 ```
 
 **样式:**
@@ -351,3 +318,22 @@ src/
 - `packages/open-web/package.json`: 前端依赖
 - `tauri.conf.json`: Tauri 应用配置
 - `packages/open-node/vitest.config.ts`: Vitest 测试配置
+
+## 技术文档参考
+
+### 核心系统文档
+
+- **持久化存储规范**: `docs/APP_CONFIG_USAGE.md` - 数据存储路径规范、配置管理
+- **事件系统**: `docs/APP_EVENT_SYSTEM.md` - 前后端通信机制、事件类型
+- **Tauri 命令**: `docs/APP_TAURI_COMMANDS.md` - IPC 命令参考、数据类型
+- **配色方案**: `docs/APP_COLOR_PALETTE.md` - UI` 颜色主题、CSS 变量
+
+### 子项目文档
+
+- **Node.js 后端**: `packages/open-node/README.md` - RAG 引擎、代码索引、向量检索
+- **React 前端**: `packages/open-web/README.md` - UI 组件、路由、状态管理
+
+### 数据存储
+
+- 所有数据存储在 `~/.open-context/` 目录
+- 详见 `docs/APP_CONFIG_USAGE.md` 中的完整目录结构

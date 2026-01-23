@@ -1,4 +1,4 @@
-import { HelpCircle, Share2 } from 'lucide-react';
+import { FolderOpen, HelpCircle, Share2 } from 'lucide-react';
 import {
   Breadcrumb,
   BreadcrumbItem,
@@ -8,9 +8,12 @@ import {
   BreadcrumbSeparator
 } from '../ui/breadcrumb';
 import { useDocumentStore } from '../../storage/document-store';
+import { useRightSidebarStore } from '../../storage/right-sidebar-store';
+import { cn } from '@/lib/utils';
 
 export function ContentHeader() {
   const { currentDocument, syncStatus } = useDocumentStore();
+  const { isOpen, toggle } = useRightSidebarStore();
   const path = currentDocument?.path || [];
 
   return (
@@ -48,6 +51,16 @@ export function ContentHeader() {
         </button>
         <button className="rounded-md p-1.5 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700">
           <Share2 className="h-5 w-5" />
+        </button>
+        <button
+          onClick={toggle}
+          className={cn(
+            'rounded-md p-1.5 transition-colors hover:bg-gray-100',
+            isOpen ? 'bg-blue-50 text-blue-600' : 'text-gray-500 hover:text-gray-700'
+          )}
+          title="文件浏览器"
+        >
+          <FolderOpen className="h-5 w-5" />
         </button>
       </div>
     </div>

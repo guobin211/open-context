@@ -32,5 +32,31 @@
     "prettier-plugin-tailwindcss": "^0.7.2",
     "typescript": "~5.8.3",
     "vite": "^7.3.1"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "@parcel/watcher",
+      "classic-level",
+      "esbuild",
+      "msgpackr-extract",
+      "tree-sitter",
+      "tree-sitter-bash",
+      "tree-sitter-c",
+      "tree-sitter-c-sharp",
+      "tree-sitter-cpp",
+      "tree-sitter-css",
+      "tree-sitter-go",
+      "tree-sitter-html",
+      "tree-sitter-javascript",
+      "tree-sitter-jsdoc",
+      "tree-sitter-json",
+      "tree-sitter-python",
+      "tree-sitter-typescript"
+    ],
+    "peerDependencyRules": {
+      "allowAny": [
+        "tree-sitter"
+      ]
+    }
   }
 }

@@ -68,6 +68,9 @@ export type * from './types';
 // 导出服务提供者
 export { tauriServices };
 export { createHttpServices };
+export { readDirectoryRecursive } from './folder-service';
+export { FileTreeService } from './file-tree-service';
+export type { FileTreeNode, FileTreeState } from './file-tree-service';
 
 // ==================== 使用示例 ====================
 

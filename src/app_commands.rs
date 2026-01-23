@@ -311,7 +311,8 @@ pub fn get_notes_by_type(
 ) -> Result<Vec<Note>, String> {
     let db = state.db();
 
-    let nt = NoteType::parse(&note_type).ok_or_else(|| format!("Invalid note type: {}", note_type))?;
+    let nt =
+        NoteType::parse(&note_type).ok_or_else(|| format!("Invalid note type: {}", note_type))?;
 
     match db.list_notes_by_type(&workspace_id, nt) {
         Ok(notes) => Ok(notes),
@@ -609,14 +610,20 @@ pub struct ImportFilesTaskDto {
 }
 
 #[tauri::command]
-pub fn get_task(task_id: String, task_manager: tauri::State<TaskManager>) -> Result<TaskInfo, String> {
+pub fn get_task(
+    task_id: String,
+    task_manager: tauri::State<TaskManager>,
+) -> Result<TaskInfo, String> {
     task_manager
         .get_task(&task_id)
         .ok_or_else(|| format!("Task not found: {}", task_id))
 }
 
 #[tauri::command]
-pub fn list_tasks(task_type: Option<String>, task_manager: tauri::State<TaskManager>) -> Vec<TaskInfo> {
+pub fn list_tasks(
+    task_type: Option<String>,
+    task_manager: tauri::State<TaskManager>,
+) -> Vec<TaskInfo> {
     match task_type {
         Some(t) => task_manager.list_tasks_by_type(&t),
         None => task_manager.list_tasks(),
@@ -624,7 +631,10 @@ pub fn list_tasks(task_type: Option<String>, task_manager: tauri::State<TaskMana
 }
 
 #[tauri::command]
-pub fn cancel_task(task_id: String, task_manager: tauri::State<TaskManager>) -> Result<bool, String> {
+pub fn cancel_task(
+    task_id: String,
+    task_manager: tauri::State<TaskManager>,
+) -> Result<bool, String> {
     if task_manager.cancel(&task_id) {
         Ok(true)
     } else {
@@ -633,7 +643,10 @@ pub fn cancel_task(task_id: String, task_manager: tauri::State<TaskManager>) -> 
 }
 
 #[tauri::command]
-pub fn cleanup_tasks(max_age_ms: Option<i64>, task_manager: tauri::State<TaskManager>) -> Result<(), String> {
+pub fn cleanup_tasks(
+    max_age_ms: Option<i64>,
+    task_manager: tauri::State<TaskManager>,
+) -> Result<(), String> {
     let age = max_age_ms.unwrap_or(3600000);
     task_manager.cleanup_completed(age);
     Ok(())
@@ -686,19 +699,25 @@ pub async fn clone_repository_task(
             Ok(value) => {
                 manager.complete(&task_id, Some(value));
                 log::info!("Clone repository task completed: {}", task_id);
-                let _ = app.emit("task:completed", serde_json::json!({
-                    "taskId": task_id,
-                    "taskType": task_type
-                }));
+                let _ = app.emit(
+                    "task:completed",
+                    serde_json::json!({
+                        "taskId": task_id,
+                        "taskType": task_type
+                    }),
+                );
             }
             Err(e) => {
                 manager.fail(&task_id, &e);
                 log::error!("Clone repository task failed: {} - {}", task_id, e);
-                let _ = app.emit("task:failed", serde_json::json!({
-                    "taskId": task_id,
-                    "taskType": task_type,
-                    "error": e
-                }));
+                let _ = app.emit(
+                    "task:failed",
+                    serde_json::json!({
+                        "taskId": task_id,
+                        "taskType": task_type,
+                        "error": e
+                    }),
+                );
             }
         }
     });
@@ -727,7 +746,11 @@ pub async fn index_repository_task(
 
     tauri::async_runtime::spawn(async move {
         manager.set_running(&task_id);
-        log::info!("Starting index repository task: {} for repo {}", task_id, repo_id);
+        log::info!(
+            "Starting index repository task: {} for repo {}",
+            task_id,
+            repo_id
+        );
 
         manager.update_progress(&task_id, 10, Some("Scanning files...".to_string()));
         tokio::time::sleep(std::time::Duration::from_millis(100)).await;
@@ -741,16 +764,22 @@ pub async fn index_repository_task(
         manager.update_progress(&task_id, 80, Some("Generating embeddings...".to_string()));
         tokio::time::sleep(std::time::Duration::from_millis(100)).await;
 
-        manager.complete(&task_id, Some(serde_json::json!({
-            "repositoryId": repo_id,
-            "status": "indexed"
-        })));
+        manager.complete(
+            &task_id,
+            Some(serde_json::json!({
+                "repositoryId": repo_id,
+                "status": "indexed"
+            })),
+        );
 
         log::info!("Index repository task completed: {}", task_id);
-        let _ = app.emit("task:completed", serde_json::json!({
-            "taskId": task_id,
-            "taskType": task_type
-        }));
+        let _ = app.emit(
+            "task:completed",
+            serde_json::json!({
+                "taskId": task_id,
+                "taskType": task_type
+            }),
+        );
     });
 
     Ok(handle)
@@ -778,7 +807,11 @@ pub async fn import_files_task(
 
     tauri::async_runtime::spawn(async move {
         manager.set_running(&task_id);
-        log::info!("Starting import files task: {} with {} files", task_id, total);
+        log::info!(
+            "Starting import files task: {} with {} files",
+            task_id,
+            total
+        );
 
         for (i, path) in paths.iter().enumerate() {
             let progress = ((i + 1) * 100 / total) as u8;
@@ -787,16 +820,22 @@ pub async fn import_files_task(
             tokio::time::sleep(std::time::Duration::from_millis(50)).await;
         }
 
-        manager.complete(&task_id, Some(serde_json::json!({
-            "imported": total,
-            "status": "completed"
-        })));
+        manager.complete(
+            &task_id,
+            Some(serde_json::json!({
+                "imported": total,
+                "status": "completed"
+            })),
+        );
 
         log::info!("Import files task completed: {}", task_id);
-        let _ = app.emit("task:completed", serde_json::json!({
-            "taskId": task_id,
-            "taskType": task_type
-        }));
+        let _ = app.emit(
+            "task:completed",
+            serde_json::json!({
+                "taskId": task_id,
+                "taskType": task_type
+            }),
+        );
     });
 
     Ok(handle)

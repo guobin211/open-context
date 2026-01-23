@@ -463,10 +463,10 @@ Co-Authored-By: Claude <noreply@anthropic.com>
 
 - [README.md](../README.md) - 项目概述和快速开始
 - [CLAUDE.md](../CLAUDE.md) - 完整的项目开发指南
-- [EVENT_SYSTEM.md](../docs/EVENT_SYSTEM.md) - 事件系统详细文档
+- [EVENT_SYSTEM.md](../docs/APP_EVENT_SYSTEM.md) - 事件系统详细文档
 - [APP_STATE_USAGE.md](../docs/APP_STATE_USAGE.md) - 状态管理使用指南
 - [APP_CONFIG_USAGE.md](../docs/APP_CONFIG_USAGE.md) - 配置管理使用指南
-- [TAURI_COMMANDS.md](../docs/TAURI_COMMANDS.md) - Tauri IPC 命令参考
+- [TAURI_COMMANDS.md](../docs/APP_TAURI_COMMANDS.md) - Tauri IPC 命令参考
 
 ### 子项目文档
 

@@ -1,7 +1,7 @@
 use chrono::Utc;
 use rusqlite::{Result as SqliteResult, params};
 
-use crate::app_state::{DatabaseManager, GitRepository, WebLink, CloneStatus, IndexStatus};
+use crate::app_state::{CloneStatus, DatabaseManager, GitRepository, IndexStatus, WebLink};
 
 /// Git repository management operations
 impl DatabaseManager {

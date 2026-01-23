@@ -1,13 +1,13 @@
-import { X, Settings, Palette, Database, Cloud, BrainCircuit, Server, Key } from 'lucide-react';
-import { useSettingsStore } from '../../../../storage/settings-store';
-import { GeneralSettings } from './general-settings';
-import { AppearanceSettings } from './appearance-settings';
-import { StorageSettings } from './storage-settings';
-import { ServerSettings } from './server-settings';
-import { CloudSettings } from './cloud-settings';
-import { AIProviderSettings } from './ai-provider-settings';
-import { ShortcutsSettings } from './shortcuts-settings';
+import { BrainCircuit, Cloud, Database, Key, Palette, Server, Settings, X } from 'lucide-react';
 import { cn } from '../../../../lib/utils';
+import { useSettingsStore } from '../../../../storage/settings-store';
+import { AIProviderSettings } from './ai-provider-settings';
+import { AppearanceSettings } from './appearance-settings';
+import { CloudSettings } from './cloud-settings';
+import { GeneralSettings } from './general-settings';
+import { ServerSettings } from './server-settings';
+import { ShortcutsSettings } from './shortcuts-settings';
+import { StorageSettings } from './storage-settings';
 
 const SettingsLayout = () => {
   const { config } = useSettingsStore();
@@ -75,25 +75,28 @@ const SettingsLayout = () => {
   const activeItem = settingsMenuItems.find((item) => item.id === config._internal.activeCategory);
 
   return (
-    <div className="flex h-screen overflow-hidden">
-      <aside className="w-56 shrink-0 border-r border-gray-200 bg-gray-50">
-        <SettingsMenu settingsMenuItems={settingsMenuItems} iconMap={iconMap} />
-      </aside>
-      <main className="flex-1 overflow-hidden bg-white">
-        <header className="flex h-16 items-center justify-between border-b border-gray-200 px-6">
-          <h1 className="text-xl font-semibold text-gray-900">{activeItem?.label}</h1>
-          <button
-            className="rounded-md p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700"
-            onClick={() => window.history.back()}
-          >
-            <X className="h-5 w-5" />
-          </button>
-        </header>
+    <div className="h-screen w-screen flex-col overflow-hidden">
+      <div data-tauri-drag-region className="h-10 w-full border-b border-gray-200 bg-white"></div>
+      <div className="flex overflow-hidden">
+        <aside className="w-56 shrink-0 border-r border-gray-200 bg-gray-50">
+          <SettingsMenu settingsMenuItems={settingsMenuItems} iconMap={iconMap} />
+        </aside>
+        <main className="flex-1 overflow-hidden bg-white">
+          <header className="flex h-16 items-center justify-between border-b border-gray-200 px-6">
+            <h1 className="text-xl font-semibold text-gray-900">{activeItem?.label}</h1>
+            <button
+              className="rounded-md p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700"
+              onClick={() => window.history.back()}
+            >
+              <X className="h-5 w-5" />
+            </button>
+          </header>
 
-        <div className="h-[calc(100vh-4rem)] overflow-auto p-6">
-          <SettingsContent />
-        </div>
-      </main>
+          <div className="h-[calc(100vh-4rem)] overflow-auto p-6">
+            <SettingsContent />
+          </div>
+        </main>
+      </div>
     </div>
   );
 };
@@ -154,7 +157,11 @@ const SettingsContent = () => {
     }
   };
 
-  return <div className="max-w-3xl">{renderContent()}</div>;
+  return (
+    <div className="max-w-3xl">
+      <div>{renderContent()}</div>
+    </div>
+  );
 };
 
 export { SettingsLayout };

@@ -2,6 +2,8 @@ mod app_commands;
 pub mod app_config;
 mod app_event_emitter;
 mod app_events;
+mod app_file_tree;
+mod app_file_tree_commands;
 mod app_runtime;
 mod app_sidecar;
 pub mod app_state;
@@ -13,6 +15,10 @@ pub mod app_task;
 
 // ==================== Tauri Command Exports ====================
 use app_commands::{
+    // Task commands
+    cancel_task,
+    cleanup_tasks,
+    clone_repository_task,
     create_file,
     create_note,
     create_repository,
@@ -25,16 +31,20 @@ use app_commands::{
     get_all_files,
     // Note commands
     get_all_notes,
-    get_favorited_notes,
-    get_notes_by_type,
     // Repository commands
     get_all_repositories,
     // Workspace commands
     get_all_workspaces,
+    get_favorited_notes,
     get_file,
     get_note,
+    get_notes_by_type,
     get_repository,
+    get_task,
     get_workspace,
+    import_files_task,
+    index_repository_task,
+    list_tasks,
     // System command
     ping,
     search_notes,
@@ -44,21 +54,21 @@ use app_commands::{
     update_note,
     update_repository,
     update_workspace,
-    // Task commands
-    cancel_task,
-    cleanup_tasks,
-    clone_repository_task,
-    get_task,
-    import_files_task,
-    index_repository_task,
-    list_tasks,
+};
+
+use app_file_tree_commands::{
+    clear_cache, create_file_or_dir, delete_file_or_dir, read_dir, rename_file_or_dir,
+    search_workspace_files, stop_watch_dir, watch_dir,
 };
 
 // ==================== Event Exports ====================
+use app_event_emitter::{EventEmitter, EventListener};
+use app_events::AppEvent;
 
 // ==================== State Management Exports ====================
 use app_state::AppState;
 use app_task::TaskManager;
+use tauri::Manager;
 
 /// Run the application
 pub fn run() {
@@ -81,6 +91,31 @@ pub fn run() {
         .plugin(tauri_plugin_opener::init())
         .manage(app_state)
         .manage(task_manager)
+        .setup(|app| {
+            // 初始化事件发射器并管理其状态
+            let event_emitter = EventEmitter::new(app.handle().clone());
+            app.manage(event_emitter);
+
+            // 发送应用启动事件
+            let version = app.package_info().version.to_string();
+            let emitter = app.state::<EventEmitter>();
+            let _ = emitter.emit_global(&AppEvent::AppStarted {
+                version,
+                timestamp: AppEvent::now(),
+            });
+
+            // 为主窗口设置监听器
+            if let Some(main_window) = app.get_webview_window("main") {
+                EventListener::setup_window_listeners(&main_window);
+            }
+
+            // 发送应用就绪事件
+            let _ = emitter.emit_global(&AppEvent::AppReady {
+                timestamp: AppEvent::now(),
+            });
+
+            Ok(())
+        })
         .invoke_handler(tauri::generate_handler![
             // Workspace commands
             get_all_workspaces,
@@ -119,9 +154,35 @@ pub fn run() {
             clone_repository_task,
             index_repository_task,
             import_files_task,
+            // File tree commands
+            read_dir,
+            clear_cache,
+            watch_dir,
+            stop_watch_dir,
+            create_file_or_dir,
+            rename_file_or_dir,
+            delete_file_or_dir,
+            search_workspace_files,
             // System command
             ping,
         ])
-        .run(tauri::generate_context!())
-        .expect("error while running tauri application");
+        .build(tauri::generate_context!())
+        .expect("error while building tauri application")
+        .run(|app_handle, event| match event {
+            tauri::RunEvent::ExitRequested { .. } => {
+                if let Some(emitter) = app_handle.try_state::<EventEmitter>() {
+                    let _ = emitter.emit_global(&AppEvent::AppWillQuit {
+                        timestamp: AppEvent::now(),
+                    });
+                }
+            }
+            tauri::RunEvent::Exit => {
+                if let Some(emitter) = app_handle.try_state::<EventEmitter>() {
+                    let _ = emitter.emit_global(&AppEvent::AppQuit {
+                        timestamp: AppEvent::now(),
+                    });
+                }
+            }
+            _ => {}
+        });
 }
