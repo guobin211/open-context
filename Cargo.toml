@@ -1,12 +1,14 @@
 [workspace]
 resolver = "3"
 
-members = [
-    "apps/open-app"
-]
+members = ["apps/open-app"]
 
 [workspace.dependencies]
 anyhow = "1.0.100"
+home = "0.5"
+zip = "3.0"
+tar = "0.4"
+tempfile = "3"
 chrono = "0.4"
 dirs = "5.0"
 dotenv = "0.15"
@@ -18,8 +20,27 @@ portable-pty = "0.9.0"
 notify = "8"
 ignore = "0.4"
 serde_json = "1"
-aws-config = { version = "1.1.7", features = ["behavior-version-latest"] }
 aws-sdk-s3 = "1.120.0"
+url = "2.5"
+base64 = "0.22"
+rustls = "0.23"
+bytes = "1.11"
+tokio-util = "0.7"
+tokio-stream = "0.1"
+async-stream = "0.3"
+async-trait = "0.1"
+futures = "0.3"
+rand = "0.8"
+rayon = "1.10"
+regex = "1.11"
+cfg-if = "1.0"
+reqwest = { version = "0.13", features = [
+    "json",
+    "multipart",
+    "stream",
+    "rustls",
+], default-features = false }
+aws-config = { version = "1.1.7", features = ["behavior-version-latest"] }
 serde = { version = "1", features = ["derive"] }
 tokio = { version = "1", features = ["full"] }
 tauri = { version = "2", features = ["macos-private-api"] }

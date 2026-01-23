@@ -1,8 +1,12 @@
 import tailwindcss from '@tailwindcss/vite';
 import { tanstackRouter } from '@tanstack/router-plugin/vite';
-import react from '@vitejs/plugin-react';
+import react from '@vitejs/plugin-react-swc';
 import { codeInspectorPlugin } from 'code-inspector-plugin';
 import { defineConfig } from 'vite';
+import checker from 'vite-plugin-checker';
+import inspect from 'vite-plugin-inspect';
+import topLevelAwait from 'vite-plugin-top-level-await';
+import wasm from 'vite-plugin-wasm';
 
 // https://vite.dev/config/
 export default defineConfig(async () => ({
@@ -15,7 +19,13 @@ export default defineConfig(async () => ({
     codeInspectorPlugin({
       bundler: 'vite'
     }),
-    react()
+    react(),
+    wasm(),
+    topLevelAwait(),
+    checker({
+      typescript: true
+    }),
+    inspect()
   ],
   clearScreen: false,
   resolve: {
@@ -24,7 +34,7 @@ export default defineConfig(async () => ({
     }
   },
   build: {
-    target: 'es2018',
+    target: 'es2020',
     chunkSizeWarningLimit: 2048
   },
   server: {

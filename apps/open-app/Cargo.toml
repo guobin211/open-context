@@ -36,6 +36,7 @@ uuid = { workspace = true }
 tokio = { workspace = true }
 notify = { workspace = true }
 ignore = { workspace = true }
+futures = { workspace = true }
 
 # tauri
 tauri = { version = "2", features = [

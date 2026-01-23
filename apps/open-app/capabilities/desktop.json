@@ -1,7 +1,5 @@
 {
   "identifier": "desktop-capability",
-  "platforms": ["macOS", "windows", "linux"],
-  "windows": ["main"],
   "permissions": [
     "autostart:default",
     "autostart:allow-disable",
@@ -518,7 +516,6 @@
     "window-state:allow-restore-state",
     "window-state:allow-save-window-state",
     {
-      "identifier": "fs:scope",
       "allow": [
         {
           "path": "$AUDIO/**"
@@ -595,10 +592,10 @@
         {
           "path": "$APPLOG/**"
         }
-      ]
+      ],
+      "identifier": "fs:scope"
     },
     {
-      "identifier": "fs:allow-read-dir",
       "allow": [
         {
           "path": "$AUDIO/**"
@@ -675,10 +672,10 @@
         {
           "path": "$APPLOG/**"
         }
-      ]
+      ],
+      "identifier": "fs:allow-read-dir"
     },
     {
-      "identifier": "fs:allow-read-file",
       "allow": [
         {
           "path": "$AUDIO/**"
@@ -755,10 +752,10 @@
         {
           "path": "$APPLOG/**"
         }
-      ]
+      ],
+      "identifier": "fs:allow-read-file"
     },
     {
-      "identifier": "fs:allow-stat",
       "allow": [
         {
           "path": "$AUDIO/**"
@@ -835,10 +832,10 @@
         {
           "path": "$APPLOG/**"
         }
-      ]
+      ],
+      "identifier": "fs:allow-stat"
     },
     {
-      "identifier": "fs:allow-write-file",
       "allow": [
         {
           "path": "$AUDIO/**"
@@ -915,10 +912,10 @@
         {
           "path": "$APPLOG/**"
         }
-      ]
+      ],
+      "identifier": "fs:allow-write-file"
     },
     {
-      "identifier": "fs:allow-mkdir",
       "allow": [
         {
           "path": "$AUDIO/**"
@@ -995,10 +992,10 @@
         {
           "path": "$APPLOG/**"
         }
-      ]
+      ],
+      "identifier": "fs:allow-mkdir"
     },
     {
-      "identifier": "fs:allow-remove",
       "allow": [
         {
           "path": "$AUDIO/**"
@@ -1075,10 +1072,10 @@
         {
           "path": "$APPLOG/**"
         }
-      ]
+      ],
+      "identifier": "fs:allow-remove"
     },
     {
-      "identifier": "fs:allow-rename",
       "allow": [
         {
           "path": "$AUDIO/**"
@@ -1155,11 +1152,19 @@
         {
           "path": "$APPLOG/**"
         }
-      ]
+      ],
+      "identifier": "fs:allow-rename"
     },
     "shell:default",
     "notification:default",
     "process:default",
-    "upload:default"
-  ]
+    "upload:default",
+    "macos-permissions:default",
+    "screenshots:default",
+    "nspopover:allow-show-popover",
+    "nspopover:allow-hide-popover",
+    "nspopover:allow-is-popover-shown"
+  ],
+  "platforms": ["macOS", "windows", "linux"],
+  "windows": ["main"]
 }

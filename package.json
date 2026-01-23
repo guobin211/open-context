@@ -36,9 +36,9 @@
   "pnpm": {
     "onlyBuiltDependencies": [
       "@parcel/watcher",
+      "@swc/core",
       "classic-level",
       "esbuild",
-      "less",
       "msgpackr-extract",
       "tree-sitter",
       "tree-sitter-bash",
@@ -57,10 +57,11 @@
     "peerDependencyRules": {
       "allowAny": [
         "tree-sitter"
-      ]
+      ],
+      "allowedVersions": {
+        "marked-terminal>marked": "17"
+      }
     },
-    "patchedDependencies": {
-      "marked-terminal": "patches/marked-terminal.patch"
-    }
+    "patchedDependencies": {}
   }
 }

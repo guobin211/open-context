@@ -1,18 +1,18 @@
 {
+  "devDependencies": {
+    "@tauri-apps/cli": "^2.9.6"
+  },
   "name": "open-app",
   "private": true,
-  "version": "0.1.0",
-  "type": "module",
   "scripts": {
+    "build:all": "pnpm build:server && pnpm build:app",
+    "build:app": "tauri build",
+    "build:web": "cd ./../../ && pnpm --filter open-web build",
     "dev": "pnpm dev:all",
     "dev:app": "tauri dev --no-watch",
     "dev:web": "cd ./../../ && pnpm --filter open-web dev",
-    "build:web": "cd ./../../ && pnpm --filter open-web build",
-    "build:app": "tauri build",
-    "build:all": "pnpm build:server && pnpm build:app",
     "tauri": "tauri"
   },
-  "devDependencies": {
-    "@tauri-apps/cli": "^2.9.6"
-  }
+  "type": "module",
+  "version": "0.1.0"
 }
