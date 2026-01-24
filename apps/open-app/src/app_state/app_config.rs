@@ -9,6 +9,7 @@ pub struct AppConfig {
     pub version: String,
     pub log_level: String,
     pub app_data_dir: String,
+    pub bin_dir: String,
     pub cache_dir: String,
     pub config_dir: String,
     pub database_dir: String,
@@ -33,6 +34,7 @@ impl Default for AppConfig {
             version: env!("CARGO_PKG_VERSION").to_string(),
             log_level: "info".to_string(),
             app_data_dir: app_data_dir.clone(),
+            bin_dir: format!("{}/bin", app_data_dir),
             commands_dir: format!("{}/commands", app_data_dir),
             cache_dir: format!("{}/cache", app_data_dir),
             config_dir: format!("{}/config", app_data_dir),
@@ -142,6 +144,7 @@ impl ConfigManager {
 pub fn init_app_dirs() -> Result<(), Box<dyn std::error::Error>> {
     let base = AppConfig::base_dir();
     let dirs = [
+        "bin",
         "cache",
         "config",
         "database",

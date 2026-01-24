@@ -8,11 +8,11 @@
 
 ### 核心模块
 
-| 模块                                  | 职责                                        | 技术栈                  |
-| ------------------------------------- | ------------------------------------------- | ----------------------- |
-| **tauri** (根目录 `src/`)             | 客户端桌面应用的壳，负责桌面相关的 API 操作 | Rust + Tauri            |
-| **open-node** (`packages/open-node/`) | 后台服务，负责构建索引、文件处理等后台任务  | Node.js + Hono          |
-| **open-web** (`packages/open-web/`)   | React 编写的 Web 端 UI，提供用户界面        | React + TanStack Router |
+| 模块                              | 职责                                        | 技术栈                  |
+| --------------------------------- | ------------------------------------------- | ----------------------- |
+| **tauri** (`apps/open-app/`)      | 客户端桌面应用的壳，负责桌面相关的 API 操作 | Rust + Tauri            |
+| **open-node** (`apps/open-node/`) | 后台服务，负责构建索引、文件处理等后台任务  | Node.js + Hono          |
+| **open-web** (`apps/open-web/`)   | React 编写的 Web 端 UI，提供用户界面        | React + TanStack Router |
 
 ### 交互流程
 
@@ -132,12 +132,12 @@ pnpm --filter open-node test:ui
 
 ## 代码风格指南
 
-### TypeScript/JavaScript (packages/open-node, packages/open-web)
+### TypeScript/JavaScript (apps/open-node, apps/open-web)
 
 **导入规范:**
 
 - open-node 使用相对导入: `import { SymbolExtractor } from '../indexers'`
-- open-web 使用绝对导入: `import { cn } from '@/lib/utils'` (指向 `packages/open-web/src/`)
+- open-web 使用绝对导入: `import { cn } from '@/lib/utils'` (指向 `apps/open-web/src/`)
 - 顺序: 外部库 → 内部模块
 - 类型导入: 优先混合使用，仅在复杂类型回环依赖时使用 `import type`
 
@@ -179,6 +179,7 @@ pnpm --filter open-node test:ui
 - Tiptap 组件: 分层架构 (extension → node → ui-primitive → ui → templates)
 - 使用 `forwardRef` 的组件: `export const Button = forwardRef<HTMLButtonElement, ButtonProps>(...)`
 - 使用 `memo` 的组件: `export const Icon = memo(({ ... }: Props) => ...)`
+- 箭头函数组件添加`displayName`属性，以便于调试
 
 **路由模式:**
 
@@ -203,7 +204,7 @@ pnpm --filter open-node test:ui
 
 - open 当前无测试配置 (测试仅在 open-node 中)
 
-### Rust (src/)
+### Rust (apps/openp-app/)
 
 **`命名规范:**
 
@@ -214,13 +215,13 @@ pnpm --filter open-node test:ui
 
 **错误处理:**
 
-- 使用 `Result<T, E>` 类型
+- 使用 `anyhow::Result<T, E>` 类型
 - 使用 `?` 操作符传播错误
 - 谨慎使用 `.expect()` (优先使用 `?` 或优雅解包)
 
 ## 架构模式
 
-### Node.js 服务 (packages/open-node)
+### Node.js 服务 (apps/open-node)
 
 **分层架构:**
 
@@ -255,7 +256,7 @@ export class WorkspaceService {
 - 类型与实现共置 (`types/` 目录)
 - 测试文件镜像 `src/` 结构到 `tests/`
 
-### React 前端 (packages/open-web)
+### React 前端 (apps/open-web)
 
 **路由 (TanStack Router):**
 
@@ -307,17 +308,17 @@ src/
 ### Monorepo 使用
 
 - 使用 `pnpm --filter <package>` 在特定包中运行命令
-- 包: `open-node`, `open-web`, `tauri-app` (根目录)
+- 包: `open-node`, `open-web`, `open-app`
 
 ## 配置文件
 
 - `.oxlintrc.json`: TypeScript/JavaScript 代码检查规则
 - `.prettierrc`: 代码格式化 (120 字符宽度, 单引号, LF)
 - `Cargo.toml`: Rust 依赖
-- `packages/open-node/package.json`: Node.js 服务依赖
-- `packages/open-web/package.json`: 前端依赖
-- `tauri.conf.json`: Tauri 应用配置
-- `packages/open-node/vitest.config.ts`: Vitest 测试配置
+- `apps/open-node/package.json`: Node.js 服务依赖
+- `apps/open-web/package.json`: 前端依赖
+- `apps/open-app/tauri.conf.json`: Tauri 应用配置
+- `apps/open-node/vitest.config.ts`: Vitest 测试配置
 
 ## 技术文档参考
 
@@ -326,14 +327,35 @@ src/
 - **持久化存储规范**: `docs/APP_CONFIG_USAGE.md` - 数据存储路径规范、配置管理
 - **事件系统**: `docs/APP_EVENT_SYSTEM.md` - 前后端通信机制、事件类型
 - **Tauri 命令**: `docs/APP_TAURI_COMMANDS.md` - IPC 命令参考、数据类型
-- **配色方案**: `docs/APP_COLOR_PALETTE.md` - UI` 颜色主题、CSS 变量
 
 ### 子项目文档
 
-- **Node.js 后端**: `packages/open-node/README.md` - RAG 引擎、代码索引、向量检索
-- **React 前端**: `packages/open-web/README.md` - UI 组件、路由、状态管理
+- **Node.js 后端**: `apps/open-node/README.md` - RAG 引擎、代码索引、向量检索
+- **React 前端**: `apps/open-web/README.md` - UI 组件、路由、状态管理
 
 ### 数据存储
 
 - 所有数据存储在 `~/.open-context/` 目录
 - 详见 `docs/APP_CONFIG_USAGE.md` 中的完整目录结构
+  use anyhow::Result;
+
+#[tauri::command]
+pub async fn update_user_settings(settings: UserSettings) -> Result<TaskHandle, String> {
+let task = task_manager.create_task("custom_task_name");
+let task_id = task.id.clone();
+let task_type = task.task_type.clone();
+let handle = TaskHandle {
+task_id: task_id.clone(),
+task_type: task_type.clone(),
+status: TaskStatus::Pending,
+};
+tauri::async_runtime::spawn(async move {
+manager.set_running(&task_id);
+// ... task logic
+});
+return Ok(handle);
+}
+
+```
+
+```

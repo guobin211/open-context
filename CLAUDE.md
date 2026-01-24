@@ -59,43 +59,77 @@ Open-Context 是一个开源的 AI Agent 上下文管理工具，提供对话、
 
 ```
 open-context/
-├── src/                           # Rust 源码（Tauri 后端）
-│   ├── app_state*.rs              # 状态管理和数据模型
-│   ├── app_events.rs              # 事件系统定义
-│   ├── app_config.rs              # 配置管理
-│   ├── app_commands.rs            # Tauri IPC 命令
-│   ├── app_file_tree.rs           # 文件树管理（缓存、监听）
-│   ├── app_file_tree_commands.rs  # 文件树 Tauri 命令
-│   ├── app_task.rs                # 任务调度系统
-│   └── main.rs                    # 应用入口
-│
-├── packages/
-│   ├── open-web/                  # React 前端
+├── apps/                           # 应用模块
+│   ├── open-app/                   # Tauri 桌面应用（Rust 后端）
+│   │   └── src/
+│   │       ├── main.rs             # 应用入口
+│   │       ├── lib.rs              # 库导出
+│   │       ├── app_command/        # Tauri IPC 命令（63 个命令）
+│   │       │   ├── mod.rs          # 命令注册器
+│   │       │   ├── dto.rs          # 数据传输对象
+│   │       │   ├── system_commands.rs       # 系统命令
+│   │       │   ├── workspace_commands.rs    # 工作空间命令
+│   │       │   ├── file_commands.rs         # 文件命令
+│   │       │   ├── file_tree_commands.rs    # 文件树命令
+│   │       │   ├── note_commands.rs         # 笔记命令
+│   │       │   ├── repository_commands.rs   # 仓库命令
+│   │       │   └── task_commands.rs         # 任务命令
+│   │       ├── app_state/         # 状态管理与数据模型
+│   │       │   ├── database.rs    # SQLite 数据库管理器
+│   │       │   ├── state.rs       # 应用状态结构
+│   │       │   ├── app_config.rs  # 配置管理
+│   │       │   ├── app_state_workspace.rs    # 工作空间状态
+│   │       │   ├── app_state_note.rs         # 笔记状态
+│   │       │   ├── app_state_file.rs         # 文件状态
+│   │       │   ├── app_state_folder.rs       # 文件夹状态
+│   │       │   ├── app_state_repo.rs         # 仓库状态
+│   │       │   ├── app_state_chat.rs         # 对话状态
+│   │       │   ├── app_state_link.rs         # 链接状态
+│   │       │   ├── app_state_terminal.rs     # 终端状态
+│   │       │   └── app_state_webview.rs      # WebView 状态
+│   │       ├── app_events/        # 事件系统
+│   │       │   ├── event_type.rs  # 事件类型定义（27+ 种事件）
+│   │       │   └── event_emitter.rs  # 事件发射器
+│   │       └── app_service/        # 业务服务
+│   │           ├── app_file_tree.rs     # 文件树管理
+│   │           ├── app_runtime.rs       # 运行时配置
+│   │           ├── app_sidecar.rs       # Sidecar 进程管理
+│   │           └── app_task.rs          # 任务调度
+│   │
+│   ├── open-web/                   # React 前端
 │   │   └── src/
 │   │       ├── components/        # UI 组件
+│   │       │   ├── ui/            # shadcn/ui 基础组件（49 个）
 │   │       │   ├── layout/        # 布局组件（三栏布局）
 │   │       │   ├── sidebar/       # 侧边栏组件（树形结构）
-│   │       │   ├── file-tree/     # 文件树组件（递归、右键菜单）
+│   │       │   ├── file-tree/     # 文件树组件
 │   │       │   ├── files/         # 文件视图组件
-│   │       │   ├── welcome/       # 欢迎页组件
-│   │       │   └── ui/            # shadcn/ui 基础组件
-│   │       ├── routes/            # TanStack Router（文件系统路由）
+│   │       │   ├── tiptap-node/   # Tiptap 自定义节点
+│   │       │   ├── tiptap-ui/     # Tiptap UI 组件
+│   │       │   └── playground/    # Playground 演示组件（30+ 个）
+│   │       ├── routes/            # TanStack Router 路由
+│   │       │   ├── __root.tsx     # 根布局
+│   │       │   ├── index.tsx      # 首页
+│   │       │   ├── playground/    # Playground 路由（30+ 个子页面）
+│   │       │   └── settings/      # 设置页面路由（已实现）
 │   │       ├── storage/           # Zustand 状态管理（11 个 store）
 │   │       ├── services/          # 前端服务层
-│   │       └── hooks/             # React Hooks
+│   │       ├── hooks/             # React Hooks
+│   │       └── i18n/              # 国际化
 │   │
 │   └── open-node/                 # Node.js 后端（RAG 引擎）
 │       └── src/
+│           ├── api/               # REST API 端点
 │           ├── services/          # 业务服务
 │           ├── indexers/          # 代码索引器（tree-sitter）
 │           ├── db/                # 数据库层（LevelDB, Qdrant）
-│           ├── api/               # REST API 端点
-│           └── types/             # TypeScript 类型定义
+│           ├── jobs/              # 后台任务队列
+│           ├── types/             # TypeScript 类型定义
+│           └── utils/             # 工具函数
 │
 ├── docs/                          # 技术文档
 ├── openspec/                      # OpenSpec 变更提案
-├── examples/                      # 代码示例
-└── tests/                         # 测试文件
+└── examples/                      # 代码示例
 ```
 
 ### 文件命名规范
@@ -116,17 +150,29 @@ open-context/
 
 ## 核心架构
 
-### 1. Rust Tauri 后端 (src/)
+### 1. Rust Tauri 后端 (apps/open-app)
 
 - **桌面外壳**：应用窗口管理、系统集成、IPC 通信
 - **核心模块**：
-  - `app_state*.rs`：基于 SQLite 的状态管理（工作空间、笔记、文件、对话、仓库链接）
-  - `app_events.rs` + `app_event_emitter.rs`：事件系统（27+ 种事件，多窗口支持）
-  - `app_config.rs`：应用配置管理（线程安全、热重载）
-  - `app_commands.rs`：Tauri IPC 命令（CRUD 操作、文件读写）
-  - `app_file_tree.rs`：文件树管理（5 分钟缓存、notify 监听、跨平台隐藏文件检测）
-  - `app_file_tree_commands.rs`：文件树 Tauri 命令（按需加载、监听）
-  - `app_task.rs`：任务调度系统（后台任务管理）
+  - `app_command/`：Tauri IPC 命令（63 个命令）
+    - `system_commands.rs` - 系统命令（ping、版本获取）
+    - `workspace_commands.rs` - 工作空间 CRUD
+    - `file_commands.rs` - 文件 CRUD
+    - `file_tree_commands.rs` - 文件树操作（8 个命令）
+    - `note_commands.rs` - 笔记操作（含收藏、搜索）
+    - `repository_commands.rs` - Git 仓库管理
+    - `task_commands.rs` - 任务管理（克隆、索引、导入）
+  - `app_state/`：基于 SQLite 的状态管理
+  - `app_events/`：事件系统（27+ 种事件）
+    - 生命周期事件：AppStarted, AppReady, AppQuit
+    - 窗口事件：WindowCreated, WindowFocused, WindowClosed 等
+    - 服务事件：ServiceStarted, ServiceStopped, ServiceError
+    - 任务事件：TaskCreated, TaskProgress, TaskCompleted 等
+  - `app_service/`：业务服务
+    - `app_file_tree.rs` - 文件树管理（5 分钟缓存、notify 监听）
+    - `app_task.rs` - 任务调度系统
+    - `app_runtime.rs` - 运行时配置
+    - `app_sidecar.rs` - Sidecar 进程管理
 
 **详细文档**：
 
@@ -135,7 +181,7 @@ open-context/
 - [Tauri 命令参考](docs/APP_TAURI_COMMANDS.md)
 - [配色方案](docs/APP_COLOR_PALETTE.md)
 
-### 2. Node.js 后端 (packages/open-node)
+### 2. Node.js 后端 (apps/open-node)
 
 **RAG 引擎核心**，运行在 4500 端口：
 
@@ -146,13 +192,16 @@ open-context/
 
 **当前限制**：仅支持 TypeScript/JavaScript 索引
 
-### 3. React 前端 (packages/open-web)
+### 3. React 前端 (apps/open-web)
 
 运行在 1420 端口（开发模式）：
 
 - **技术栈**：React 19、Vite、TypeScript、Tailwind CSS 4、shadcn/ui、Tiptap
-- **路由**：TanStack Router（文件系统路由，自动生成 `routeTree.gen.ts`）
-- **状态管理**：
+- **路由**：TanStack Router（文件系统路由）
+  - `/` - 首页
+  - `/playground/*` - Playground 模块（30+ 个子页面）
+  - `/settings/*` - 设置页面（已实现）
+- **状态管理**（Zustand）：
   - `chat-store.ts` - 对话会话、消息管理
   - `notebook-store.ts` - 笔记组织、收藏管理
   - `files-store.ts` - 文件分组、最近文件
@@ -160,18 +209,15 @@ open-context/
   - `tabs-store.ts` - 标签页管理（最多 10 个）
   - `sidebar-store.ts` - 侧边栏展开/收起
   - `right-sidebar-store.ts` - 右侧 Explorer 面板
-- **UI 布局**：
-  - `main-layout.tsx` - 三栏布局容器
-  - `top-search-bar.tsx` - 顶部搜索栏
-  - `sidebar.tsx` - 左侧栏（对话树、笔记树、资源树）
-  - `content-area.tsx` - 中间内容区（标签页 + AI 输入栏）
-  - `explorer-panel.tsx` - 右侧 Explorer 面板（文件夹树）
-  - `status-bar.tsx` - 底部状态栏
-- **文件树组件**：
-  - `file-tree.tsx` - 递归文件树（延迟加载、虚拟滚动）
-  - `file-tree-context-menu.tsx` - 右键菜单
-  - `breadcrumb.tsx` - 面包屑导航
-  - `file-search.tsx` - 文件搜索
+  - `settings-store.ts` - 设置状态
+- **核心组件**：
+  - `components/ui/` - shadcn/ui 基础组件（49 个）
+  - `components/layout/` - 布局组件（main-layout、content-area、ai-input-bar 等）
+  - `components/sidebar/` - 侧边栏组件（conversation-tree、note-tree、space-tree 等）
+  - `components/file-tree/` - 文件树组件（递归、右键菜单）
+  - `components/tiptap-node/` - Tiptap 自定义节点
+  - `components/tiptap-ui/` - Tiptap UI 组件
+  - `components/playground/` - Playground 演示组件（30+ 个）
 - **国际化**：i18next（支持简体中文、繁体中文、English、日本語、한국어）
 
 ## 核心数据流
@@ -181,7 +227,7 @@ open-context/
 **后端发送事件（Rust）**：
 
 ```rust
-use open_context_lib::{EventEmitter, AppEvent};
+use open_app_lib::{EventEmitter, AppEvent};
 
 let emitter = EventEmitter::new(app.handle().clone());
 let event = AppEvent::AppReady { timestamp: AppEvent::now() };
@@ -191,16 +237,11 @@ emitter.emit_global(&event)?;
 **前端监听事件（React）**：
 
 ```tsx
-import { useThemeEvent, useServiceStatus } from '@/hooks/use-app-events';
+import { useThemeEvent } from '@/hooks/use-app-events';
 
 function MyComponent() {
   const theme = useThemeEvent('system');
-  const nodeServer = useServiceStatus('node-server');
-  return (
-    <div>
-      Theme: {theme}, Server: {nodeServer.isRunning}
-    </div>
-  );
+  return <div>Theme: {theme}</div>;
 }
 ```
 
@@ -211,7 +252,7 @@ function MyComponent() {
 **后端加载（Rust）**：
 
 ```rust
-use open_context_lib::app_file_tree::read_dir_on_demand;
+use open_app_lib::app_service::app_file_tree::read_dir_on_demand;
 
 let nodes = read_dir_on_demand(dir_path).await?;
 ```
@@ -286,7 +327,6 @@ pnpm build:app     # Tauri 桌面应用
 # Rust 测试
 cargo test --lib
 cargo test --lib app_events        # 测试特定模块
-cargo run --example event_usage    # 运行示例
 
 # Node.js 测试
 pnpm --filter open-node test
@@ -318,33 +358,41 @@ pnpm fmt:js         # JavaScript/TypeScript (Prettier)
 所有数据存储在 `~/.config/open-context/`（可通过 `OPEN_CONTEXT_CONFIG_DIR` 环境变量自定义），另外前端状态持久化使用 Tauri Store，存储在 `~/.open-context/cache/` 下。
 
 ```
-~/.config/open-context/
-├── config.json          # 全局配置
-├── app_state.db         # SQLite 数据库（工作空间、笔记、文件、对话）
-├── leveldb/             # LevelDB 数据库
-│   ├── main/            # 主数据库（符号、元数据）
-│   ├── edges/           # 正向边（依赖关系）
-│   └── reverse-edges/   # 反向边（被依赖关系）
-├── qdrant/              # Qdrant 向量数据库
-├── logs/                # 应用日志
-└── workspaces/          # 工作空间数据
-    └── {workspace-id}/
-        ├── repos/       # Git 仓库缓存
-        ├── files/       # 文件资源
-        └── notes/       # 笔记数据
-
-~/.open-context/cache/
-└── store.bin            # Tauri Store（前端状态持久化）
+~/.open-context/
+├── bin/            # 安装的二进制文件（sidecar模式）
+├── cache/          # 缓存目录（Tauri Store 持久化文件）
+├── config/         # 配置文件（config.json）
+├── database/       # 数据库数据
+│   ├── app_state.db    # SQLite 数据库
+│   ├── surrealdb/          # surrealdb 数据库
+│   ├── leveldb/        # LevelDB 数据库
+│   │   ├── main/           # 主数据库（符号、元数据）
+│   │   ├── edges/          # 正向边（依赖关系）
+│   │   └── reverse-edges/  # 反向边（被依赖关系）
+│   └── qdrant/         # Qdrant 向量数据库
+├── notebook/       # 笔记数据
+├── session/        # 会话数据
+├── workspace/      # 工作空间数据
+├── files/          # 文件索引数据
+├── logs/           # 应用日志
+├── plugins/        # 插件配置
+├── commands/       # 命令历史/配置
+├── skills/         # Skills 数据
+├── todos/          # Todo 数据
+├── projects/       # 项目数据
+├── rules/          # 规则数据
+└── hooks/          # Hooks 配置
 ```
 
 ### 数据库技术栈
 
-| 数据库          | 用途               | 位置             |
-| --------------- | ------------------ | ---------------- |
-| **SQLite**      | 元数据、状态管理   | `app_state.db`   |
-| **LevelDB**     | 符号、依赖关系图   | `leveldb/`       |
-| **Qdrant**      | 向量嵌入、语义搜索 | `qdrant/` 或远程 |
-| **Tauri Store** | 前端状态持久化     | `store.bin`      |
+| 数据库          | 用途               | 位置                    |
+| --------------- | ------------------ | ----------------------- |
+| **SQLite**      | 元数据、状态管理   | `app_state.db`          |
+| **LevelDB**     | 符号、依赖关系图   | `leveldb/`              |
+| **Qdrant**      | 向量嵌入、语义搜索 | `qdrant/` 或远程        |
+| **surrealdb**   | 向量嵌入、全文搜索 | `surrealdb/` 或远程     |
+| **Tauri Store** | 前端状态持久化     | `chat-store.store.json` |
 
 ## 时间处理规范
 
@@ -432,9 +480,8 @@ Node.js 服务器运行在 `http://localhost:4500`：
 **事件系统**：
 
 - 添加新事件：在 `app_events.rs` 中添加枚举变体
-- 同步更新 `packages/open-web/src/types/app-events.types.ts`
+- 同步更新 `apps/open-web/src/lib/app-events.ts`
 - 如需要，在 `use-app-events.ts` 中添加便捷 Hook
-- 参考 `examples/event_usage.rs`
 
 **状态管理**：
 
@@ -446,7 +493,6 @@ Node.js 服务器运行在 `http://localhost:4500`：
 
 - 使用 `ConfigManager` 进行线程安全的配置访问
 - 修改配置后自动保存
-- 参考 `examples/config_usage.rs`
 
 ### Node.js RAG 引擎开发
 
@@ -495,14 +541,14 @@ Node.js 服务器运行在 `http://localhost:4500`：
 
 ## 配置文件
 
-| 文件                               | 说明                               |
-| ---------------------------------- | ---------------------------------- |
-| `tauri.conf.json`                  | Tauri 应用配置（窗口、打包、更新） |
-| `Cargo.toml`                       | Rust 依赖和构建配置                |
-| `packages/open-node/esbuild.mjs`   | Node.js 构建配置                   |
-| `packages/open-web/vite.config.ts` | Vite/React 构建配置                |
-| `.oxlintrc.json`                   | JavaScript/TypeScript 检查规则     |
-| `.prettierrc`                      | 代码格式化规则                     |
+| 文件                           | 说明                               |
+| ------------------------------ | ---------------------------------- |
+| `tauri.conf.json`              | Tauri 应用配置（窗口、打包、更新） |
+| `Cargo.toml`                   | Rust 依赖和构建配置                |
+| `apps/open-node/esbuild.mjs`   | Node.js 构建配置                   |
+| `apps/open-web/vite.config.ts` | Vite/React 构建配置                |
+| `.oxlintrc.json`               | JavaScript/TypeScript 检查规则     |
+| `.prettierrc`                  | 代码格式化规则                     |
 
 ## 文档参考
 
@@ -512,12 +558,9 @@ Node.js 服务器运行在 `http://localhost:4500`：
 - [EVENT_SYSTEM.md](docs/APP_EVENT_SYSTEM.md) - 事件系统完整文档
 - [APP_CONFIG_USAGE.md](./docs/APP_CONFIG_USAGE.md) - 配置管理使用指南
 - [TAURI_COMMANDS.md](docs/APP_TAURI_COMMANDS.md) - Tauri IPC 命令参考
-- [APP_COLOR_PALETTE.md](docs/APP_COLOR_PALETTE.md) - 应用配色方案
 - [OpenSpec 变更提案](openspec/) - 功能提案和设计文档
 
 ### 代码示例
 
-- [examples/event_usage.rs](./examples/event_usage.rs) - 事件系统示例
-- [examples/config_usage.rs](./examples/config_usage.rs) - 配置管理示例
-- [packages/open-web/src/components/event-demo.tsx](./packages/open-web/src/components/event-demo.tsx) - React 事件示例
-- [packages/open-web/src/components/file-tree/file-tree-demo.tsx](./packages/open-web/src/components/file-tree/file-tree-demo.tsx) - 文件树示例
+- [apps/open-web/src/components/event-demo.tsx](./apps/open-web/src/components/event-demo.tsx) - React 事件示例
+- [apps/open-web/src/components/file-tree/file-tree-demo.tsx](./apps/open-web/src/components/file-tree/file-tree-demo.tsx) - 文件树示例

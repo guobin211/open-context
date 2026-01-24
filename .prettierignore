@@ -7,6 +7,7 @@ build
 uploads
 public
 icons
+gen
 *.gen.ts
 *-lock.yaml
 .tanstack

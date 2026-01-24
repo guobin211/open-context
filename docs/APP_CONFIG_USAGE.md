@@ -17,15 +17,17 @@
 
 ```
 ~/.open-context/
+├── bin/            # 安装的二进制文件（sidecar模式）
 ├── cache/          # 缓存目录（Tauri Store 持久化文件）
 ├── config/         # 配置文件（config.json）
 ├── database/       # 数据库数据
-│   ├── app_state.db    # SQLite 数据库
-│   ├── leveldb/        # LevelDB 数据库
+│   ├── app_state.db        # SQLite 数据库
+│   ├── surrealdb/          # surrealdb 数据库
+│   ├── leveldb/            # LevelDB 数据库
 │   │   ├── main/           # 主数据库（符号、元数据）
 │   │   ├── edges/          # 正向边（依赖关系）
 │   │   └── reverse-edges/  # 反向边（被依赖关系）
-│   └── qdrant/         # Qdrant 向量数据库
+│   └── qdrant/             # Qdrant 向量数据库
 ├── notebook/       # 笔记数据
 ├── session/        # 会话数据
 ├── workspace/      # 工作空间数据

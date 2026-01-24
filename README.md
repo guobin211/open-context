@@ -189,13 +189,8 @@ Node.js 服务器运行在 `http://localhost:4500`，主要接口：
 
 ### 子项目文档
 
-- [Node.js 后端](./packages/open-node/README.md) - RAG 引擎、代码索引、向量检索
-- [React 前端](./packages/open-web/README.md) - UI 组件、路由、状态管理
-
-### 代码示例
-
-- [事件系统示例](./examples/event_usage.rs)
-- [配置管理示例](./examples/config_usage.rs)
+- [Node.js 后端](./apps/open-node/README.md) - RAG 引擎、代码索引、向量检索
+- [React 前端](./apps/open-web/README.md) - UI 组件、路由、状态管理
 
 ## 🤝 贡献
 

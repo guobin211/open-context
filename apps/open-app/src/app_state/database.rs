@@ -151,6 +151,27 @@ impl DatabaseManager {
             [],
         )?;
 
+        conn.execute(
+            "CREATE TABLE IF NOT EXISTS tasks (
+                id TEXT PRIMARY KEY,
+                task_type TEXT NOT NULL,
+                status TEXT NOT NULL DEFAULT 'pending',
+                progress INTEGER NOT NULL DEFAULT 0,
+                message TEXT,
+                result TEXT,
+                error TEXT,
+                retry_count INTEGER NOT NULL DEFAULT 0,
+                max_retries INTEGER NOT NULL DEFAULT 3,
+                retry_delay_ms INTEGER NOT NULL DEFAULT 1000,
+                input TEXT,
+                persistent INTEGER NOT NULL DEFAULT 0,
+                created_at INTEGER NOT NULL,
+                updated_at INTEGER NOT NULL,
+                completed_at INTEGER
+            )",
+            [],
+        )?;
+
         self.run_migrations(&conn)?;
         self.create_indexes(&conn)?;
 
@@ -363,6 +384,23 @@ impl DatabaseManager {
         conn.execute("CREATE INDEX IF NOT EXISTS idx_links_visited ON web_links(workspace_id, last_visited_at DESC)", [])?;
         conn.execute(
             "CREATE INDEX IF NOT EXISTS idx_links_url ON web_links(url)",
+            [],
+        )?;
+
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_tasks_status ON tasks(status)",
+            [],
+        )?;
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_tasks_type ON tasks(task_type)",
+            [],
+        )?;
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_tasks_persistent ON tasks(persistent)",
+            [],
+        )?;
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_tasks_created_at ON tasks(created_at)",
             [],
         )?;
 
