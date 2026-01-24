@@ -34,11 +34,11 @@ export const Breadcrumb: React.FC<BreadcrumbProps> = ({ currentPath, onNavigate,
         className
       )}
     >
-      <Folder className="text-muted-foreground h-4 w-4 flex-shrink-0" />
+      <Folder className="text-muted-foreground h-4 w-4 shrink-0" />
 
       {segments.map((segment, index) => (
         <React.Fragment key={segment.fullPath}>
-          {index > 0 && <ChevronRight className="text-muted-foreground h-3 w-3 flex-shrink-0" />}
+          {index > 0 && <ChevronRight className="text-muted-foreground h-3 w-3 shrink-0" />}
           <button
             onClick={() => onNavigate?.(segment.fullPath)}
             className={cn(

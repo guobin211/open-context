@@ -6,13 +6,6 @@
 
 @custom-variant dark (&:is(.dark *));
 
-html,
-body {
-  margin: 0;
-  padding: 0;
-  background: transparent;
-}
-
 * {
   box-sizing: border-box;
 }
@@ -138,8 +131,15 @@ body {
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground;
+    @apply text-foreground;
   }
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: transparent;
 }
 
 .cursor {

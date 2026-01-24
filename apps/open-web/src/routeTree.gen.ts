@@ -11,6 +11,35 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as SettingsIndexRouteImport } from './routes/settings/index'
+import { Route as PlaygroundIndexRouteImport } from './routes/playground/index'
+import { Route as PlaygroundXmlParserRouteImport } from './routes/playground/xml-parser'
+import { Route as PlaygroundWorkflowEditorRouteImport } from './routes/playground/workflow-editor'
+import { Route as PlaygroundWordViewerRouteImport } from './routes/playground/word-viewer'
+import { Route as PlaygroundWebviewRouteImport } from './routes/playground/webview'
+import { Route as PlaygroundVirtualListRouteImport } from './routes/playground/virtual-list'
+import { Route as PlaygroundTerminalRouteImport } from './routes/playground/terminal'
+import { Route as PlaygroundRichTextRouteImport } from './routes/playground/rich-text'
+import { Route as PlaygroundQrcodeGeneratorRouteImport } from './routes/playground/qrcode-generator'
+import { Route as PlaygroundPngParserRouteImport } from './routes/playground/png-parser'
+import { Route as PlaygroundPdfViewerRouteImport } from './routes/playground/pdf-viewer'
+import { Route as PlaygroundOcrViewerRouteImport } from './routes/playground/ocr-viewer'
+import { Route as PlaygroundMarkdownRouteImport } from './routes/playground/markdown'
+import { Route as PlaygroundKatexMathRouteImport } from './routes/playground/katex-math'
+import { Route as PlaygroundJsonEditorRouteImport } from './routes/playground/json-editor'
+import { Route as PlaygroundImageEditorRouteImport } from './routes/playground/image-editor'
+import { Route as PlaygroundHotkeysDemoRouteImport } from './routes/playground/hotkeys-demo'
+import { Route as PlaygroundFileTreeRouteImport } from './routes/playground/file-tree'
+import { Route as PlaygroundFileManagerRouteImport } from './routes/playground/file-manager'
+import { Route as PlaygroundExcelViewerRouteImport } from './routes/playground/excel-viewer'
+import { Route as PlaygroundExcelToJsonRouteImport } from './routes/playground/excel-to-json'
+import { Route as PlaygroundDragAndDropRouteImport } from './routes/playground/drag-and-drop'
+import { Route as PlaygroundDiffViewerRouteImport } from './routes/playground/diff-viewer'
+import { Route as PlaygroundDataVizRouteImport } from './routes/playground/data-viz'
+import { Route as PlaygroundCropperDemoRouteImport } from './routes/playground/cropper-demo'
+import { Route as PlaygroundCosUploadRouteImport } from './routes/playground/cos-upload'
+import { Route as PlaygroundCodeEditorRouteImport } from './routes/playground/code-editor'
+import { Route as PlaygroundChatRouteImport } from './routes/playground/chat'
+import { Route as PlaygroundAstViewerRouteImport } from './routes/playground/ast-viewer'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
@@ -22,30 +51,387 @@ const SettingsIndexRoute = SettingsIndexRouteImport.update({
   path: '/settings/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PlaygroundIndexRoute = PlaygroundIndexRouteImport.update({
+  id: '/playground/',
+  path: '/playground/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlaygroundXmlParserRoute = PlaygroundXmlParserRouteImport.update({
+  id: '/playground/xml-parser',
+  path: '/playground/xml-parser',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlaygroundWorkflowEditorRoute =
+  PlaygroundWorkflowEditorRouteImport.update({
+    id: '/playground/workflow-editor',
+    path: '/playground/workflow-editor',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const PlaygroundWordViewerRoute = PlaygroundWordViewerRouteImport.update({
+  id: '/playground/word-viewer',
+  path: '/playground/word-viewer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlaygroundWebviewRoute = PlaygroundWebviewRouteImport.update({
+  id: '/playground/webview',
+  path: '/playground/webview',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlaygroundVirtualListRoute = PlaygroundVirtualListRouteImport.update({
+  id: '/playground/virtual-list',
+  path: '/playground/virtual-list',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlaygroundTerminalRoute = PlaygroundTerminalRouteImport.update({
+  id: '/playground/terminal',
+  path: '/playground/terminal',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlaygroundRichTextRoute = PlaygroundRichTextRouteImport.update({
+  id: '/playground/rich-text',
+  path: '/playground/rich-text',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlaygroundQrcodeGeneratorRoute =
+  PlaygroundQrcodeGeneratorRouteImport.update({
+    id: '/playground/qrcode-generator',
+    path: '/playground/qrcode-generator',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const PlaygroundPngParserRoute = PlaygroundPngParserRouteImport.update({
+  id: '/playground/png-parser',
+  path: '/playground/png-parser',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlaygroundPdfViewerRoute = PlaygroundPdfViewerRouteImport.update({
+  id: '/playground/pdf-viewer',
+  path: '/playground/pdf-viewer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlaygroundOcrViewerRoute = PlaygroundOcrViewerRouteImport.update({
+  id: '/playground/ocr-viewer',
+  path: '/playground/ocr-viewer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlaygroundMarkdownRoute = PlaygroundMarkdownRouteImport.update({
+  id: '/playground/markdown',
+  path: '/playground/markdown',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlaygroundKatexMathRoute = PlaygroundKatexMathRouteImport.update({
+  id: '/playground/katex-math',
+  path: '/playground/katex-math',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlaygroundJsonEditorRoute = PlaygroundJsonEditorRouteImport.update({
+  id: '/playground/json-editor',
+  path: '/playground/json-editor',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlaygroundImageEditorRoute = PlaygroundImageEditorRouteImport.update({
+  id: '/playground/image-editor',
+  path: '/playground/image-editor',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlaygroundHotkeysDemoRoute = PlaygroundHotkeysDemoRouteImport.update({
+  id: '/playground/hotkeys-demo',
+  path: '/playground/hotkeys-demo',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlaygroundFileTreeRoute = PlaygroundFileTreeRouteImport.update({
+  id: '/playground/file-tree',
+  path: '/playground/file-tree',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlaygroundFileManagerRoute = PlaygroundFileManagerRouteImport.update({
+  id: '/playground/file-manager',
+  path: '/playground/file-manager',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlaygroundExcelViewerRoute = PlaygroundExcelViewerRouteImport.update({
+  id: '/playground/excel-viewer',
+  path: '/playground/excel-viewer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlaygroundExcelToJsonRoute = PlaygroundExcelToJsonRouteImport.update({
+  id: '/playground/excel-to-json',
+  path: '/playground/excel-to-json',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlaygroundDragAndDropRoute = PlaygroundDragAndDropRouteImport.update({
+  id: '/playground/drag-and-drop',
+  path: '/playground/drag-and-drop',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlaygroundDiffViewerRoute = PlaygroundDiffViewerRouteImport.update({
+  id: '/playground/diff-viewer',
+  path: '/playground/diff-viewer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlaygroundDataVizRoute = PlaygroundDataVizRouteImport.update({
+  id: '/playground/data-viz',
+  path: '/playground/data-viz',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlaygroundCropperDemoRoute = PlaygroundCropperDemoRouteImport.update({
+  id: '/playground/cropper-demo',
+  path: '/playground/cropper-demo',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlaygroundCosUploadRoute = PlaygroundCosUploadRouteImport.update({
+  id: '/playground/cos-upload',
+  path: '/playground/cos-upload',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlaygroundCodeEditorRoute = PlaygroundCodeEditorRouteImport.update({
+  id: '/playground/code-editor',
+  path: '/playground/code-editor',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlaygroundChatRoute = PlaygroundChatRouteImport.update({
+  id: '/playground/chat',
+  path: '/playground/chat',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PlaygroundAstViewerRoute = PlaygroundAstViewerRouteImport.update({
+  id: '/playground/ast-viewer',
+  path: '/playground/ast-viewer',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/playground/ast-viewer': typeof PlaygroundAstViewerRoute
+  '/playground/chat': typeof PlaygroundChatRoute
+  '/playground/code-editor': typeof PlaygroundCodeEditorRoute
+  '/playground/cos-upload': typeof PlaygroundCosUploadRoute
+  '/playground/cropper-demo': typeof PlaygroundCropperDemoRoute
+  '/playground/data-viz': typeof PlaygroundDataVizRoute
+  '/playground/diff-viewer': typeof PlaygroundDiffViewerRoute
+  '/playground/drag-and-drop': typeof PlaygroundDragAndDropRoute
+  '/playground/excel-to-json': typeof PlaygroundExcelToJsonRoute
+  '/playground/excel-viewer': typeof PlaygroundExcelViewerRoute
+  '/playground/file-manager': typeof PlaygroundFileManagerRoute
+  '/playground/file-tree': typeof PlaygroundFileTreeRoute
+  '/playground/hotkeys-demo': typeof PlaygroundHotkeysDemoRoute
+  '/playground/image-editor': typeof PlaygroundImageEditorRoute
+  '/playground/json-editor': typeof PlaygroundJsonEditorRoute
+  '/playground/katex-math': typeof PlaygroundKatexMathRoute
+  '/playground/markdown': typeof PlaygroundMarkdownRoute
+  '/playground/ocr-viewer': typeof PlaygroundOcrViewerRoute
+  '/playground/pdf-viewer': typeof PlaygroundPdfViewerRoute
+  '/playground/png-parser': typeof PlaygroundPngParserRoute
+  '/playground/qrcode-generator': typeof PlaygroundQrcodeGeneratorRoute
+  '/playground/rich-text': typeof PlaygroundRichTextRoute
+  '/playground/terminal': typeof PlaygroundTerminalRoute
+  '/playground/virtual-list': typeof PlaygroundVirtualListRoute
+  '/playground/webview': typeof PlaygroundWebviewRoute
+  '/playground/word-viewer': typeof PlaygroundWordViewerRoute
+  '/playground/workflow-editor': typeof PlaygroundWorkflowEditorRoute
+  '/playground/xml-parser': typeof PlaygroundXmlParserRoute
+  '/playground/': typeof PlaygroundIndexRoute
   '/settings/': typeof SettingsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/playground/ast-viewer': typeof PlaygroundAstViewerRoute
+  '/playground/chat': typeof PlaygroundChatRoute
+  '/playground/code-editor': typeof PlaygroundCodeEditorRoute
+  '/playground/cos-upload': typeof PlaygroundCosUploadRoute
+  '/playground/cropper-demo': typeof PlaygroundCropperDemoRoute
+  '/playground/data-viz': typeof PlaygroundDataVizRoute
+  '/playground/diff-viewer': typeof PlaygroundDiffViewerRoute
+  '/playground/drag-and-drop': typeof PlaygroundDragAndDropRoute
+  '/playground/excel-to-json': typeof PlaygroundExcelToJsonRoute
+  '/playground/excel-viewer': typeof PlaygroundExcelViewerRoute
+  '/playground/file-manager': typeof PlaygroundFileManagerRoute
+  '/playground/file-tree': typeof PlaygroundFileTreeRoute
+  '/playground/hotkeys-demo': typeof PlaygroundHotkeysDemoRoute
+  '/playground/image-editor': typeof PlaygroundImageEditorRoute
+  '/playground/json-editor': typeof PlaygroundJsonEditorRoute
+  '/playground/katex-math': typeof PlaygroundKatexMathRoute
+  '/playground/markdown': typeof PlaygroundMarkdownRoute
+  '/playground/ocr-viewer': typeof PlaygroundOcrViewerRoute
+  '/playground/pdf-viewer': typeof PlaygroundPdfViewerRoute
+  '/playground/png-parser': typeof PlaygroundPngParserRoute
+  '/playground/qrcode-generator': typeof PlaygroundQrcodeGeneratorRoute
+  '/playground/rich-text': typeof PlaygroundRichTextRoute
+  '/playground/terminal': typeof PlaygroundTerminalRoute
+  '/playground/virtual-list': typeof PlaygroundVirtualListRoute
+  '/playground/webview': typeof PlaygroundWebviewRoute
+  '/playground/word-viewer': typeof PlaygroundWordViewerRoute
+  '/playground/workflow-editor': typeof PlaygroundWorkflowEditorRoute
+  '/playground/xml-parser': typeof PlaygroundXmlParserRoute
+  '/playground': typeof PlaygroundIndexRoute
   '/settings': typeof SettingsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/playground/ast-viewer': typeof PlaygroundAstViewerRoute
+  '/playground/chat': typeof PlaygroundChatRoute
+  '/playground/code-editor': typeof PlaygroundCodeEditorRoute
+  '/playground/cos-upload': typeof PlaygroundCosUploadRoute
+  '/playground/cropper-demo': typeof PlaygroundCropperDemoRoute
+  '/playground/data-viz': typeof PlaygroundDataVizRoute
+  '/playground/diff-viewer': typeof PlaygroundDiffViewerRoute
+  '/playground/drag-and-drop': typeof PlaygroundDragAndDropRoute
+  '/playground/excel-to-json': typeof PlaygroundExcelToJsonRoute
+  '/playground/excel-viewer': typeof PlaygroundExcelViewerRoute
+  '/playground/file-manager': typeof PlaygroundFileManagerRoute
+  '/playground/file-tree': typeof PlaygroundFileTreeRoute
+  '/playground/hotkeys-demo': typeof PlaygroundHotkeysDemoRoute
+  '/playground/image-editor': typeof PlaygroundImageEditorRoute
+  '/playground/json-editor': typeof PlaygroundJsonEditorRoute
+  '/playground/katex-math': typeof PlaygroundKatexMathRoute
+  '/playground/markdown': typeof PlaygroundMarkdownRoute
+  '/playground/ocr-viewer': typeof PlaygroundOcrViewerRoute
+  '/playground/pdf-viewer': typeof PlaygroundPdfViewerRoute
+  '/playground/png-parser': typeof PlaygroundPngParserRoute
+  '/playground/qrcode-generator': typeof PlaygroundQrcodeGeneratorRoute
+  '/playground/rich-text': typeof PlaygroundRichTextRoute
+  '/playground/terminal': typeof PlaygroundTerminalRoute
+  '/playground/virtual-list': typeof PlaygroundVirtualListRoute
+  '/playground/webview': typeof PlaygroundWebviewRoute
+  '/playground/word-viewer': typeof PlaygroundWordViewerRoute
+  '/playground/workflow-editor': typeof PlaygroundWorkflowEditorRoute
+  '/playground/xml-parser': typeof PlaygroundXmlParserRoute
+  '/playground/': typeof PlaygroundIndexRoute
   '/settings/': typeof SettingsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/settings/'
+  fullPaths:
+    | '/'
+    | '/playground/ast-viewer'
+    | '/playground/chat'
+    | '/playground/code-editor'
+    | '/playground/cos-upload'
+    | '/playground/cropper-demo'
+    | '/playground/data-viz'
+    | '/playground/diff-viewer'
+    | '/playground/drag-and-drop'
+    | '/playground/excel-to-json'
+    | '/playground/excel-viewer'
+    | '/playground/file-manager'
+    | '/playground/file-tree'
+    | '/playground/hotkeys-demo'
+    | '/playground/image-editor'
+    | '/playground/json-editor'
+    | '/playground/katex-math'
+    | '/playground/markdown'
+    | '/playground/ocr-viewer'
+    | '/playground/pdf-viewer'
+    | '/playground/png-parser'
+    | '/playground/qrcode-generator'
+    | '/playground/rich-text'
+    | '/playground/terminal'
+    | '/playground/virtual-list'
+    | '/playground/webview'
+    | '/playground/word-viewer'
+    | '/playground/workflow-editor'
+    | '/playground/xml-parser'
+    | '/playground/'
+    | '/settings/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/settings'
-  id: '__root__' | '/' | '/settings/'
+  to:
+    | '/'
+    | '/playground/ast-viewer'
+    | '/playground/chat'
+    | '/playground/code-editor'
+    | '/playground/cos-upload'
+    | '/playground/cropper-demo'
+    | '/playground/data-viz'
+    | '/playground/diff-viewer'
+    | '/playground/drag-and-drop'
+    | '/playground/excel-to-json'
+    | '/playground/excel-viewer'
+    | '/playground/file-manager'
+    | '/playground/file-tree'
+    | '/playground/hotkeys-demo'
+    | '/playground/image-editor'
+    | '/playground/json-editor'
+    | '/playground/katex-math'
+    | '/playground/markdown'
+    | '/playground/ocr-viewer'
+    | '/playground/pdf-viewer'
+    | '/playground/png-parser'
+    | '/playground/qrcode-generator'
+    | '/playground/rich-text'
+    | '/playground/terminal'
+    | '/playground/virtual-list'
+    | '/playground/webview'
+    | '/playground/word-viewer'
+    | '/playground/workflow-editor'
+    | '/playground/xml-parser'
+    | '/playground'
+    | '/settings'
+  id:
+    | '__root__'
+    | '/'
+    | '/playground/ast-viewer'
+    | '/playground/chat'
+    | '/playground/code-editor'
+    | '/playground/cos-upload'
+    | '/playground/cropper-demo'
+    | '/playground/data-viz'
+    | '/playground/diff-viewer'
+    | '/playground/drag-and-drop'
+    | '/playground/excel-to-json'
+    | '/playground/excel-viewer'
+    | '/playground/file-manager'
+    | '/playground/file-tree'
+    | '/playground/hotkeys-demo'
+    | '/playground/image-editor'
+    | '/playground/json-editor'
+    | '/playground/katex-math'
+    | '/playground/markdown'
+    | '/playground/ocr-viewer'
+    | '/playground/pdf-viewer'
+    | '/playground/png-parser'
+    | '/playground/qrcode-generator'
+    | '/playground/rich-text'
+    | '/playground/terminal'
+    | '/playground/virtual-list'
+    | '/playground/webview'
+    | '/playground/word-viewer'
+    | '/playground/workflow-editor'
+    | '/playground/xml-parser'
+    | '/playground/'
+    | '/settings/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  PlaygroundAstViewerRoute: typeof PlaygroundAstViewerRoute
+  PlaygroundChatRoute: typeof PlaygroundChatRoute
+  PlaygroundCodeEditorRoute: typeof PlaygroundCodeEditorRoute
+  PlaygroundCosUploadRoute: typeof PlaygroundCosUploadRoute
+  PlaygroundCropperDemoRoute: typeof PlaygroundCropperDemoRoute
+  PlaygroundDataVizRoute: typeof PlaygroundDataVizRoute
+  PlaygroundDiffViewerRoute: typeof PlaygroundDiffViewerRoute
+  PlaygroundDragAndDropRoute: typeof PlaygroundDragAndDropRoute
+  PlaygroundExcelToJsonRoute: typeof PlaygroundExcelToJsonRoute
+  PlaygroundExcelViewerRoute: typeof PlaygroundExcelViewerRoute
+  PlaygroundFileManagerRoute: typeof PlaygroundFileManagerRoute
+  PlaygroundFileTreeRoute: typeof PlaygroundFileTreeRoute
+  PlaygroundHotkeysDemoRoute: typeof PlaygroundHotkeysDemoRoute
+  PlaygroundImageEditorRoute: typeof PlaygroundImageEditorRoute
+  PlaygroundJsonEditorRoute: typeof PlaygroundJsonEditorRoute
+  PlaygroundKatexMathRoute: typeof PlaygroundKatexMathRoute
+  PlaygroundMarkdownRoute: typeof PlaygroundMarkdownRoute
+  PlaygroundOcrViewerRoute: typeof PlaygroundOcrViewerRoute
+  PlaygroundPdfViewerRoute: typeof PlaygroundPdfViewerRoute
+  PlaygroundPngParserRoute: typeof PlaygroundPngParserRoute
+  PlaygroundQrcodeGeneratorRoute: typeof PlaygroundQrcodeGeneratorRoute
+  PlaygroundRichTextRoute: typeof PlaygroundRichTextRoute
+  PlaygroundTerminalRoute: typeof PlaygroundTerminalRoute
+  PlaygroundVirtualListRoute: typeof PlaygroundVirtualListRoute
+  PlaygroundWebviewRoute: typeof PlaygroundWebviewRoute
+  PlaygroundWordViewerRoute: typeof PlaygroundWordViewerRoute
+  PlaygroundWorkflowEditorRoute: typeof PlaygroundWorkflowEditorRoute
+  PlaygroundXmlParserRoute: typeof PlaygroundXmlParserRoute
+  PlaygroundIndexRoute: typeof PlaygroundIndexRoute
   SettingsIndexRoute: typeof SettingsIndexRoute
 }
 
@@ -65,11 +451,243 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SettingsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/playground/': {
+      id: '/playground/'
+      path: '/playground'
+      fullPath: '/playground/'
+      preLoaderRoute: typeof PlaygroundIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/playground/xml-parser': {
+      id: '/playground/xml-parser'
+      path: '/playground/xml-parser'
+      fullPath: '/playground/xml-parser'
+      preLoaderRoute: typeof PlaygroundXmlParserRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/playground/workflow-editor': {
+      id: '/playground/workflow-editor'
+      path: '/playground/workflow-editor'
+      fullPath: '/playground/workflow-editor'
+      preLoaderRoute: typeof PlaygroundWorkflowEditorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/playground/word-viewer': {
+      id: '/playground/word-viewer'
+      path: '/playground/word-viewer'
+      fullPath: '/playground/word-viewer'
+      preLoaderRoute: typeof PlaygroundWordViewerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/playground/webview': {
+      id: '/playground/webview'
+      path: '/playground/webview'
+      fullPath: '/playground/webview'
+      preLoaderRoute: typeof PlaygroundWebviewRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/playground/virtual-list': {
+      id: '/playground/virtual-list'
+      path: '/playground/virtual-list'
+      fullPath: '/playground/virtual-list'
+      preLoaderRoute: typeof PlaygroundVirtualListRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/playground/terminal': {
+      id: '/playground/terminal'
+      path: '/playground/terminal'
+      fullPath: '/playground/terminal'
+      preLoaderRoute: typeof PlaygroundTerminalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/playground/rich-text': {
+      id: '/playground/rich-text'
+      path: '/playground/rich-text'
+      fullPath: '/playground/rich-text'
+      preLoaderRoute: typeof PlaygroundRichTextRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/playground/qrcode-generator': {
+      id: '/playground/qrcode-generator'
+      path: '/playground/qrcode-generator'
+      fullPath: '/playground/qrcode-generator'
+      preLoaderRoute: typeof PlaygroundQrcodeGeneratorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/playground/png-parser': {
+      id: '/playground/png-parser'
+      path: '/playground/png-parser'
+      fullPath: '/playground/png-parser'
+      preLoaderRoute: typeof PlaygroundPngParserRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/playground/pdf-viewer': {
+      id: '/playground/pdf-viewer'
+      path: '/playground/pdf-viewer'
+      fullPath: '/playground/pdf-viewer'
+      preLoaderRoute: typeof PlaygroundPdfViewerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/playground/ocr-viewer': {
+      id: '/playground/ocr-viewer'
+      path: '/playground/ocr-viewer'
+      fullPath: '/playground/ocr-viewer'
+      preLoaderRoute: typeof PlaygroundOcrViewerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/playground/markdown': {
+      id: '/playground/markdown'
+      path: '/playground/markdown'
+      fullPath: '/playground/markdown'
+      preLoaderRoute: typeof PlaygroundMarkdownRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/playground/katex-math': {
+      id: '/playground/katex-math'
+      path: '/playground/katex-math'
+      fullPath: '/playground/katex-math'
+      preLoaderRoute: typeof PlaygroundKatexMathRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/playground/json-editor': {
+      id: '/playground/json-editor'
+      path: '/playground/json-editor'
+      fullPath: '/playground/json-editor'
+      preLoaderRoute: typeof PlaygroundJsonEditorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/playground/image-editor': {
+      id: '/playground/image-editor'
+      path: '/playground/image-editor'
+      fullPath: '/playground/image-editor'
+      preLoaderRoute: typeof PlaygroundImageEditorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/playground/hotkeys-demo': {
+      id: '/playground/hotkeys-demo'
+      path: '/playground/hotkeys-demo'
+      fullPath: '/playground/hotkeys-demo'
+      preLoaderRoute: typeof PlaygroundHotkeysDemoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/playground/file-tree': {
+      id: '/playground/file-tree'
+      path: '/playground/file-tree'
+      fullPath: '/playground/file-tree'
+      preLoaderRoute: typeof PlaygroundFileTreeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/playground/file-manager': {
+      id: '/playground/file-manager'
+      path: '/playground/file-manager'
+      fullPath: '/playground/file-manager'
+      preLoaderRoute: typeof PlaygroundFileManagerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/playground/excel-viewer': {
+      id: '/playground/excel-viewer'
+      path: '/playground/excel-viewer'
+      fullPath: '/playground/excel-viewer'
+      preLoaderRoute: typeof PlaygroundExcelViewerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/playground/excel-to-json': {
+      id: '/playground/excel-to-json'
+      path: '/playground/excel-to-json'
+      fullPath: '/playground/excel-to-json'
+      preLoaderRoute: typeof PlaygroundExcelToJsonRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/playground/drag-and-drop': {
+      id: '/playground/drag-and-drop'
+      path: '/playground/drag-and-drop'
+      fullPath: '/playground/drag-and-drop'
+      preLoaderRoute: typeof PlaygroundDragAndDropRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/playground/diff-viewer': {
+      id: '/playground/diff-viewer'
+      path: '/playground/diff-viewer'
+      fullPath: '/playground/diff-viewer'
+      preLoaderRoute: typeof PlaygroundDiffViewerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/playground/data-viz': {
+      id: '/playground/data-viz'
+      path: '/playground/data-viz'
+      fullPath: '/playground/data-viz'
+      preLoaderRoute: typeof PlaygroundDataVizRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/playground/cropper-demo': {
+      id: '/playground/cropper-demo'
+      path: '/playground/cropper-demo'
+      fullPath: '/playground/cropper-demo'
+      preLoaderRoute: typeof PlaygroundCropperDemoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/playground/cos-upload': {
+      id: '/playground/cos-upload'
+      path: '/playground/cos-upload'
+      fullPath: '/playground/cos-upload'
+      preLoaderRoute: typeof PlaygroundCosUploadRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/playground/code-editor': {
+      id: '/playground/code-editor'
+      path: '/playground/code-editor'
+      fullPath: '/playground/code-editor'
+      preLoaderRoute: typeof PlaygroundCodeEditorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/playground/chat': {
+      id: '/playground/chat'
+      path: '/playground/chat'
+      fullPath: '/playground/chat'
+      preLoaderRoute: typeof PlaygroundChatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/playground/ast-viewer': {
+      id: '/playground/ast-viewer'
+      path: '/playground/ast-viewer'
+      fullPath: '/playground/ast-viewer'
+      preLoaderRoute: typeof PlaygroundAstViewerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  PlaygroundAstViewerRoute: PlaygroundAstViewerRoute,
+  PlaygroundChatRoute: PlaygroundChatRoute,
+  PlaygroundCodeEditorRoute: PlaygroundCodeEditorRoute,
+  PlaygroundCosUploadRoute: PlaygroundCosUploadRoute,
+  PlaygroundCropperDemoRoute: PlaygroundCropperDemoRoute,
+  PlaygroundDataVizRoute: PlaygroundDataVizRoute,
+  PlaygroundDiffViewerRoute: PlaygroundDiffViewerRoute,
+  PlaygroundDragAndDropRoute: PlaygroundDragAndDropRoute,
+  PlaygroundExcelToJsonRoute: PlaygroundExcelToJsonRoute,
+  PlaygroundExcelViewerRoute: PlaygroundExcelViewerRoute,
+  PlaygroundFileManagerRoute: PlaygroundFileManagerRoute,
+  PlaygroundFileTreeRoute: PlaygroundFileTreeRoute,
+  PlaygroundHotkeysDemoRoute: PlaygroundHotkeysDemoRoute,
+  PlaygroundImageEditorRoute: PlaygroundImageEditorRoute,
+  PlaygroundJsonEditorRoute: PlaygroundJsonEditorRoute,
+  PlaygroundKatexMathRoute: PlaygroundKatexMathRoute,
+  PlaygroundMarkdownRoute: PlaygroundMarkdownRoute,
+  PlaygroundOcrViewerRoute: PlaygroundOcrViewerRoute,
+  PlaygroundPdfViewerRoute: PlaygroundPdfViewerRoute,
+  PlaygroundPngParserRoute: PlaygroundPngParserRoute,
+  PlaygroundQrcodeGeneratorRoute: PlaygroundQrcodeGeneratorRoute,
+  PlaygroundRichTextRoute: PlaygroundRichTextRoute,
+  PlaygroundTerminalRoute: PlaygroundTerminalRoute,
+  PlaygroundVirtualListRoute: PlaygroundVirtualListRoute,
+  PlaygroundWebviewRoute: PlaygroundWebviewRoute,
+  PlaygroundWordViewerRoute: PlaygroundWordViewerRoute,
+  PlaygroundWorkflowEditorRoute: PlaygroundWorkflowEditorRoute,
+  PlaygroundXmlParserRoute: PlaygroundXmlParserRoute,
+  PlaygroundIndexRoute: PlaygroundIndexRoute,
   SettingsIndexRoute: SettingsIndexRoute,
 }
 export const routeTree = rootRouteImport

@@ -1,4 +1,5 @@
 use tauri::{AppHandle, Manager, WebviewWindow, Wry};
+use tauri_plugin_prevent_default::Flags;
 
 /// 执行窗口相关操作
 fn perform_window_operations(window: &WebviewWindow) {
@@ -73,9 +74,13 @@ pub fn setup_general_plugins(builder: TauriBuilder) -> TauriBuilder {
         .plugin(tauri_plugin_macos_permissions::init())
         .plugin(tauri_plugin_screenshots::init())
         .plugin(tauri_nspanel::init());
-
-    #[cfg(not(debug_assertions))]
-    let builder = builder.plugin(tauri_plugin_prevent_default::init());
-
+    // 添加防止默认行为的插件
+    let flags = Flags::all()
+        .difference(Flags::CONTEXT_MENU | Flags::DEV_TOOLS | Flags::RELOAD | Flags::FOCUS_MOVE);
+    let prevent_default = tauri_plugin_prevent_default::Builder::default()
+        .with_flags(flags)
+        .build();
+    let builder = builder.plugin(prevent_default);
+    log::info!("plugins initialized");
     builder
 }

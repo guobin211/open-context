@@ -61,7 +61,7 @@ export const FileSearch: React.FC<FileSearchProps> = ({ service, onSelectResult,
     }
 
     if (query.trim()) {
-      searchTimeoutRef.current = setTimeout(() => {
+      searchTimeoutRef.current = window.setTimeout(() => {
         performSearch(query).catch(console.error);
       }, 300);
     } else {
@@ -138,7 +138,7 @@ export const FileSearch: React.FC<FileSearchProps> = ({ service, onSelectResult,
   return (
     <div className={cn('bg-background flex flex-col border-b', className)}>
       <div className="flex items-center gap-2 border-b px-2 py-2">
-        <Search className="text-muted-foreground h-4 w-4 flex-shrink-0" />
+        <Search className="text-muted-foreground h-4 w-4 shrink-0" />
         <Input
           ref={inputRef}
           value={query}
@@ -171,7 +171,7 @@ export const FileSearch: React.FC<FileSearchProps> = ({ service, onSelectResult,
       )}
 
       {!isSearching && results.length > 0 && (
-        <ScrollArea className="max-h-[300px]">
+        <ScrollArea className="max-h-75">
           <div className="py-1">
             {results.map((result, index) => (
               <SearchResultItem
@@ -218,9 +218,9 @@ const SearchResultItem: React.FC<SearchResultItemProps> = ({ result, isSelected,
       )}
     >
       {result.isDirectory ? (
-        <Folder className="h-4 w-4 flex-shrink-0 text-blue-500" />
+        <Folder className="h-4 w-4 shrink-0 text-blue-500" />
       ) : (
-        <File className="h-4 w-4 flex-shrink-0 text-gray-500" />
+        <File className="h-4 w-4 shrink-0 text-gray-500" />
       )}
 
       <div className="min-w-0 flex-1">
@@ -228,14 +228,14 @@ const SearchResultItem: React.FC<SearchResultItemProps> = ({ result, isSelected,
         <div className="text-muted-foreground flex items-center gap-1 truncate text-xs">
           {result.directory.split(path.sep).map((segment, index) => (
             <React.Fragment key={index}>
-              {index > 0 && <ChevronRight className="h-3 w-3 flex-shrink-0" />}
+              {index > 0 && <ChevronRight className="h-3 w-3 shrink-0" />}
               <span className="truncate">{segment}</span>
             </React.Fragment>
           ))}
         </div>
       </div>
 
-      <ChevronRight className="text-muted-foreground h-4 w-4 flex-shrink-0" />
+      <ChevronRight className="text-muted-foreground h-4 w-4 shrink-0" />
     </button>
   );
 };

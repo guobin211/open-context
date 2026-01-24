@@ -2,7 +2,6 @@
 name = "open-app"
 version = "0.1.0"
 description = "A Agent Context and RAG System"
-authors = ["michaelbguo@tencent.com"]
 edition = "2024"
 resolver = "3"
 
@@ -37,12 +36,22 @@ tokio = { workspace = true }
 notify = { workspace = true }
 ignore = { workspace = true }
 futures = { workspace = true }
+cookie = { workspace = true }
+cookie_store = { workspace = true }
+derive_more = { workspace = true }
+indexmap = { workspace = true }
+reqwest_cookie_store = { workspace = true }
+image = { workspace = true }
+async-ffmpeg-sidecar = { workspace = true }
 
 # tauri
 tauri = { version = "2", features = [
-    "macos-private-api",
-    "tray-icon",
-    "image-png",
+  "macos-private-api",
+  "tray-icon",
+  "image-png",
+  "rustls-tls",
+  "webview-data-url",
+  "config-json5",
 ] }
 tauri-plugin-opener = "2"
 tauri-plugin-clipboard-manager = "2"
