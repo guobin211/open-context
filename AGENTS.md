@@ -204,7 +204,7 @@ pnpm --filter open-node test:ui
 
 - open 当前无测试配置 (测试仅在 open-node 中)
 
-### Rust (apps/openp-app/)
+### Rust (apps/open-app/)
 
 **`命名规范:**
 
@@ -327,6 +327,7 @@ src/
 - **持久化存储规范**: `docs/APP_CONFIG_USAGE.md` - 数据存储路径规范、配置管理
 - **事件系统**: `docs/APP_EVENT_SYSTEM.md` - 前后端通信机制、事件类型
 - **Tauri 命令**: `docs/APP_TAURI_COMMANDS.md` - IPC 命令参考、数据类型
+- **异步任务模式**: `docs/APP_ASYNC_TASK_PATTERN.md` - 任务创建、状态查询、进度追踪
 
 ### 子项目文档
 
@@ -337,25 +338,3 @@ src/
 
 - 所有数据存储在 `~/.open-context/` 目录
 - 详见 `docs/APP_CONFIG_USAGE.md` 中的完整目录结构
-  use anyhow::Result;
-
-#[tauri::command]
-pub async fn update_user_settings(settings: UserSettings) -> Result<TaskHandle, String> {
-let task = task_manager.create_task("custom_task_name");
-let task_id = task.id.clone();
-let task_type = task.task_type.clone();
-let handle = TaskHandle {
-task_id: task_id.clone(),
-task_type: task_type.clone(),
-status: TaskStatus::Pending,
-};
-tauri::async_runtime::spawn(async move {
-manager.set_running(&task_id);
-// ... task logic
-});
-return Ok(handle);
-}
-
-```
-
-```
