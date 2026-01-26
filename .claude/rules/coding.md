@@ -81,11 +81,13 @@ type: always
 src/
 ├── components/
 │   ├── ui/           # shadcn/ui 组件
-│   ├── layout/       # 布局组件
+│   ├── layout/       # 布局组件（三栏布局）
 │   ├── sidebar/      # 侧边栏组件
-│   └── content/      # 内容区组件
+│   ├── file-tree/    # 文件树组件
+│   └── tiptap-*/     # Tiptap 编辑器相关组件
 ├── routes/           # TanStack Router 路由
-├── zustand/          # Zustand stores
+├── storage/          # Zustand stores
+├── services/         # 前端服务层
 ├── hooks/            # 自定义 hooks
 ├── lib/              # 工具函数
 └── i18n/             # 国际化
@@ -122,8 +124,9 @@ export const NavItem: React.FC<NavItemProps> = (props) => {
 
 ### 状态管理
 
-- Zustand：客户端全局状态
+- Zustand：客户端全局状态（位于 `src/storage/` 目录）
 - React Query：服务端状态和缓存
+- Tauri Store：持久化存储（`~/.open-context/cache/*.store.json`）
 - useState：组件局部状态
 
 ### 样式
@@ -143,19 +146,16 @@ export const NavItem: React.FC<NavItemProps> = (props) => {
 ├─ tsconfig.json
 ├─ .env
 ├─ src/
-│   ├─ api/
-│   ├─ services/
-│   ├─ jobs/
-│   ├─ db/
-│   ├─ indexers/
-│   ├─ utils/
-│   ├─ types/
+│   ├─ api/          # REST API 端点
+│   ├─ services/     # 业务服务
+│   ├─ jobs/         # 后台任务队列
+│   ├─ db/           # 数据库层（LevelDB, Qdrant, SurrealDB）
+│   ├─ indexers/     # 代码索引器（tree-sitter）
+│   ├─ utils/        # 工具函数
+│   ├─ types/        # TypeScript 类型定义
+│   ├─ config/       # 配置管理
 │   └─ app.ts
-├─ data/
-│   ├─ leveldb/
-│   └─ logs/
 ├─ tests/
-├─ scripts/
 └─ README.md
 ```
 

@@ -36,10 +36,9 @@ open-context/
 │   ├── open-node/         # Node.js 后台服务 → 📖 [文档](./apps/open-node/README.md)
 │   └── open-web/          # React 前端应用 → 📖 [文档](./apps/open-web/README.md)
 ├── docs/                  # 技术文档
-│   ├── APP_CONFIG_USAGE.md        # 持久化存储规范
-│   ├── APP_EVENT_SYSTEM.md        # 事件系统文档
-│   ├── APP_TAURI_COMMANDS.md      # Tauri 命令参考
-│   └── APP_ASYNC_TASK_PATTERN.md  # 异步任务模式
+│   ├── SHARED_STORAGE.md  # 共享存储规范
+│   ├── APP_TAURI.md       # Tauri 端文档（命令、事件、异步任务）
+│   └── NODE_BACKEND.md    # Node.js 后端文档（API、数据模型、RAG 系统）
 ├── AGENTS.md              # AI 编码代理指南
 ├── CLAUDE.md              # Claude 专用指南
 └── README.md              # 本文件
@@ -78,19 +77,11 @@ pnpm dev:app       # Tauri 桌面应用
 
 ### 核心系统文档
 
-| 文档                                                | 说明                                 |
-| --------------------------------------------------- | ------------------------------------ |
-| [📖 持久化存储规范](./docs/APP_CONFIG_USAGE.md)     | 数据存储路径规范、配置管理、目录结构 |
-| [📖 事件系统](./docs/APP_EVENT_SYSTEM.md)           | 前后端通信机制、事件类型、订阅模式   |
-| [📖 Tauri 命令](./docs/APP_TAURI_COMMANDS.md)       | IPC 命令参考、数据类型、调用示例     |
-| [📖 异步任务模式](./docs/APP_ASYNC_TASK_PATTERN.md) | 任务创建、状态查询、进度追踪         |
-
-### 数据库文档
-
-| 文档                                                       | 说明                                    |
-| ---------------------------------------------------------- | --------------------------------------- |
-| [📖 SurrealDB 架构](./docs/NODE_SURREALDB_ARCHITECTURE.md) | 数据模型、表定义、图查询、全文搜索      |
-| [📖 SurrealDB 使用指南](./docs/NODE_SURREALDB_USAGE.md)    | 连接配置、CRUD 操作、图形遍历、性能建议 |
+| 文档                                          | 说明                                             |
+| --------------------------------------------- | ------------------------------------------------ |
+| [📖 共享存储规范](./docs/SHARED_STORAGE.md)   | 数据存储路径规范、配置管理、目录结构             |
+| [📖 Tauri 端文档](./docs/APP_TIRI.md)         | Tauri 命令、事件系统、异步任务模式、数据类型定义 |
+| [📖 Node.js 后端文档](./docs/NODE_BACKEND.md) | API 设计、数据模型、RAG 系统、向量/图数据库架构  |
 
 ### 开发指南
 

@@ -64,7 +64,7 @@ open-context/
 │   │   └── src/
 │   │       ├── main.rs             # 应用入口
 │   │       ├── lib.rs              # 库导出
-│   │       ├── app_command/        # Tauri IPC 命令（63 个命令）
+│   │       ├── app_command/        # Tauri IPC 命令
 │   │       │   ├── mod.rs          # 命令注册器
 │   │       │   ├── dto.rs          # 数据传输对象
 │   │       │   ├── system_commands.rs       # 系统命令
@@ -86,9 +86,10 @@ open-context/
 │   │       │   ├── app_state_chat.rs         # 对话状态
 │   │       │   ├── app_state_link.rs         # 链接状态
 │   │       │   ├── app_state_terminal.rs     # 终端状态
-│   │       │   └── app_state_webview.rs      # WebView 状态
+│   │       │   ├── app_state_webview.rs      # WebView 状态
+│   │       │   └── app_state_task.rs         # 任务状态
 │   │       ├── app_events/        # 事件系统
-│   │       │   ├── event_type.rs  # 事件类型定义（27+ 种事件）
+│   │       │   ├── event_type.rs  # 事件类型定义（30+ 种事件）
 │   │       │   └── event_emitter.rs  # 事件发射器
 │   │       └── app_service/        # 业务服务
 │   │           ├── app_file_tree.rs     # 文件树管理
@@ -99,22 +100,31 @@ open-context/
 │   ├── open-web/                   # React 前端
 │   │   └── src/
 │   │       ├── components/        # UI 组件
-│   │       │   ├── ui/            # shadcn/ui 基础组件（49 个）
+│   │       │   ├── ui/            # shadcn/ui 基础组件
 │   │       │   ├── layout/        # 布局组件（三栏布局）
 │   │       │   ├── sidebar/       # 侧边栏组件（树形结构）
 │   │       │   ├── file-tree/     # 文件树组件
-│   │       │   ├── files/         # 文件视图组件
-│   │       │   ├── tiptap-node/   # Tiptap 自定义节点
-│   │       │   ├── tiptap-ui/     # Tiptap UI 组件
-│   │       │   └── playground/    # Playground 演示组件（30+ 个）
+│   │       │   └── tiptap-*/      # Tiptap 编辑器相关组件
 │   │       ├── routes/            # TanStack Router 路由
 │   │       │   ├── __root.tsx     # 根布局
 │   │       │   ├── index.tsx      # 首页
 │   │       │   ├── playground/    # Playground 路由（30+ 个子页面）
-│   │       │   └── settings/      # 设置页面路由（已实现）
-│   │       ├── storage/           # Zustand 状态管理（11 个 store）
+│   │       │   └── settings/      # 设置页面路由
+│   │       ├── storage/           # Zustand 状态管理
+│   │       │   ├── chat-store.ts
+│   │       │   ├── document-store.ts
+│   │       │   ├── files-store.ts
+│   │       │   ├── notebook-store.ts
+│   │       │   ├── sidebar-store.ts
+│   │       │   ├── sidebar-chat-store.ts
+│   │       │   ├── right-sidebar-store.ts
+│   │       │   ├── settings-store.ts
+│   │       │   ├── tabs-store.ts
+│   │       │   ├── user-store.ts
+│   │       │   └── workspace-store.ts
 │   │       ├── services/          # 前端服务层
 │   │       ├── hooks/             # React Hooks
+│   │       ├── lib/               # 工具函数
 │   │       └── i18n/              # 国际化
 │   │
 │   └── open-node/                 # Node.js 后端（RAG 引擎）
@@ -122,10 +132,11 @@ open-context/
 │           ├── api/               # REST API 端点
 │           ├── services/          # 业务服务
 │           ├── indexers/          # 代码索引器（tree-sitter）
-│           ├── db/                # 数据库层（LevelDB, Qdrant）
+│           ├── db/                # 数据库层（LevelDB, Qdrant, SurrealDB）
 │           ├── jobs/              # 后台任务队列
 │           ├── types/             # TypeScript 类型定义
-│           └── utils/             # 工具函数
+│           ├── utils/             # 工具函数
+│           └── config/            # 配置管理
 │
 ├── docs/                          # 技术文档
 ├── openspec/                      # OpenSpec 变更提案
@@ -148,85 +159,32 @@ open-context/
 2. **测试文件**：Rust 用 `#[cfg(test)]` 或 `tests/`；TypeScript 用 `*.test.ts`
 3. **文档同步**：修改核心功能时，同步更新 `docs/` 中的相关文档
 
-## 核心架构
+## 核心架构概述
 
-### 1. Rust Tauri 后端 (apps/open-app)
+Open-Context 采用 Tauri 混合架构，三层协作：
 
-- **桌面外壳**：应用窗口管理、系统集成、IPC 通信
-- **核心模块**：
-  - `app_command/`：Tauri IPC 命令（63 个命令）
-    - `system_commands.rs` - 系统命令（ping、版本获取）
-    - `workspace_commands.rs` - 工作空间 CRUD
-    - `file_commands.rs` - 文件 CRUD
-    - `file_tree_commands.rs` - 文件树操作（8 个命令）
-    - `note_commands.rs` - 笔记操作（含收藏、搜索）
-    - `repository_commands.rs` - Git 仓库管理
-    - `task_commands.rs` - 任务管理（克隆、索引、导入）
-  - `app_state/`：基于 SQLite 的状态管理
-  - `app_events/`：事件系统（27+ 种事件）
-    - 生命周期事件：AppStarted, AppReady, AppQuit
-    - 窗口事件：WindowCreated, WindowFocused, WindowClosed 等
-    - 服务事件：ServiceStarted, ServiceStopped, ServiceError
-    - 任务事件：TaskCreated, TaskProgress, TaskCompleted 等
-  - `app_service/`：业务服务
-    - `app_file_tree.rs` - 文件树管理（5 分钟缓存、notify 监听）
-    - `app_task.rs` - 任务调度系统
-    - `app_runtime.rs` - 运行时配置
-    - `app_sidecar.rs` - Sidecar 进程管理
+| 模块              | 职责                              | 技术栈                  | 运行端口 |
+| ----------------- | --------------------------------- | ----------------------- | -------- |
+| **open-app**      | 桌面外壳，本地 FS 操作、系统调用  | Rust + Tauri 2.x        | -        |
+| **open-node**     | RAG 引擎，代码索引、向量检索      | Node.js + Hono          | 4500     |
+| **open-web**      | React UI，用户界面和交互          | React 19 + TanStack Router | 1420     |
 
-**详细文档**：
+### 模块通信流程
 
-- [事件系统文档](docs/APP_EVENT_SYSTEM.md)
-- [配置管理文档](./docs/APP_CONFIG_USAGE.md)
-- [Tauri 命令参考](docs/APP_TAURI_COMMANDS.md)
-- [配色方案](docs/APP_COLOR_PALETTE.md)
+```
+用户操作 → open-web → Tauri IPC → open-app (本地 FS 操作)
+                            ↓
+                       启动 open-node
+                            ↓
+              open-web ←→ open-node (HTTP/WebSocket)
+              open-app ←→ open-node (HTTP/WebSocket)
+```
 
-### 2. Node.js 后端 (apps/open-node)
-
-**RAG 引擎核心**，运行在 4500 端口：
-
-- **核心服务**：IndexerService、GraphService、RAGService、VectorService、JobService
-- **索引器**：SymbolExtractor（Tree-sitter AST 解析）、CodeChunkBuilder、GraphBuilder
-- **存储层**：
-  - LevelDB（低延迟 KV 存储，用于实时索引）
-  - SurrealDB（全文检索 + 图数据库，用于复杂查询）
-  - Qdrant（向量检索，语义搜索）
-- **任务队列**：JobQueue（顺序处理），IndexJob、ReindexJob
-
-**详细文档**：
-
-- [SurrealDB 架构文档](docs/NODE_SURREALDB_ARCHITECTURE.md)
-- [SurrealDB 使用指南](docs/NODE_SURREALDB_USAGE.md)
-
-**当前限制**：仅支持 TypeScript/JavaScript 索引
-
-### 3. React 前端 (apps/open-web)
-
-运行在 1420 端口（开发模式）：
-
-- **技术栈**：React 19、Vite、TypeScript、Tailwind CSS 4、shadcn/ui、Tiptap
-- **路由**：TanStack Router（文件系统路由）
-  - `/` - 首页
-  - `/playground/*` - Playground 模块（30+ 个子页面）
-  - `/settings/*` - 设置页面（已实现）
-- **状态管理**（Zustand）：
-  - `chat-store.ts` - 对话会话、消息管理
-  - `notebook-store.ts` - 笔记组织、收藏管理
-  - `files-store.ts` - 文件分组、最近文件
-  - `workspace-store.ts` - 工作空间、资源管理
-  - `tabs-store.ts` - 标签页管理（最多 10 个）
-  - `sidebar-store.ts` - 侧边栏展开/收起
-  - `right-sidebar-store.ts` - 右侧 Explorer 面板
-  - `settings-store.ts` - 设置状态
-- **核心组件**：
-  - `components/ui/` - shadcn/ui 基础组件（49 个）
-  - `components/layout/` - 布局组件（main-layout、content-area、ai-input-bar 等）
-  - `components/sidebar/` - 侧边栏组件（conversation-tree、note-tree、space-tree 等）
-  - `components/file-tree/` - 文件树组件（递归、右键菜单）
-  - `components/tiptap-node/` - Tiptap 自定义节点
-  - `components/tiptap-ui/` - Tiptap UI 组件
-  - `components/playground/` - Playground 演示组件（30+ 个）
-- **国际化**：i18next（支持简体中文、繁体中文、English、日本語、한국어）
+详细架构文档请参考：
+- [AGENTS.md](./AGENTS.md) - 完整的项目架构和编码规范
+- [共享存储规范](./docs/SHARED_STORAGE.md) - 数据存储路径
+- [Tauri 端文档](./docs/APP_TAURI.md) - Tauri 命令和事件系统
+- [Node.js 后端文档](./docs/NODE_BACKEND.md) - RAG 系统和 API 设计
 
 ## 核心数据流
 
@@ -253,7 +211,7 @@ function MyComponent() {
 }
 ```
 
-详细文档：[docs/APP_EVENT_SYSTEM.md](docs/APP_EVENT_SYSTEM.md)
+详细事件分类和类型请参考 `apps/open-app/src/app_events/event_type.rs`。
 
 ### 文件树工作流
 
@@ -366,23 +324,25 @@ pnpm fmt:js         # JavaScript/TypeScript (Prettier)
 
 ## 存储架构
 
-### 数据存储位置
-
-所有数据存储在 `~/.config/open-context/`（可通过 `OPEN_CONTEXT_CONFIG_DIR` 环境变量自定义），另外前端状态持久化使用 Tauri Store，存储在 `~/.open-context/cache/` 下。
+所有数据存储在 `~/.open-context/` 目录下（可通过 `OPEN_CONTEXT_HOME` 环境变量自定义）。
 
 ```
 ~/.open-context/
-├── bin/            # 安装的二进制文件（sidecar模式）
+├── bin/            # 二进制文件（sidecar模式）
 ├── cache/          # 缓存目录（Tauri Store 持久化文件）
+│   ├── chat-store.store.json      # 对话状态
+│   ├── right-sidebar.store.json   # 右侧栏状态
+│   ├── notebook-store.store.json  # 笔记状态
+│   └── workspace-store.store.json # 工作空间状态
 ├── config/         # 配置文件（config.json）
 ├── database/       # 数据库数据
-│   ├── app_state.db    # SQLite 数据库
-│   ├── surrealdb/          # surrealdb 数据库
+│   ├── app_state.db    # SQLite 数据库（Tauri 端）
+│   ├── surrealdb/      # SurrealDB 数据库（图数据库）
 │   ├── leveldb/        # LevelDB 数据库
 │   │   ├── main/           # 主数据库（符号、元数据）
 │   │   ├── edges/          # 正向边（依赖关系）
 │   │   └── reverse-edges/  # 反向边（被依赖关系）
-│   └── qdrant/         # Qdrant 向量数据库
+│   └── qdrant/         # Qdrant 向量数据库（需独立部署）
 ├── notebook/       # 笔记数据
 ├── session/        # 会话数据
 ├── workspace/      # 工作空间数据
@@ -399,13 +359,15 @@ pnpm fmt:js         # JavaScript/TypeScript (Prettier)
 
 ### 数据库技术栈
 
-| 数据库          | 用途                         | 位置                    |
-| --------------- | ---------------------------- | ----------------------- |
-| **SQLite**      | 元数据、状态管理             | `app_state.db`          |
-| **LevelDB**     | 符号、依赖关系图（实时索引） | `leveldb/`              |
-| **SurrealDB**   | 全文检索、图数据库、关系查询 | `surrealdb/` 或远程     |
-| **Qdrant**      | 向量嵌入、语义搜索           | `qdrant/` 或远程        |
-| **Tauri Store** | 前端状态持久化               | `chat-store.store.json` |
+| 数据库          | 用途                         | 位置                            |
+| --------------- | ---------------------------- | ------------------------------- |
+| **SQLite**      | 元数据、状态管理             | `database/app_state.db`         |
+| **LevelDB**     | 符号、依赖关系图（实时索引） | `database/leveldb/`             |
+| **SurrealDB**   | 全文检索、图数据库、关系查询 | `database/surrealdb/` 或远程    |
+| **Qdrant**      | 向量嵌入、语义搜索           | 独立部署或远程                  |
+| **Tauri Store** | 前端状态持久化               | `cache/*.store.json`            |
+
+详细存储规范请参考 [docs/SHARED_STORAGE.md](./docs/SHARED_STORAGE.md)。
 
 ## 时间处理规范
 
@@ -452,30 +414,34 @@ const relative = dayjs(timestamp).fromNow(); // "2 小时前"
 
 Node.js 服务器运行在 `http://localhost:4500`：
 
-- `/workspaces/*` - 工作空间 CRUD
-- `/repos/*` - 仓库管理
-- `/repos/:repoId/index` - 触发索引任务
-- `/query/vector` - 语义搜索
-- `/query/code` - 代码搜索（向量 + 图）
-- `/graph/*` - 依赖关系图查询
+```
+/api/v1/workspaces              # 工作空间 CRUD
+/api/v1/workspaces/{id}/repos   # 仓库管理
+/api/v1/repos/{id}/index        # 触发索引任务
+/api/v1/query/vector            # 语义搜索
+/api/v1/query/code              # 代码搜索（向量 + 图）
+/api/v1/graph/*                 # 依赖关系图查询
+/api/v1/jobs/{id}               # 任务状态查询
+```
 
-详细 API 文档：[docs/TAURI_COMMANDS.md](docs/APP_TAURI_COMMANDS.md)
+详细 API 设计请参考 [docs/NODE_BACKEND.md](./docs/NODE_BACKEND.md)。
 
 ## 开发实践
 
-### 前端开发
+### 前端开发 (open-web)
 
-**组件开发**：
+**组件模式**：
 
+- React 组件必须使用箭头函数：`export const Component = () => {}`（禁止 function 声明）
 - UI 组件基于 Radix UI primitives 和 shadcn/ui
 - 使用 `cn()` 工具函数合并 Tailwind 类名
-- Tiptap 编辑器组件遵循分层架构
+- Props 接口命名为 `{组件名}Props`
 
 **状态管理**：
 
-- Zustand：客户端全局状态
-- React Query：服务端状态和数据缓存
-- usePersistedState：使用 Tauri Store 持久化状态
+- Zustand：客户端全局状态（`src/storage/` 目录）
+- React Query：服务端状态和缓存
+- Tauri Store：持久化存储（`~/.open-context/cache/*.store.json`）
 
 **路由约定**：
 
@@ -487,40 +453,51 @@ Node.js 服务器运行在 `http://localhost:4500`：
 
 - 翻译文件位于 `src/i18n/locales/`
 - 使用 `useTranslation` Hook 访问翻译函数
+- 支持语言：zh-CN, en, ja, ko, zh-TW
 
-### 后端开发（Rust）
+### 后端开发 (open-app)
 
-**事件系统**：
+**命名规范**：
 
-- 添加新事件：在 `app_events.rs` 中添加枚举变体
-- 同步更新 `apps/open-web/src/lib/app-events.ts`
-- 如需要，在 `use-app-events.ts` 中添加便捷 Hook
+- 模块/函数/变量：snake_case
+- 类型/结构体/枚举：PascalCase
 
-**状态管理**：
+**错误处理**：
 
-- 所有数据操作通过 `DatabaseManager`
-- 使用 `Arc<Mutex<Connection>>` 保证线程安全
-- 自动更新 `updated_at` 时间戳
+- 使用 `anyhow::Result<T, E>` 类型
+- 使用 `?` 操作符传播错误
+- 谨慎使用 `.expect()`（优先使用 `?` 或优雅解包）
 
-**配置管理**：
+### Node.js RAG 引擎开发 (open-node)
 
-- 使用 `ConfigManager` 进行线程安全的配置访问
-- 修改配置后自动保存
+**目录结构**：
 
-### Node.js RAG 引擎开发
+```
+src/
+├── api/       # REST 端点 (Hono 路由)
+├── services/  # 业务逻辑
+├── db/        # 数据访问 (LevelDB, Qdrant, SurrealDB)
+├── indexers/  # 代码解析 (tree-sitter)
+├── jobs/      # 异步任务
+├── utils/     # 工具函数
+├── types/     # TypeScript 定义
+└── config/    # 配置管理
+```
 
-**添加语言支持**：
+**服务模式**：
 
-1. 安装 tree-sitter 解析器包
-2. 在 `SymbolExtractor.extractSymbols()` 中添加语言特定的 AST 查询
-3. 更新 `ASTParser` 以识别新语言
-4. 在 `GraphBuilder` 中添加节点类型映射
+```typescript
+export class ServiceName {
+  private repo = new RepositoryName();
 
-**性能优化**：
-
-- 连接池支持
-- 查询缓存
-- 批量插入优化
+  async operation(dto: CreateDto): Promise<Entity> {
+    logger.info({ field: value }, 'Operation');
+    const entity = await this.repo.create(dto);
+    logger.info({ id: entity.id }, 'Created');
+    return entity;
+  }
+}
+```
 
 ## 重要说明
 
@@ -538,7 +515,6 @@ Node.js 服务器运行在 `http://localhost:4500`：
   - ✅ 三栏布局（左侧栏、中间区、右侧 Explorer）已实现
   - ✅ 文件树组件（递归、右键菜单）已实现
   - ✅ 标签页系统（多标签管理）已实现
-  - ✅ 欢迎页已实现
   - ⏳ 与 Node.js RAG 服务的 API 集成待完成
   - ⏳ 笔记富文本编辑器集成待完成
 - **Node.js 后端**：
@@ -547,31 +523,38 @@ Node.js 服务器运行在 `http://localhost:4500`：
 
 ### 开发建议
 
-1. **避免过度工程**：只实现当前需要的功能，不添加额外特性
-2. **保持简洁**：不添加未被要求的注释、类型注解或错误处理
+1. **简化实现**：只做明确要求的事，不要自作主张加功能
+2. **避免冗余**：不添加未被要求的注释、类型注解或错误处理
 3. **信任内部代码**：只在系统边界（用户输入、外部 API）进行验证
-4. **删除未使用代码**：不使用 `_var` 重命名或 `// removed` 注释，直接删除
+4. **删除废弃代码**：不使用 `_var` 重命名或 `// removed` 注释，直接删除
+5. **禁止类型抑制**：不使用 `as any`、`@ts-ignore`、`@ts-expect-error`
 
 ## 配置文件
 
-| 文件                           | 说明                               |
-| ------------------------------ | ---------------------------------- |
+| 文件                           | 说明                              |
+| ------------------------------ | --------------------------------- |
 | `tauri.conf.json`              | Tauri 应用配置（窗口、打包、更新） |
-| `Cargo.toml`                   | Rust 依赖和构建配置                |
-| `apps/open-node/esbuild.mjs`   | Node.js 构建配置                   |
-| `apps/open-web/vite.config.ts` | Vite/React 构建配置                |
-| `.oxlintrc.json`               | JavaScript/TypeScript 检查规则     |
-| `.prettierrc`                  | 代码格式化规则                     |
+| `Cargo.toml`                   | Rust 依赖和构建配置               |
+| `apps/open-node/package.json`  | Node.js 服务依赖                  |
+| `apps/open-web/package.json`   | 前端依赖                         |
+| `.oxlintrc.json`               | JavaScript/TypeScript 检查规则    |
+| `.prettierrc`                  | 代码格式化规则                    |
+| `pnpm-workspace.yaml`          | Monorepo 工作区配置               |
 
 ## 文档参考
 
 ### 核心文档
 
+- [AGENTS.md](./AGENTS.md) - 完整的项目架构和编码规范
 - [README.md](./README.md) - 项目概述和快速开始
-- [EVENT_SYSTEM.md](docs/APP_EVENT_SYSTEM.md) - 事件系统完整文档
-- [APP_CONFIG_USAGE.md](./docs/APP_CONFIG_USAGE.md) - 配置管理使用指南
-- [TAURI_COMMANDS.md](docs/APP_TAURI_COMMANDS.md) - Tauri IPC 命令参考
-- [OpenSpec 变更提案](openspec/) - 功能提案和设计文档
+- [共享存储规范](./docs/SHARED_STORAGE.md) - 数据存储路径规范
+- [Tauri 端文档](./docs/APP_TAURI.md) - Tauri 命令、事件系统
+- [Node.js 后端文档](./docs/NODE_BACKEND.md) - API 设计、RAG 系统
+
+### 子项目文档
+
+- [open-node README](./apps/open-node/README.md) - RAG 引擎详细文档
+- [open-web README](./apps/open-web/README.md) - 前端架构文档
 
 ### 代码示例
 

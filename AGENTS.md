@@ -327,10 +327,9 @@ src/
 
 ### 核心系统文档
 
-- **[持久化存储规范](./docs/APP_CONFIG_USAGE.md)** - 数据存储路径规范、配置管理、目录结构详解
-- **[事件系统](./docs/APP_EVENT_SYSTEM.md)** - 前后端通信机制、事件类型、订阅与发布模式
-- **[Tauri 命令](./docs/APP_TAURI_COMMANDS.md)** - IPC 命令参考、数据类型定义、调用示例
-- **[异步任务模式](./docs/APP_ASYNC_TASK_PATTERN.md)** - 任务创建、状态查询、进度追踪实现方案
+- **[共享存储规范](./docs/SHARED_STORAGE.md)** - 数据存储路径规范、配置管理、目录结构详解
+- **[Tauri 端文档](./docs/APP_TAURI.md)** - Tauri 命令、事件系统、异步任务模式、数据类型定义
+- **[Node.js 后端文档](./docs/NODE_BACKEND.md)** - API 设计、数据模型、RAG 系统、向量/图数据库架构
 
 ### 子项目文档
 
@@ -340,4 +339,9 @@ src/
 ### 数据存储
 
 - 所有数据存储在 `~/.open-context/` 目录
-- 详见 [持久化存储规范](./docs/APP_CONFIG_USAGE.md) 中的完整目录结构
+- 详见 [共享存储规范](./docs/SHARED_STORAGE.md) 中的完整目录结构
+- **数据库**：
+  - SQLite：`~/.open-context/database/app_state.db`（Tauri 端）
+  - SurrealDB：`~/.open-context/database/surrealdb/`（图数据库）
+  - LevelDB：`~/.open-context/database/leveldb/`（符号、依赖关系）
+  - Qdrant：向量数据库（需独立部署）
