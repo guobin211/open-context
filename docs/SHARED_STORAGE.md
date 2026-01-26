@@ -80,11 +80,13 @@
   "version": "0.1.0",
   "database": {
     "sqlite": {
-      "path": "~/.open-context/database/sqlite",
+      "workspace_db": "~/.open-context/database/sqlite/workspace.db",
+      "repository_db": "~/.open-context/database/sqlite/repository.db",
+      "symbol_db": "~/.open-context/database/sqlite/symbol.db",
+      "edge_db": "~/.open-context/database/sqlite/edge.db",
+      "reverse_edge_db": "~/.open-context/database/sqlite/reverse_edge.db",
       "wal_mode": true,
-      "busy_timeout": 5000,
-      "cache_size_mb": 64,
-      "mmap_size_gb": 30
+      "busy_timeout": 5000
     },
     "surrealdb": {
       "url": "http://localhost:8000",
@@ -92,28 +94,21 @@
       "database": "open_context",
       "username": "root",
       "password": "root",
-      "embedded": false,
-      "data_path": "~/.open-context/database/surrealdb"
+      "embedded": false
     },
     "qdrant": {
       "url": "http://localhost:6333",
       "api_key": null,
       "embedding_dim": 1024,
       "collection_name": "code_symbols",
-      "distance_metric": "Cosine",
-      "embedded": false,
-      "data_path": "~/.open-context/database/qdrant"
+      "distance": "Cosine",
+      "embedded": false
     }
   },
   "node_server": {
     "port": 4500,
-    "auto_start": true,
-    "health_check_interval_ms": 30000
-  },
-  "indexer": {
-    "batch_size": 100,
-    "max_file_size_mb": 10,
-    "skip_patterns": ["node_modules", ".git", "dist", "build"]
+    "host": "127.0.0.1",
+    "auto_start": true
   },
   "log_level": "info"
 }
@@ -121,23 +116,32 @@
 
 ### 配置项说明
 
-| 配置项                                 | 类型   | 默认值                            | 说明                 |
-| -------------------------------------- | ------ | --------------------------------- | -------------------- |
-| `version`                              | String | 自动读取                          | 应用版本号           |
-| `database.sqlite.path`                 | String | `~/.open-context/database/sqlite` | SQLite 路径          |
-| `database.sqlite.wal_mode`             | bool   | `true`                            | WAL 模式             |
-| `database.sqlite.busy_timeout`         | number | `5000`                            | SQLite 忙等待超时    |
-| `database.surrealdb.url`               | String | `http://localhost:8000`           | SurrealDB 连接地址   |
-| `database.surrealdb.namespace`         | String | `code_index`                      | SurrealDB 命名司     |
-| `database.surrealdb.database`          | String | `open_context`                    | SurrealDB 数据库名   |
-| `database.qdrant.url`                  | String | `http://localhost:6333`           | Qdrant 连接地址      |
-| `database.qdrant.embedding_dim`        | number | `1024`                            | 向量维度             |
-| `node_server.port`                     | u16    | `4500`                            | Node.js 服务端口     |
-| `node_server.auto_start`               | bool   | `true`                            | 是否自动启动服务     |
-| `node_server.health_check_interval_ms` | number | `30000`                           | 健康检查间隔（毫秒） |
-| `indexer.batch_size`                   | number | `100`                             | 索引批次大小         |
-| `indexer.max_file_size_mb`             | number | `10`                              | 最大文件大小（MB）   |
-| `log_level`                            | String | `info`                            | 日志级别             |
+| 配置项                          | 类型    | 默认值                                                 | 说明                |
+| ------------------------------- | ------- | ------------------------------------------------------ | ------------------- |
+| `version`                       | String  | `0.1.0`                                                | 配置版本号          |
+| `database.sqlite.workspace_db`  | String  | `~/.open-context/database/sqlite/workspace.db`         | 工作空间数据库路径  |
+| `database.sqlite.repository_db` | String  | `~/.open-context/database/sqlite/repository.db`        | 仓库数据库路径      |
+| `database.sqlite.symbol_db`     | String  | `~/.open-context/database/sqlite/symbol.db`            | 符号数据库路径      |
+| `database.sqlite.edge_db`       | String  | `~/.open-context/database/sqlite/edge.db`              | 边数据库路径        |
+| `database.sqlite.reverse_edge_db` | String | `~/.open-context/database/sqlite/reverse_edge.db`      | 反向边数据库路径    |
+| `database.sqlite.wal_mode`      | boolean | `true`                                                 | WAL 模式            |
+| `database.sqlite.busy_timeout`  | number  | `5000`                                                 | SQLite 忙等待超时   |
+| `database.surrealdb.url`        | String  | `http://localhost:8000`                                | SurrealDB 连接地址  |
+| `database.surrealdb.namespace`  | String  | `code_index`                                           | SurrealDB 命名空间  |
+| `database.surrealdb.database`   | String  | `open_context`                                         | SurrealDB 数据库名  |
+| `database.surrealdb.username`   | String  | `root`                                                 | SurrealDB 用户名    |
+| `database.surrealdb.password`   | String  | `root`                                                 | SurrealDB 密码      |
+| `database.surrealdb.embedded`   | boolean | `false`                                                | 是否使用嵌入式模式  |
+| `database.qdrant.url`           | String  | `http://localhost:6333`                                | Qdrant 连接地址     |
+| `database.qdrant.api_key`       | String? | `null`                                                 | Qdrant API Key      |
+| `database.qdrant.embedding_dim` | number  | `1024`                                                 | 向量维度            |
+| `database.qdrant.collection_name` | String | `code_symbols`                                        | 集合名称            |
+| `database.qdrant.distance`      | String  | `Cosine`                                               | 距离度量方式        |
+| `database.qdrant.embedded`      | boolean | `false`                                                | 是否使用嵌入式模式  |
+| `node_server.port`              | number  | `4500`                                                 | Node.js 服务端口    |
+| `node_server.host`              | String  | `127.0.0.1`                                            | Node.js 服务主机    |
+| `node_server.auto_start`        | boolean | `true`                                                 | 是否自动启动服务    |
+| `log_level`                     | String  | `info`                                                 | 日志级别            |
 
 **log_level 可选值**：`trace`, `debug`, `info`, `warn`, `error`
 

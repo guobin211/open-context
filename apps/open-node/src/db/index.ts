@@ -7,3 +7,4 @@ export * from './workspace-repository';
 export * from './repo-repository';
 export * from './job-repository';
 export * from './database-health-checker';
+export * from './data-sync-service';

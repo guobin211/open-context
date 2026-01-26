@@ -3,6 +3,51 @@ use std::fs;
 use std::path::PathBuf;
 use std::sync::RwLock;
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct DatabaseConfig {
+    pub sqlite: SqliteConfig,
+    pub surrealdb: SurrealDbConfig,
+    pub qdrant: QdrantConfig,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SqliteConfig {
+    pub workspace_db: String,
+    pub repository_db: String,
+    pub symbol_db: String,
+    pub edge_db: String,
+    pub reverse_edge_db: String,
+    pub wal_mode: bool,
+    pub busy_timeout: u32,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SurrealDbConfig {
+    pub url: String,
+    pub namespace: String,
+    pub database: String,
+    pub username: String,
+    pub password: String,
+    pub embedded: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct QdrantConfig {
+    pub url: String,
+    pub api_key: Option<String>,
+    pub embedding_dim: u32,
+    pub collection_name: String,
+    pub distance: String,
+    pub embedded: bool,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct NodeServerConfig {
+    pub port: u16,
+    pub host: String,
+    pub auto_start: bool,
+}
+
 /// Application configuration
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct AppConfig {
@@ -25,6 +70,10 @@ pub struct AppConfig {
     pub projects_dir: String,
     pub rules_dir: String,
     pub hooks_dir: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub database: Option<DatabaseConfig>,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub node_server: Option<NodeServerConfig>,
 }
 
 impl Default for AppConfig {
@@ -50,6 +99,8 @@ impl Default for AppConfig {
             projects_dir: format!("{}/projects", app_data_dir),
             rules_dir: format!("{}/rules", app_data_dir),
             hooks_dir: format!("{}/hooks", app_data_dir),
+            database: None,
+            node_server: None,
         }
     }
 }
