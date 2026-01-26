@@ -5,3 +5,4 @@ export * from './vector-service';
 export * from './graph-service';
 export * from './job-service';
 export * from './rag-service';
+export * from './fulltext-service';

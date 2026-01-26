@@ -3,7 +3,7 @@ import { serve } from '@hono/node-server';
 import { logger as honoLogger } from 'hono/logger';
 import dotenv from 'dotenv';
 import { DefaultConfig, initStorageDirs } from './config';
-import { getLevelDBInstance, getQdrantInstance } from './db';
+import { getLevelDBInstance, getQdrantInstance, getSurrealDBInstance } from './db';
 import { GraphService } from './services';
 import router from './api/router';
 import logger from './utils/logger';
@@ -39,6 +39,10 @@ async function main() {
   const qdrant = getQdrantInstance();
   await qdrant.init();
 
+  const surrealdb = getSurrealDBInstance();
+  await surrealdb.connect();
+  await surrealdb.initSchema();
+
   logger.info('Loading graph...');
   const graphService = new GraphService();
   await graphService.init();
@@ -65,6 +69,7 @@ async function main() {
   const shutdown = async () => {
     logger.info('Shutting down...');
     await leveldb.close();
+    await surrealdb.disconnect();
     server.close();
     process.exit(0);
   };

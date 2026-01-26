@@ -1,5 +1,5 @@
 import { IndexerService, RepoService, JobService, GraphService } from '../services';
-import { getQdrantInstance } from '../db';
+import { getQdrantInstance, getSurrealDBInstance } from '../db';
 import { batchGenerateEmbeddings } from '../utils/vector';
 import logger from '../utils/logger';
 
@@ -9,6 +9,7 @@ export class IndexJob {
   private jobService = new JobService();
   private graphService: GraphService;
   private qdrant = getQdrantInstance();
+  private surrealdb = getSurrealDBInstance();
 
   constructor(graphService: GraphService) {
     this.graphService = graphService;
@@ -51,27 +52,19 @@ export class IndexJob {
       }));
       await this.qdrant.batchUpsertSymbols(points);
 
-      // 批量存入 LevelDB (Symbol 原始数据)
-      const symbolEntries = result.chunks.map((chunk) => ({
-        key: `symbol:${chunk.symbolId}`,
-        value: {
-          ...chunk.payload,
-          id: chunk.symbolId,
-          qualifiedName: chunk.payload.symbol_name, // 对应 Symbol 类型的 qualifiedName
-          location: { startLine: 0, endLine: 0 }, // 占位，Extractor 需进一步完善
-          codeChunk: chunk.payload.code,
-          indexedAt: chunk.payload.indexed_at
-        }
+      // 批量存入 SurrealDB (Symbol 原始数据)
+      const symbols = result.chunks.map((chunk) => ({
+        ...chunk.payload,
+        symbol_id: chunk.symbolId,
+        content_hash: ''
       }));
-      await this.graphService.db.batchPut(symbolEntries);
+      await this.surrealdb.batchUpsertSymbols(symbols);
 
       await this.jobService.updateJobStatus(params.jobId, 'running', 0.8);
 
       // 批量存入图边
       if (result.edges.length > 0) {
-        for (const edge of result.edges) {
-          await this.graphService.addEdge(edge.from, edge.to, edge.type);
-        }
+        await this.graphService.batchAddEdges(result.edges);
       }
 
       await this.repoService.updateIndexStatus(params.repoId, result.commit, result.languageStats);
