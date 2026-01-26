@@ -1,10 +1,10 @@
-import type { RootContent, Heading, Code, Paragraph, List } from 'mdast';
-import { remark } from 'remark';
-import remarkMdx from 'remark-mdx';
-import remarkGfm from 'remark-gfm';
+import type { Code, Heading, List, Paragraph, RootContent } from 'mdast';
 import { toString } from 'mdast-util-to-string';
-import { generateSymbolId } from '../utils';
-import type { SymbolKind, Visibility, SymbolPayload } from '../types';
+import { remark } from 'remark';
+import remarkGfm from 'remark-gfm';
+import remarkMdx from 'remark-mdx';
+import type { SymbolKind, SymbolPayload, Visibility } from '../../types';
+import { generateSymbolId } from '../../utils';
 
 /**
  * Markdown 文档块
@@ -47,6 +47,11 @@ export class MarkdownIndexer {
   }): MarkdownChunk[] {
     const sections = this.extractSections(params.code);
     return this.buildChunks(sections, params);
+  }
+
+  indexFile(text: string, filePath: string): MarkdownChunk[] {
+    const sections = this.extractSections(text);
+    return [];
   }
 
   /**

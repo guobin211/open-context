@@ -5,8 +5,6 @@ export interface Repository {
   url: string;
   defaultBranch: string;
   languageStats: {
-    typescript?: number;
-    javascript?: number;
     [key: string]: number | undefined;
   };
   lastIndexedCommit: string;

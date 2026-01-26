@@ -1,7 +1,6 @@
-import fs from 'fs/promises';
-import path from 'path';
-import { createHash } from 'crypto';
-import { extensionMapping, SupportLanguage } from '@/indexers';
+import fs from 'node:fs/promises';
+import path from 'node:path';
+import { createHash } from 'node:crypto';
 
 export async function ensureDir(dirPath: string): Promise<void> {
   await fs.mkdir(dirPath, { recursive: true });

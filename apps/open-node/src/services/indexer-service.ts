@@ -1,13 +1,17 @@
-import { GitService, getRepoPath } from '../utils/git';
-import { getFileExtension } from '../utils/fs';
+import { CommonIndexer } from '@/indexers/common-indexer';
+import { getLanguageFromExt } from '@/indexers/core/ast-parser';
 import { Repository } from '../types';
+import { getFileExtension } from '../utils/fs';
+import { getRepoPath, GitService } from '../utils/git';
 import logger from '../utils/logger';
-import { FileIndexer } from '@/indexers/file-indexer';
-import { extensionMapping } from '@/indexers';
 
 export class IndexerService {
-  private fileIndexer = new FileIndexer();
+  private commonIndexer = new CommonIndexer();
 
+  /**
+   * Index a git repository
+   * @param params
+   */
   async indexRepository(params: { repository: Repository; workspaceId: string; mode: 'full' | 'incremental' }) {
     const repoPath = getRepoPath(params.repository.id);
     const git = new GitService(repoPath);
@@ -27,13 +31,13 @@ export class IndexerService {
 
     for (const file of files) {
       const ext = getFileExtension(file);
-      const language = extensionMapping[ext];
+      const language = getLanguageFromExt(ext);
       if (!language) {
         continue;
       }
       languageStats[language] = (languageStats[language] || 0) + 1;
       const code = await git.readFile(file);
-      const res = await this.fileIndexer.index({
+      const res = await this.commonIndexer.index({
         code,
         language,
         filePath: file,
@@ -54,9 +58,18 @@ export class IndexerService {
     };
   }
 
-  async indexMarkdown() {}
+  /**
+   * Index a markdown content
+   */
+  async indexMarkdownFile() {}
 
+  /**
+   * Index a URL
+   */
   async indexUrl() {}
 
-  async indexTxt() {}
+  /**
+   * Index a plain text content
+   */
+  async indexTxtFile() {}
 }

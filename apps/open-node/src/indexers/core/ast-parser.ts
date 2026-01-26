@@ -27,25 +27,6 @@ export type SupportLanguage =
   | 'json'
   | 'markdown';
 
-export const extensionMapping: Record<string, SupportLanguage> = {
-  ts: 'ts',
-  tsx: 'tsx',
-  js: 'js',
-  jsx: 'jsx',
-  py: 'python',
-  go: 'go',
-  cpp: 'cpp',
-  c: 'c',
-  cs: 'csharp',
-  sh: 'bash',
-  css: 'css',
-  html: 'html',
-  json: 'json',
-  md: 'markdown',
-  mdc: 'markdown',
-  mdx: 'markdown'
-} as const;
-
 /**
  * 解析结果，包含 AST 树和原始代码
  */
@@ -95,29 +76,6 @@ export const LANGUAGE_EXTENSIONS: Record<string, SupportLanguage> = {
  */
 export function getLanguageFromExt(ext: string): SupportLanguage | null {
   return LANGUAGE_EXTENSIONS[ext.toLowerCase()] || null;
-}
-
-/**
- * 检查语言是否支持
- */
-export function isLanguageSupported(language: string): language is SupportLanguage {
-  const supported: SupportLanguage[] = [
-    'ts',
-    'tsx',
-    'js',
-    'jsx',
-    'python',
-    'go',
-    'cpp',
-    'c',
-    'csharp',
-    'bash',
-    'css',
-    'html',
-    'json',
-    'markdown'
-  ];
-  return supported.includes(language as SupportLanguage);
 }
 
 export class ASTParser {

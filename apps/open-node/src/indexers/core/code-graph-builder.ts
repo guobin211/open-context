@@ -1,6 +1,6 @@
 import Parser from 'tree-sitter';
-import { EdgeType } from '../types';
-import { ASTParser, type ParseResult, type SupportLanguage, getASTParser } from './ast-parser';
+import { EdgeType } from '../../types';
+import { ASTParser, type ParseResult, type SupportLanguage } from './ast-parser';
 
 export interface GraphEdge {
   from: string;
