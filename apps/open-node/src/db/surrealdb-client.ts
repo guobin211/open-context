@@ -127,6 +127,9 @@ export class SurrealDBService {
 
         -- workspace_id 索引（用于查询过滤）
         DEFINE INDEX IF NOT EXISTS workspace_id_idx ON symbol FIELDS workspace_id;
+        DEFINE INDEX IF NOT EXISTS repo_id_idx ON symbol FIELDS repo_id;
+        DEFINE INDEX IF NOT EXISTS symbol_kind_idx ON symbol FIELDS symbol_kind;
+        DEFINE INDEX IF NOT EXISTS language_idx ON symbol FIELDS language;
 
         -- 定义关系边表
         DEFINE TABLE IF NOT EXISTS IMPORTS SCHEMAFULL TYPE RELATION IN symbol OUT symbol;

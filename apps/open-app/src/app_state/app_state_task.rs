@@ -7,7 +7,7 @@
 
 use crate::app_service::{TaskInfo, TaskStatus};
 use rusqlite::Connection;
-use rusqlite::{Result as SqliteResult, params};
+use rusqlite::{params, Result as SqliteResult};
 use std::sync::{Arc, Mutex};
 
 pub struct TaskStateManager {

@@ -1,7 +1,7 @@
 use std::sync::{Arc, Mutex};
 
-use super::DatabaseManager;
 use super::app_config::AppConfig;
+use super::DatabaseManager;
 
 #[derive(Clone)]
 pub struct AppState {

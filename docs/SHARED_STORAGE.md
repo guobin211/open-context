@@ -25,13 +25,14 @@
 ├── cache/          # 缓存数据（Tauri Store 持久化文件）
 ├── config/         # 配置文件（config.json）
 ├── database/       # 数据库数据
-│   ├── app_state.db        # SQLite 数据库（Tauri 端）
-│   ├── surrealdb/          # SurrealDB 数据库（Node.js 端）
-│   ├── leveldb/            # LevelDB 数据库
-│   │   ├── main/           # 主数据库（符号、元数据）
-│   │   ├── edges/          # 正向边（依赖关系）
-│   │   └── reverse-edges/  # 反向边（被依赖关系）
-│   └── qdrant/             # Qdrant 向量数据库
+│   ├── sqlite/             # SQLite 数据库目录
+│   │   ├── workspace.db    # 工作空间、笔记、文件、链接
+│   │   ├── repository.db   # Git 仓库、索引任务
+│   │   ├── symbol.db       # 符号数据（KV 存储）
+│   │   ├── edge.db         # 正向边（依赖关系图）
+│   │   └── reverse_edge.db # 反向边（被依赖关系）
+│   ├── surrealdb/          # SurrealDB 数据库（图数据、全文检索）
+│   └── qdrant/             # Qdrant 向量数据库（语义检索）
 ├── notebook/       # 笔记数据
 ├── session/        # 会话数据
 ├── workspace/      # 工作空间数据
@@ -77,13 +78,42 @@
 ```json
 {
   "version": "0.1.0",
+  "database": {
+    "sqlite": {
+      "path": "~/.open-context/database/sqlite",
+      "wal_mode": true,
+      "busy_timeout": 5000,
+      "cache_size_mb": 64,
+      "mmap_size_gb": 30
+    },
+    "surrealdb": {
+      "url": "http://localhost:8000",
+      "namespace": "code_index",
+      "database": "open_context",
+      "username": "root",
+      "password": "root",
+      "embedded": false,
+      "data_path": "~/.open-context/database/surrealdb"
+    },
+    "qdrant": {
+      "url": "http://localhost:6333",
+      "api_key": null,
+      "embedding_dim": 1024,
+      "collection_name": "code_symbols",
+      "distance_metric": "Cosine",
+      "embedded": false,
+      "data_path": "~/.open-context/database/qdrant"
+    }
+  },
   "node_server": {
     "port": 4500,
-    "auto_start": true
+    "auto_start": true,
+    "health_check_interval_ms": 30000
   },
-  "qdrant": {
-    "url": "http://localhost:6333",
-    "embedding_dim": 1024
+  "indexer": {
+    "batch_size": 100,
+    "max_file_size_mb": 10,
+    "skip_patterns": ["node_modules", ".git", "dist", "build"]
   },
   "log_level": "info"
 }
@@ -91,13 +121,23 @@
 
 ### 配置项说明
 
-| 配置项                   | 类型   | 默认值                  | 说明             |
-| ------------------------ | ------ | ----------------------- | ---------------- |
-| `version`                | String | 自动读取                | 应用版本号       |
-| `node_server.port`       | u16    | `4500`                  | Node.js 服务端口 |
-| `node_server.auto_start` | bool   | `true`                  | 是否自动启动服务 |
-| `qdrant.url`             | String | `http://localhost:6333` | Qdrant 连接地址  |
-| `log_level`              | String | `info`                  | 日志级别         |
+| 配置项                                 | 类型   | 默认值                            | 说明                 |
+| -------------------------------------- | ------ | --------------------------------- | -------------------- |
+| `version`                              | String | 自动读取                          | 应用版本号           |
+| `database.sqlite.path`                 | String | `~/.open-context/database/sqlite` | SQLite 路径          |
+| `database.sqlite.wal_mode`             | bool   | `true`                            | WAL 模式             |
+| `database.sqlite.busy_timeout`         | number | `5000`                            | SQLite 忙等待超时    |
+| `database.surrealdb.url`               | String | `http://localhost:8000`           | SurrealDB 连接地址   |
+| `database.surrealdb.namespace`         | String | `code_index`                      | SurrealDB 命名司     |
+| `database.surrealdb.database`          | String | `open_context`                    | SurrealDB 数据库名   |
+| `database.qdrant.url`                  | String | `http://localhost:6333`           | Qdrant 连接地址      |
+| `database.qdrant.embedding_dim`        | number | `1024`                            | 向量维度             |
+| `node_server.port`                     | u16    | `4500`                            | Node.js 服务端口     |
+| `node_server.auto_start`               | bool   | `true`                            | 是否自动启动服务     |
+| `node_server.health_check_interval_ms` | number | `30000`                           | 健康检查间隔（毫秒） |
+| `indexer.batch_size`                   | number | `100`                             | 索引批次大小         |
+| `indexer.max_file_size_mb`             | number | `10`                              | 最大文件大小（MB）   |
+| `log_level`                            | String | `info`                            | 日志级别             |
 
 **log_level 可选值**：`trace`, `debug`, `info`, `warn`, `error`
 

@@ -33,8 +33,8 @@ async function main() {
 
   logger.info('Initializing databases...');
 
-  const leveldb = getSQLiteDBInstance();
-  await leveldb.open();
+  const indexDb = getSQLiteDBInstance();
+  await indexDb.open();
 
   const qdrant = getQdrantInstance();
   await qdrant.init();
@@ -68,7 +68,7 @@ async function main() {
 
   const shutdown = async () => {
     logger.info('Shutting down...');
-    await leveldb.close();
+    await indexDb.close();
     await surrealdb.disconnect();
     server.close();
     process.exit(0);

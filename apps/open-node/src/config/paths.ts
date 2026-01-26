@@ -43,7 +43,7 @@ export const StoragePaths = {
 
   // 数据库目录
   database: () => join(getBaseDir(), 'database'),
-  leveldb: () => join(getBaseDir(), 'database', 'leveldb'),
+  sqlite: () => join(getBaseDir(), 'database', 'sqlite'),
   qdrant: () => join(getBaseDir(), 'database', 'qdrant'),
   surrealdb: () => join(getBaseDir(), 'database', 'surrealdb'),
 

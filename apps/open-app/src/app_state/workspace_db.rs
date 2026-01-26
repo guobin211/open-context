@@ -2,11 +2,11 @@ use rusqlite::{Connection, Result as SqliteResult};
 use std::path::PathBuf;
 use std::sync::{Arc, Mutex};
 
-pub struct DatabaseManager {
+pub struct WorkspaceDatabaseManager {
     conn: Arc<Mutex<Connection>>,
 }
 
-impl DatabaseManager {
+impl WorkspaceDatabaseManager {
     pub fn new(db_path: PathBuf) -> SqliteResult<Self> {
         if let Some(parent) = db_path.parent() {
             std::fs::create_dir_all(parent)
@@ -102,32 +102,6 @@ impl DatabaseManager {
                 updated_at INTEGER NOT NULL,
                 FOREIGN KEY (workspace_id) REFERENCES workspaces(id) ON DELETE CASCADE,
                 FOREIGN KEY (parent_id) REFERENCES imported_directories(id) ON DELETE SET NULL
-            )",
-            [],
-        )?;
-
-        conn.execute(
-            "CREATE TABLE IF NOT EXISTS git_repositories (
-                id TEXT PRIMARY KEY,
-                workspace_id TEXT NOT NULL,
-                name TEXT NOT NULL,
-                remote_url TEXT NOT NULL,
-                local_path TEXT NOT NULL,
-                branch TEXT NOT NULL,
-                default_branch TEXT,
-                last_commit_hash TEXT,
-                last_synced_at INTEGER,
-                clone_status TEXT NOT NULL DEFAULT 'pending',
-                clone_progress INTEGER NOT NULL DEFAULT 0,
-                index_status TEXT NOT NULL DEFAULT 'not_indexed',
-                indexed_at INTEGER,
-                file_count INTEGER NOT NULL DEFAULT 0,
-                symbol_count INTEGER NOT NULL DEFAULT 0,
-                vector_count INTEGER NOT NULL DEFAULT 0,
-                is_archived INTEGER NOT NULL DEFAULT 0,
-                created_at INTEGER NOT NULL,
-                updated_at INTEGER NOT NULL,
-                FOREIGN KEY (workspace_id) REFERENCES workspaces(id) ON DELETE CASCADE
             )",
             [],
         )?;
@@ -239,41 +213,6 @@ impl DatabaseManager {
             [],
         );
 
-        // git_repositories migrations
-        let _ = conn.execute(
-            "ALTER TABLE git_repositories ADD COLUMN default_branch TEXT",
-            [],
-        );
-        let _ = conn.execute(
-            "ALTER TABLE git_repositories ADD COLUMN clone_status TEXT NOT NULL DEFAULT 'pending'",
-            [],
-        );
-        let _ = conn.execute(
-            "ALTER TABLE git_repositories ADD COLUMN clone_progress INTEGER NOT NULL DEFAULT 0",
-            [],
-        );
-        let _ = conn.execute("ALTER TABLE git_repositories ADD COLUMN index_status TEXT NOT NULL DEFAULT 'not_indexed'", []);
-        let _ = conn.execute(
-            "ALTER TABLE git_repositories ADD COLUMN indexed_at INTEGER",
-            [],
-        );
-        let _ = conn.execute(
-            "ALTER TABLE git_repositories ADD COLUMN file_count INTEGER NOT NULL DEFAULT 0",
-            [],
-        );
-        let _ = conn.execute(
-            "ALTER TABLE git_repositories ADD COLUMN symbol_count INTEGER NOT NULL DEFAULT 0",
-            [],
-        );
-        let _ = conn.execute(
-            "ALTER TABLE git_repositories ADD COLUMN vector_count INTEGER NOT NULL DEFAULT 0",
-            [],
-        );
-        let _ = conn.execute(
-            "ALTER TABLE git_repositories ADD COLUMN is_archived INTEGER NOT NULL DEFAULT 0",
-            [],
-        );
-
         // web_links migrations
         let _ = conn.execute("ALTER TABLE web_links ADD COLUMN thumbnail_url TEXT", []);
         let _ = conn.execute(
@@ -338,7 +277,10 @@ impl DatabaseManager {
             "CREATE INDEX IF NOT EXISTS idx_notes_updated ON notes(workspace_id, updated_at DESC)",
             [],
         )?;
-        conn.execute("CREATE INDEX IF NOT EXISTS idx_notes_viewed ON notes(workspace_id, last_viewed_at DESC)", [])?;
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_notes_viewed ON notes(workspace_id, last_viewed_at DESC)",
+            [],
+        )?;
 
         conn.execute(
             "CREATE INDEX IF NOT EXISTS idx_files_workspace ON imported_files(workspace_id)",
@@ -356,7 +298,10 @@ impl DatabaseManager {
             "CREATE INDEX IF NOT EXISTS idx_files_checksum ON imported_files(checksum)",
             [],
         )?;
-        conn.execute("CREATE INDEX IF NOT EXISTS idx_files_archived ON imported_files(workspace_id, is_archived)", [])?;
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_files_archived ON imported_files(workspace_id, is_archived)",
+            [],
+        )?;
 
         conn.execute(
             "CREATE INDEX IF NOT EXISTS idx_dirs_workspace ON imported_directories(workspace_id)",
@@ -366,32 +311,27 @@ impl DatabaseManager {
             "CREATE INDEX IF NOT EXISTS idx_dirs_parent ON imported_directories(parent_id)",
             [],
         )?;
-        conn.execute("CREATE INDEX IF NOT EXISTS idx_dirs_archived ON imported_directories(workspace_id, is_archived)", [])?;
-
         conn.execute(
-            "CREATE INDEX IF NOT EXISTS idx_repos_workspace ON git_repositories(workspace_id)",
+            "CREATE INDEX IF NOT EXISTS idx_dirs_archived ON imported_directories(workspace_id, is_archived)",
             [],
         )?;
-        conn.execute(
-            "CREATE INDEX IF NOT EXISTS idx_repos_clone_status ON git_repositories(clone_status)",
-            [],
-        )?;
-        conn.execute(
-            "CREATE INDEX IF NOT EXISTS idx_repos_index_status ON git_repositories(index_status)",
-            [],
-        )?;
-        conn.execute("CREATE INDEX IF NOT EXISTS idx_repos_archived ON git_repositories(workspace_id, is_archived)", [])?;
 
         conn.execute(
             "CREATE INDEX IF NOT EXISTS idx_links_workspace ON web_links(workspace_id)",
             [],
         )?;
-        conn.execute("CREATE INDEX IF NOT EXISTS idx_links_favorited ON web_links(workspace_id, is_favorited)", [])?;
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_links_favorited ON web_links(workspace_id, is_favorited)",
+            [],
+        )?;
         conn.execute(
             "CREATE INDEX IF NOT EXISTS idx_links_archived ON web_links(workspace_id, is_archived)",
             [],
         )?;
-        conn.execute("CREATE INDEX IF NOT EXISTS idx_links_visited ON web_links(workspace_id, last_visited_at DESC)", [])?;
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_links_visited ON web_links(workspace_id, last_visited_at DESC)",
+            [],
+        )?;
         conn.execute(
             "CREATE INDEX IF NOT EXISTS idx_links_url ON web_links(url)",
             [],

@@ -1,4 +1,4 @@
-import { getSQLiteDBInstance } from './sqlite-db';
+import { getSQLiteDBInstance } from './index-db';
 import { Workspace, CreateWorkspaceDto, UpdateWorkspaceDto } from '../types';
 import { generateUUID } from '../utils/id';
 

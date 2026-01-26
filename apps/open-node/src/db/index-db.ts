@@ -11,18 +11,18 @@ export class SQLiteDBService {
   private reverseEdgesDb: Keyv;
 
   constructor(dbPath?: string) {
-    const basePath = dbPath || StoragePaths.leveldb();
+    const basePath = dbPath || StoragePaths.sqlite();
 
     this.db = new Keyv({
-      store: new KeyvSqlite(path.join(basePath, 'main.sqlite'))
+      store: new KeyvSqlite(path.join(basePath, 'symbol.db'))
     });
 
     this.edgesDb = new Keyv({
-      store: new KeyvSqlite(path.join(basePath, 'edges.sqlite'))
+      store: new KeyvSqlite(path.join(basePath, 'edge.db'))
     });
 
     this.reverseEdgesDb = new Keyv({
-      store: new KeyvSqlite(path.join(basePath, 'reverse-edges.sqlite'))
+      store: new KeyvSqlite(path.join(basePath, 'reverse_edge.db'))
     });
   }
 

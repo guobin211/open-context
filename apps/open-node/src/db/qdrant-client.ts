@@ -153,6 +153,25 @@ export class QdrantService {
       points: [symbolId]
     });
   }
+
+  async connect(): Promise<void> {
+    try {
+      await this.client.getCollections();
+      logger.info('Qdrant connected');
+    } catch (error) {
+      logger.error({ error }, 'Failed to connect to Qdrant');
+      throw error;
+    }
+  }
+
+  disconnect(): void {
+    this.client = null as any;
+    logger.info('Qdrant disconnected');
+  }
+
+  isHealthy(): boolean {
+    return this.client !== null;
+  }
 }
 
 let instance: QdrantService | null = null;
