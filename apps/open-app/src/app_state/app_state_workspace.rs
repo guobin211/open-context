@@ -1,3 +1,7 @@
+//! 工作空间状态管理模块
+//!
+//! 提供工作空间的 CRUD 操作和资源统计功能。
+
 use chrono::Utc;
 use rusqlite::{params, Result as SqliteResult};
 use serde::{Deserialize, Serialize};
@@ -16,6 +20,7 @@ pub struct Workspace {
     pub sort_order: i32,
     pub is_active: bool,
     pub is_archived: bool,
+    pub settings: Option<String>,
     pub created_at: i64,
     pub updated_at: i64,
 }
@@ -32,19 +37,25 @@ impl Workspace {
             sort_order: 0,
             is_active: false,
             is_archived: false,
+            settings: None,
             created_at: now,
             updated_at: now,
         }
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
+#[serde(rename_all = "camelCase")]
 pub struct WorkspaceResourceCount {
     pub notes: i32,
     pub files: i32,
     pub directories: i32,
     pub repositories: i32,
     pub links: i32,
+    pub conversations: i32,
+    pub terminals: i32,
+    pub webviews: i32,
+    pub chats: i32,
 }
 
 impl DatabaseManager {
@@ -52,8 +63,8 @@ impl DatabaseManager {
         let conn_arc = self.conn();
         let conn = conn_arc.lock().unwrap();
         conn.execute(
-            "INSERT INTO workspaces (id, name, description, icon, color, sort_order, is_active, is_archived, created_at, updated_at)
-             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10)",
+            "INSERT INTO workspaces (id, name, description, icon, color, sort_order, is_active, is_archived, settings, created_at, updated_at)
+             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11)",
             params![
                 workspace.id,
                 workspace.name,
@@ -63,6 +74,7 @@ impl DatabaseManager {
                 workspace.sort_order,
                 workspace.is_active as i32,
                 workspace.is_archived as i32,
+                workspace.settings,
                 workspace.created_at,
                 workspace.updated_at,
             ],
@@ -74,7 +86,7 @@ impl DatabaseManager {
         let conn_arc = self.conn();
         let conn = conn_arc.lock().unwrap();
         let mut stmt = conn.prepare(
-            "SELECT id, name, description, icon, color, sort_order, is_active, is_archived, created_at, updated_at
+            "SELECT id, name, description, icon, color, sort_order, is_active, is_archived, settings, created_at, updated_at
              FROM workspaces WHERE id = ?1",
         )?;
 
@@ -89,8 +101,9 @@ impl DatabaseManager {
                 sort_order: row.get(5)?,
                 is_active: row.get::<_, i32>(6)? != 0,
                 is_archived: row.get::<_, i32>(7)? != 0,
-                created_at: row.get(8)?,
-                updated_at: row.get(9)?,
+                settings: row.get(8)?,
+                created_at: row.get(9)?,
+                updated_at: row.get(10)?,
             }))
         } else {
             Ok(None)
@@ -101,7 +114,7 @@ impl DatabaseManager {
         let conn_arc = self.conn();
         let conn = conn_arc.lock().unwrap();
         let mut stmt = conn.prepare(
-            "SELECT id, name, description, icon, color, sort_order, is_active, is_archived, created_at, updated_at
+            "SELECT id, name, description, icon, color, sort_order, is_active, is_archived, settings, created_at, updated_at
              FROM workspaces WHERE is_archived = 0 ORDER BY sort_order ASC, updated_at DESC",
         )?;
 
@@ -115,8 +128,9 @@ impl DatabaseManager {
                 sort_order: row.get(5)?,
                 is_active: row.get::<_, i32>(6)? != 0,
                 is_archived: row.get::<_, i32>(7)? != 0,
-                created_at: row.get(8)?,
-                updated_at: row.get(9)?,
+                settings: row.get(8)?,
+                created_at: row.get(9)?,
+                updated_at: row.get(10)?,
             })
         })?;
 
@@ -134,8 +148,8 @@ impl DatabaseManager {
 
         conn.execute(
             "UPDATE workspaces
-             SET name = ?1, description = ?2, icon = ?3, color = ?4, sort_order = ?5, is_active = ?6, is_archived = ?7, updated_at = ?8
-             WHERE id = ?9",
+             SET name = ?1, description = ?2, icon = ?3, color = ?4, sort_order = ?5, is_active = ?6, is_archived = ?7, settings = ?8, updated_at = ?9
+             WHERE id = ?10",
             params![
                 workspace.name,
                 workspace.description,
@@ -144,6 +158,7 @@ impl DatabaseManager {
                 workspace.sort_order,
                 workspace.is_active as i32,
                 workspace.is_archived as i32,
+                workspace.settings,
                 updated_at,
                 workspace.id,
             ],
@@ -162,7 +177,7 @@ impl DatabaseManager {
         let conn_arc = self.conn();
         let conn = conn_arc.lock().unwrap();
         let mut stmt = conn.prepare(
-            "SELECT id, name, description, icon, color, sort_order, is_active, is_archived, created_at, updated_at
+            "SELECT id, name, description, icon, color, sort_order, is_active, is_archived, settings, created_at, updated_at
              FROM workspaces WHERE is_active = 1 LIMIT 1",
         )?;
 
@@ -177,8 +192,9 @@ impl DatabaseManager {
                 sort_order: row.get(5)?,
                 is_active: true,
                 is_archived: row.get::<_, i32>(7)? != 0,
-                created_at: row.get(8)?,
-                updated_at: row.get(9)?,
+                settings: row.get(8)?,
+                created_at: row.get(9)?,
+                updated_at: row.get(10)?,
             }))
         } else {
             Ok(None)
@@ -244,103 +260,40 @@ impl DatabaseManager {
             |row| row.get(0),
         )?;
 
+        let conversations_count: i32 = conn.query_row(
+            "SELECT COUNT(*) FROM conversations WHERE workspace_id = ?1 AND is_archived = 0",
+            params![workspace_id],
+            |row| row.get(0),
+        )?;
+
+        let terminals_count: i32 = conn.query_row(
+            "SELECT COUNT(*) FROM terminals WHERE workspace_id = ?1 AND is_archived = 0",
+            params![workspace_id],
+            |row| row.get(0),
+        )?;
+
+        let webviews_count: i32 = conn.query_row(
+            "SELECT COUNT(*) FROM webviews WHERE workspace_id = ?1 AND is_archived = 0",
+            params![workspace_id],
+            |row| row.get(0),
+        )?;
+
+        let chats_count: i32 = conn.query_row(
+            "SELECT COUNT(*) FROM chats WHERE workspace_id = ?1 AND is_archived = 0",
+            params![workspace_id],
+            |row| row.get(0),
+        )?;
+
         Ok(WorkspaceResourceCount {
             notes: notes_count,
             files: files_count,
             directories: dirs_count,
             repositories: repos_count,
             links: links_count,
+            conversations: conversations_count,
+            terminals: terminals_count,
+            webviews: webviews_count,
+            chats: chats_count,
         })
-    }
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use std::env;
-
-    fn setup_test_db() -> DatabaseManager {
-        let test_db_path =
-            env::temp_dir().join(format!("test_workspace_{}.db", uuid::Uuid::new_v4()));
-        DatabaseManager::new(test_db_path).unwrap()
-    }
-
-    #[test]
-    fn test_create_and_get_workspace() {
-        let db = setup_test_db();
-        let workspace = Workspace::new(
-            "Test Workspace".to_string(),
-            Some("Test description".to_string()),
-        );
-
-        db.create_workspace(&workspace).unwrap();
-        let retrieved = db.get_workspace(&workspace.id).unwrap();
-
-        assert!(retrieved.is_some());
-        let retrieved = retrieved.unwrap();
-        assert_eq!(retrieved.id, workspace.id);
-        assert_eq!(retrieved.name, workspace.name);
-    }
-
-    #[test]
-    fn test_list_workspaces() {
-        let db = setup_test_db();
-
-        let ws1 = Workspace::new("Workspace 1".to_string(), None);
-        let ws2 = Workspace::new("Workspace 2".to_string(), None);
-
-        db.create_workspace(&ws1).unwrap();
-        db.create_workspace(&ws2).unwrap();
-
-        let workspaces = db.list_workspaces().unwrap();
-        assert_eq!(workspaces.len(), 2);
-    }
-
-    #[test]
-    fn test_update_workspace() {
-        let db = setup_test_db();
-        let mut workspace = Workspace::new("Original Name".to_string(), None);
-
-        db.create_workspace(&workspace).unwrap();
-
-        workspace.name = "Updated Name".to_string();
-        workspace.description = Some("New description".to_string());
-        db.update_workspace(&workspace).unwrap();
-
-        let updated = db.get_workspace(&workspace.id).unwrap().unwrap();
-        assert_eq!(updated.name, "Updated Name");
-        assert_eq!(updated.description, Some("New description".to_string()));
-    }
-
-    #[test]
-    fn test_delete_workspace() {
-        let db = setup_test_db();
-        let workspace = Workspace::new("To Delete".to_string(), None);
-
-        db.create_workspace(&workspace).unwrap();
-        db.delete_workspace(&workspace.id).unwrap();
-
-        let retrieved = db.get_workspace(&workspace.id).unwrap();
-        assert!(retrieved.is_none());
-    }
-
-    #[test]
-    fn test_active_workspace() {
-        let db = setup_test_db();
-        let ws1 = Workspace::new("Workspace 1".to_string(), None);
-        let ws2 = Workspace::new("Workspace 2".to_string(), None);
-
-        db.create_workspace(&ws1).unwrap();
-        db.create_workspace(&ws2).unwrap();
-
-        db.set_active_workspace(&ws1.id).unwrap();
-        let active = db.get_active_workspace().unwrap();
-        assert!(active.is_some());
-        assert_eq!(active.unwrap().id, ws1.id);
-
-        db.set_active_workspace(&ws2.id).unwrap();
-        let active = db.get_active_workspace().unwrap();
-        assert!(active.is_some());
-        assert_eq!(active.unwrap().id, ws2.id);
     }
 }

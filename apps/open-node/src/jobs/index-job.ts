@@ -67,7 +67,9 @@ export class IndexJob {
         await this.graphService.batchAddEdges(result.edges);
       }
 
-      await this.repoService.updateIndexStatus(params.repoId, result.commit, result.languageStats);
+      // 注意：索引状态更新应该通过 Tauri 端完成
+      // 这里暂时跳过，等待 Tauri 端通过 HTTP 回调更新
+      // await this.repoService.updateIndexStatus(params.repoId, result.commit, result.languageStats);
 
       await this.jobService.updateJobStatus(params.jobId, 'completed', 1.0);
 

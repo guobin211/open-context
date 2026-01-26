@@ -1,6 +1,6 @@
 import { CommonIndexer } from '@/indexers/common-indexer';
 import { getLanguageFromExt } from '@/indexers/core/ast-parser';
-import { Repository } from '../types';
+import { GitRepository } from '../types';
 import { getFileExtension } from '../utils/fs';
 import { getRepoPath, GitService } from '../utils/git';
 import logger from '../utils/logger';
@@ -9,11 +9,10 @@ export class IndexerService {
   private commonIndexer = new CommonIndexer();
 
   /**
-   * Index a git repository
-   * @param params
+   * 索引 Git 仓库
    */
-  async indexRepository(params: { repository: Repository; workspaceId: string; mode: 'full' | 'incremental' }) {
-    const repoPath = getRepoPath(params.repository.id);
+  async indexRepository(params: { repository: GitRepository; workspaceId: string; mode: 'full' | 'incremental' }) {
+    const repoPath = params.repository.localPath || getRepoPath(params.repository.id);
     const git = new GitService(repoPath);
 
     if (params.mode === 'incremental') {

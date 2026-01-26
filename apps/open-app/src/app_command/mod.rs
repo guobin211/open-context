@@ -1,10 +1,15 @@
+mod chat_commands;
+mod directory_commands;
 mod dto;
 mod file_commands;
 mod file_tree_commands;
+mod link_commands;
 mod note_commands;
 mod repository_commands;
 mod system_commands;
 mod task_commands;
+mod terminal_commands;
+mod webview_commands;
 mod workspace_commands;
 
 use crate::TauriBuilder;
@@ -60,5 +65,56 @@ pub fn setup_invoke_handler(builder: TauriBuilder) -> TauriBuilder {
         task_commands::clone_repository_task,
         task_commands::index_repository_task,
         task_commands::import_files_task,
+        // chat
+        chat_commands::get_all_chats,
+        chat_commands::get_chat,
+        chat_commands::create_chat,
+        chat_commands::update_chat,
+        chat_commands::delete_chat,
+        // conversation
+        chat_commands::get_all_conversations,
+        chat_commands::get_conversations_by_chat,
+        chat_commands::get_conversation,
+        chat_commands::create_conversation,
+        chat_commands::update_conversation,
+        chat_commands::update_conversation_messages,
+        chat_commands::delete_conversation,
+        // terminal
+        terminal_commands::get_all_terminals,
+        terminal_commands::get_terminal,
+        terminal_commands::create_terminal,
+        terminal_commands::update_terminal,
+        terminal_commands::delete_terminal,
+        terminal_commands::set_active_terminal,
+        terminal_commands::update_terminal_cwd,
+        terminal_commands::append_terminal_history,
+        // webview
+        webview_commands::get_all_webviews,
+        webview_commands::get_webview,
+        webview_commands::create_webview,
+        webview_commands::update_webview,
+        webview_commands::delete_webview,
+        webview_commands::set_active_webview,
+        webview_commands::update_webview_url,
+        webview_commands::update_webview_scroll,
+        webview_commands::update_webview_zoom,
+        webview_commands::set_webview_loading,
+        // web link
+        link_commands::get_all_web_links,
+        link_commands::get_web_link,
+        link_commands::create_web_link,
+        link_commands::update_web_link,
+        link_commands::delete_web_link,
+        link_commands::search_web_links,
+        link_commands::increment_link_visit,
+        link_commands::toggle_link_favorite,
+        link_commands::archive_link,
+        link_commands::get_favorite_links,
+        // directory
+        directory_commands::get_all_directories,
+        directory_commands::get_directory,
+        directory_commands::create_directory,
+        directory_commands::update_directory,
+        directory_commands::delete_directory,
     ])
 }

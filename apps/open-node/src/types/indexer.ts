@@ -4,9 +4,10 @@ export interface IndexJobOptions {
   workspaceId: string;
 }
 
+// 索引任务结果（用于 API 响应）
 export interface IndexJobResult {
   jobId: string;
-  status: 'queued' | 'running' | 'completed' | 'failed';
+  status: 'pending' | 'queued' | 'running' | 'completed' | 'failed' | 'cancelled';
   progress?: number;
   error?: string;
 }
