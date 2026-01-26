@@ -5,7 +5,7 @@ import { StoragePaths } from '../config';
 import { EdgeType } from '../types';
 import logger from '../utils/logger';
 
-export class LevelDBService {
+export class SQLiteDBService {
   private db: Keyv;
   private edgesDb: Keyv;
   private reverseEdgesDb: Keyv;
@@ -174,11 +174,11 @@ export class LevelDBService {
   }
 }
 
-let instance: LevelDBService | null = null;
+let instance: SQLiteDBService | null = null;
 
-export function getLevelDBInstance(): LevelDBService {
+export function getSQLiteDBInstance(): SQLiteDBService {
   if (!instance) {
-    instance = new LevelDBService();
+    instance = new SQLiteDBService();
   }
   return instance;
 }

@@ -1,7 +1,8 @@
-import { describe, it, expect } from 'vitest';
-import { ASTParser, SymbolExtractor } from '../../src/indexers/code-symbol-extractor.ts';
-import { CodeChunkBuilder } from '../../src/indexers/code-chunk-builder';
-import { GraphBuilder } from '../../src/indexers/code-graph-builder';
+import { describe, expect, it } from 'vitest';
+import { ASTParser } from '../../src/indexers/core/ast-parser.ts';
+import { CodeChunkBuilder } from '../../src/indexers/core/code-chunk-builder';
+import { GraphBuilder } from '../../src/indexers/core/code-graph-builder';
+import { SymbolExtractor } from '../../src/indexers/core/code-symbol-extractor.ts';
 
 describe('Indexers', () => {
   describe('Symbol Extractor', () => {

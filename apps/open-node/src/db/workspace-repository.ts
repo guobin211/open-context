@@ -1,9 +1,9 @@
-import { getLevelDBInstance } from './leveldb';
+import { getSQLiteDBInstance } from './sqlite-db';
 import { Workspace, CreateWorkspaceDto, UpdateWorkspaceDto } from '../types';
 import { generateUUID } from '../utils/id';
 
 export class WorkspaceRepository {
-  private db = getLevelDBInstance();
+  private db = getSQLiteDBInstance();
   private prefix = 'workspace:';
 
   async create(dto: CreateWorkspaceDto): Promise<Workspace> {

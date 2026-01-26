@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { MarkdownIndexer } from '../../src/indexers/markdown-indexer';
+import { MarkdownIndexer } from '../../src/indexers/impl/markdown-indexer';
 
 describe('MarkdownIndexer', () => {
   const indexer = new MarkdownIndexer();

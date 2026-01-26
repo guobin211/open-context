@@ -1,9 +1,9 @@
-import { getLevelDBInstance } from './leveldb';
+import { getSQLiteDBInstance } from './sqlite-db';
 import { Repository, CreateRepositoryDto, UpdateRepositoryDto } from '../types';
 import { generateUUID } from '../utils/id';
 
 export class RepoRepository {
-  private db = getLevelDBInstance();
+  private db = getSQLiteDBInstance();
   private prefix = 'repo:';
 
   async create(workspaceId: string, dto: CreateRepositoryDto): Promise<Repository> {

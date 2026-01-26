@@ -3,7 +3,7 @@ import { serve } from '@hono/node-server';
 import { logger as honoLogger } from 'hono/logger';
 import dotenv from 'dotenv';
 import { DefaultConfig, initStorageDirs } from './config';
-import { getLevelDBInstance, getQdrantInstance, getSurrealDBInstance } from './db';
+import { getSQLiteDBInstance, getQdrantInstance, getSurrealDBInstance } from './db';
 import { GraphService } from './services';
 import router from './api/router';
 import logger from './utils/logger';
@@ -33,7 +33,7 @@ async function main() {
 
   logger.info('Initializing databases...');
 
-  const leveldb = getLevelDBInstance();
+  const leveldb = getSQLiteDBInstance();
   await leveldb.open();
 
   const qdrant = getQdrantInstance();

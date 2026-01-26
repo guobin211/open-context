@@ -1,9 +1,9 @@
-import { getLevelDBInstance } from './leveldb';
+import { getSQLiteDBInstance } from './sqlite-db';
 import { IndexJobResult } from '../types';
 import { generateUUID } from '../utils/id';
 
 export class JobRepository {
-  private db = getLevelDBInstance();
+  private db = getSQLiteDBInstance();
   private prefix = 'job:';
 
   async create(repoId: string, mode: 'full' | 'incremental'): Promise<IndexJobResult> {
