@@ -46,7 +46,7 @@ if (isDev) {
   console.log('📦 Building...');
   await context.rebuild();
   console.log('✅ Build completed successfully!');
-  console.log('ES模块版本: dist/esm/index.js');
+  console.log('ES模块版本: dist/index.js');
   await context.dispose();
   console.log('🎉 Build completed!');
 }
