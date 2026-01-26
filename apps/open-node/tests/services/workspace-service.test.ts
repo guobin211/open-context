@@ -1,22 +1,17 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect, beforeEach } from 'vitest';
 import { WorkspaceService } from '../../src/services/workspace-service';
-
-vi.mock('../../src/db/workspace-repository', () => ({
-  WorkspaceRepository: vi.fn().mockImplementation(() => ({
-    create: vi.fn(),
-    findById: vi.fn(),
-    update: vi.fn(),
-    delete: vi.fn(),
-    findAll: vi.fn()
-  }))
-}));
 
 describe('WorkspaceService', () => {
   let workspaceService: WorkspaceService;
+  let testWorkspaceId: string;
 
-  beforeEach(() => {
+  beforeEach(async () => {
     workspaceService = new WorkspaceService();
-    vi.clearAllMocks();
+    // 创建测试用 workspace
+    const workspace = await workspaceService.createWorkspace({
+      name: 'test-workspace-for-crud'
+    });
+    testWorkspaceId = workspace.id;
   });
 
   describe('createWorkspace', () => {
@@ -31,6 +26,7 @@ describe('WorkspaceService', () => {
       expect(result).toBeDefined();
       expect(result).toHaveProperty('id');
       expect(result).toHaveProperty('name');
+      expect(result.name).toBe('test-workspace');
     });
 
     it('should handle creation with minimal data', async () => {
@@ -42,18 +38,20 @@ describe('WorkspaceService', () => {
 
       expect(result).toBeDefined();
       expect(result).toHaveProperty('id');
+      expect(result.name).toBe('minimal-workspace');
     });
   });
 
   describe('getWorkspace', () => {
     it('should return workspace by id', async () => {
-      const result = await workspaceService.getWorkspace('ws_test_123');
+      const result = await workspaceService.getWorkspace(testWorkspaceId);
 
       expect(result).toBeDefined();
+      expect(result?.id).toBe(testWorkspaceId);
     });
 
     it('should return null for non-existent workspace', async () => {
-      const result = await workspaceService.getWorkspace('non_existent');
+      const result = await workspaceService.getWorkspace('non_existent_id');
 
       expect(result).toBeNull();
     });
@@ -65,9 +63,10 @@ describe('WorkspaceService', () => {
         name: 'updated-workspace'
       };
 
-      const result = await workspaceService.updateWorkspace('ws_test_123', updateDto);
+      const result = await workspaceService.updateWorkspace(testWorkspaceId, updateDto);
 
       expect(result).toBeDefined();
+      expect(result?.name).toBe('updated-workspace');
     });
 
     it('should return null for non-existent workspace', async () => {
@@ -75,7 +74,7 @@ describe('WorkspaceService', () => {
         name: 'updated-workspace'
       };
 
-      const result = await workspaceService.updateWorkspace('non_existent', updateDto);
+      const result = await workspaceService.updateWorkspace('non_existent_id', updateDto);
 
       expect(result).toBeNull();
     });
@@ -83,13 +82,21 @@ describe('WorkspaceService', () => {
 
   describe('deleteWorkspace', () => {
     it('should delete workspace', async () => {
-      const result = await workspaceService.deleteWorkspace('ws_test_123');
+      // 先创建一个专门用于删除测试的 workspace
+      const workspace = await workspaceService.createWorkspace({
+        name: 'workspace-to-delete'
+      });
 
+      const result = await workspaceService.deleteWorkspace(workspace.id);
       expect(result).toBe(true);
+
+      // 验证删除后获取返回 null
+      const deleted = await workspaceService.getWorkspace(workspace.id);
+      expect(deleted).toBeNull();
     });
 
     it('should return false for non-existent workspace', async () => {
-      const result = await workspaceService.deleteWorkspace('non_existent');
+      const result = await workspaceService.deleteWorkspace('non_existent_id');
 
       expect(result).toBe(false);
     });

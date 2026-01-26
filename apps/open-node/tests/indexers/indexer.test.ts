@@ -1,11 +1,12 @@
 import { describe, it, expect } from 'vitest';
-import { SymbolExtractor } from '../../src/indexers/symbol-extractor';
+import { ASTParser, SymbolExtractor } from '../../src/indexers/code-symbol-extractor.ts';
 import { CodeChunkBuilder } from '../../src/indexers/code-chunk-builder';
-import { GraphBuilder } from '../../src/indexers/graph-builder';
+import { GraphBuilder } from '../../src/indexers/code-graph-builder';
 
 describe('Indexers', () => {
   describe('Symbol Extractor', () => {
-    const extractor = new SymbolExtractor();
+    const parser = new ASTParser();
+    const extractor = new SymbolExtractor(parser);
 
     it('should extract function declarations', () => {
       const code = `
@@ -13,7 +14,7 @@ describe('Indexers', () => {
           return 'test';
         }
       `;
-      const symbols = extractor.extract(code, 'typescript');
+      const symbols = extractor.extract(code, 'ts', 'test.ts');
 
       expect(symbols).toMatchSnapshot();
 
@@ -30,7 +31,7 @@ describe('Indexers', () => {
           testMethod() {}
         }
       `;
-      const symbols = extractor.extract(code, 'typescript');
+      const symbols = extractor.extract(code, 'ts', 'test.ts');
 
       expect(symbols).toMatchSnapshot();
 
@@ -48,7 +49,7 @@ describe('Indexers', () => {
       const code = `
         const arrowFunc = (x: number) => x * 2;
       `;
-      const symbols = extractor.extract(code, 'typescript');
+      const symbols = extractor.extract(code, 'ts', 'test.ts');
       expect(symbols).toMatchSnapshot();
       const func = symbols.find((s) => s.name === 'arrowFunc');
 
@@ -61,7 +62,7 @@ describe('Indexers', () => {
         export function exportedFunc() {}
         export default class DefaultClass {}
       `;
-      const symbols = extractor.extract(code, 'typescript');
+      const symbols = extractor.extract(code, 'ts', 'test.ts');
       expect(symbols).toMatchSnapshot();
       const func = symbols.find((s) => s.name === 'exportedFunc');
       const cls = symbols.find((s) => s.name === 'DefaultClass');
@@ -106,7 +107,8 @@ describe('Indexers', () => {
   });
 
   describe('Graph Builder', () => {
-    const builder = new GraphBuilder();
+    const parser = new ASTParser();
+    const builder = new GraphBuilder(parser);
     it('should build dependency graph from code', () => {
       const code = `
         import { other } from './other';
@@ -121,7 +123,7 @@ describe('Indexers', () => {
 
       const edges = builder.build({
         code,
-        language: 'typescript',
+        language: 'ts',
         filePath: 'src/main.ts',
         workspaceId: 'ws1',
         repoId: 'repo1'

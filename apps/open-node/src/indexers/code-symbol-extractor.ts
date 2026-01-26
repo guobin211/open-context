@@ -1,6 +1,10 @@
 import Parser from 'tree-sitter';
-import { ASTParser } from './ast-parser';
+import { ASTParser, type ParseResult, type SupportLanguage, getASTParser } from './ast-parser';
 import { SymbolKind, Visibility } from '../types';
+import { MultiLanguageSymbolExtractor } from './multi-language-extractor';
+
+export { ASTParser, getASTParser } from './ast-parser';
+export type { SupportLanguage, ParseResult } from './ast-parser';
 
 export interface ExtractedSymbol {
   name: string;
@@ -16,18 +20,40 @@ export interface ExtractedSymbol {
 
 export class SymbolExtractor {
   private parser: ASTParser;
+  private multiLanguageExtractor: MultiLanguageSymbolExtractor;
 
-  constructor() {
-    this.parser = new ASTParser();
+  constructor(parser: ASTParser) {
+    this.parser = parser;
+    this.multiLanguageExtractor = new MultiLanguageSymbolExtractor();
   }
 
-  extract(code: string, language: 'typescript' | 'javascript'): ExtractedSymbol[] {
-    const tree = this.parser.parse(code, language);
+  /**
+   * 从代码字符串提取符号（会解析代码）
+   */
+  extract(code: string, language: SupportLanguage, filePath: string): ExtractedSymbol[] {
+    const tree = this.parser.parse(code, language, filePath);
+
+    if (this.multiLanguageExtractor.isSupported(language)) {
+      return this.multiLanguageExtractor.extract(tree, code, language);
+    }
+
+    return this.extractFromTree(tree, code);
+  }
+
+  /**
+   * 从已解析的 AST 提取符号（复用已有的解析结果）
+   */
+  extractFromTree(tree: Parser.Tree, code: string): ExtractedSymbol[] {
     const symbols: ExtractedSymbol[] = [];
-
     this.traverseAndExtract(tree.rootNode, code, '', symbols);
-
     return symbols;
+  }
+
+  /**
+   * 从 ParseResult 提取符号
+   */
+  extractFromParseResult(parseResult: ParseResult): ExtractedSymbol[] {
+    return this.extractFromTree(parseResult.tree, parseResult.code);
   }
 
   private traverseAndExtract(

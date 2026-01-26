@@ -109,11 +109,10 @@ export const NavItem: React.FC<NavItemProps> = (props) => {
     const isActive = activeItemId === id;
 
     // 事件处理
-    const handleClick = () => {
-    };
+    const handleClick = () => {};
 
     return <button onClick={handleClick}>{label}</button>;
-}
+};
 ```
 
 ### 导入规范
@@ -140,15 +139,24 @@ export const NavItem: React.FC<NavItemProps> = (props) => {
 ### 目录结构
 
 ```
-src/
-├── api/          # REST 路由（Hono）
-├── services/     # 业务逻辑层
-├── db/           # 数据持久化（LevelDB、Qdrant）
-├── indexers/     # 代码解析（tree-sitter）
-├── jobs/         # 异步任务队列
-├── utils/        # 工具函数
-├── types/        # TypeScript 类型定义
-└── app.ts        # 启动入口
+├─ package.json
+├─ tsconfig.json
+├─ .env
+├─ src/
+│   ├─ api/
+│   ├─ services/
+│   ├─ jobs/
+│   ├─ db/
+│   ├─ indexers/
+│   ├─ utils/
+│   ├─ types/
+│   └─ app.ts
+├─ data/
+│   ├─ leveldb/
+│   └─ logs/
+├─ tests/
+├─ scripts/
+└─ README.md
 ```
 
 ### 服务类模式
@@ -159,18 +167,18 @@ import { Workspace, CreateWorkspaceDto } from '../types';
 import logger from '../utils/logger';
 
 export class WorkspaceService {
-    private repo = new WorkspaceRepository();
+  private repo = new WorkspaceRepository();
 
-    async createWorkspace(dto: CreateWorkspaceDto): Promise<Workspace> {
-        logger.info({ name: dto.name }, 'Creating workspace');
-        const workspace = await this.repo.create(dto);
-        logger.info({ id: workspace.id }, 'Workspace created');
-        return workspace;
-    }
+  async createWorkspace(dto: CreateWorkspaceDto): Promise<Workspace> {
+    logger.info({ name: dto.name }, 'Creating workspace');
+    const workspace = await this.repo.create(dto);
+    logger.info({ id: workspace.id }, 'Workspace created');
+    return workspace;
+  }
 
-    async getWorkspace(id: string): Promise<Workspace | null> {
-        return this.repo.findById(id);
-    }
+  async getWorkspace(id: string): Promise<Workspace | null> {
+    return this.repo.findById(id);
+  }
 }
 ```
 
@@ -203,15 +211,13 @@ export class WorkspaceService {
 
 ### 目录结构
 
+- apps/open-app
+
 ```
 src/
 ├── main.rs          # 入口
 ├── lib.rs           # 库入口
-├── app_commands.rs  # Tauri 命令
-├── app_events.rs    # 事件处理
-├── app_runtime.rs   # 运行时配置
-├── app_sidecar.rs   # Sidecar 进程管理
-└── app_state.rs     # 应用状态
+├── app_plugins.rs   # 插件
 ```
 
 ### 命名规范
@@ -252,6 +258,7 @@ pub fn ping() -> &'static str {
 - 禁止 `@ts-ignore`、`@ts-expect-error`、`as any`
 - 公开方法显式声明返回类型
 - Props 接口：`{组件名}Props`
+- Promise函数需要catch错误，`fetch().catch(console.error)`
 
 ---
 

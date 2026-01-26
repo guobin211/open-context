@@ -8,6 +8,11 @@ import inspect from 'vite-plugin-inspect';
 import topLevelAwait from 'vite-plugin-top-level-await';
 import wasm from 'vite-plugin-wasm';
 import preload from 'vite-plugin-preload';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const __workspace = path.resolve(__dirname, '../../');
 
 // https://vite.dev/config/
 export default defineConfig(async () => ({
@@ -30,6 +35,9 @@ export default defineConfig(async () => ({
     preload()
   ],
   clearScreen: false,
+  define: {
+    __WORKSPACE__: JSON.stringify(__workspace)
+  },
   resolve: {
     alias: {
       '@': '/src'

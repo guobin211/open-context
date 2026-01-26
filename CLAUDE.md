@@ -187,8 +187,16 @@ open-context/
 
 - **核心服务**：IndexerService、GraphService、RAGService、VectorService、JobService
 - **索引器**：SymbolExtractor（Tree-sitter AST 解析）、CodeChunkBuilder、GraphBuilder
-- **存储层**：LevelDB（符号、依赖关系图）、Qdrant（向量检索）
+- **存储层**：
+  - LevelDB（低延迟 KV 存储，用于实时索引）
+  - SurrealDB（全文检索 + 图数据库，用于复杂查询）
+  - Qdrant（向量检索，语义搜索）
 - **任务队列**：JobQueue（顺序处理），IndexJob、ReindexJob
+
+**详细文档**：
+
+- [SurrealDB 架构文档](docs/NODE_SURREALDB_ARCHITECTURE.md)
+- [SurrealDB 使用指南](docs/NODE_SURREALDB_USAGE.md)
 
 **当前限制**：仅支持 TypeScript/JavaScript 索引
 
@@ -283,17 +291,22 @@ import { FileTree } from '@/components/file-tree';
 3. IndexJob 执行：
    - GitService 读取文件 → SymbolExtractor 解析 AST → 提取符号
    - CodeChunkBuilder 生成代码块 → VectorService 生成嵌入向量
-   - GraphBuilder 构建依赖关系 → 存储到 LevelDB 和 Qdrant
+   - GraphBuilder 构建依赖关系：
+     - 存储到 LevelDB（实时索引）
+     - 同步到 SurrealDB（全文检索 + 图查询）
+     - 存储到 Qdrant（向量检索）
    - GraphService 加载到内存
 4. 任务状态更新：0% → 30% → 60% → 80% → 100%
 
 ### RAG 查询流程
 
 1. 用户查询：`POST /query/code`
-2. RAGService：
-   - VectorService 生成查询向量 → Qdrant 搜索 top-K 相似符号
-   - GraphService 扩展结果，包含依赖关系（可选）
-   - 返回包含上下文的丰富结果
+2. RAGService 根据查询类型选择存储层：
+   - **向量搜索**：VectorService 生成查询向量 → Qdrant 搜索 top-K 相似符号
+   - **全文搜索**：SurrealDB BM25 搜索符号名称或代码内容
+   - **图查询**：SurrealDB 查找符号依赖链、调用关系
+3. GraphService 扩展结果，包含依赖关系
+4. 返回包含上下文的丰富结果
 
 ## 常用命令
 
@@ -386,13 +399,13 @@ pnpm fmt:js         # JavaScript/TypeScript (Prettier)
 
 ### 数据库技术栈
 
-| 数据库          | 用途               | 位置                    |
-| --------------- | ------------------ | ----------------------- |
-| **SQLite**      | 元数据、状态管理   | `app_state.db`          |
-| **LevelDB**     | 符号、依赖关系图   | `leveldb/`              |
-| **Qdrant**      | 向量嵌入、语义搜索 | `qdrant/` 或远程        |
-| **surrealdb**   | 向量嵌入、全文搜索 | `surrealdb/` 或远程     |
-| **Tauri Store** | 前端状态持久化     | `chat-store.store.json` |
+| 数据库          | 用途                         | 位置                    |
+| --------------- | ---------------------------- | ----------------------- |
+| **SQLite**      | 元数据、状态管理             | `app_state.db`          |
+| **LevelDB**     | 符号、依赖关系图（实时索引） | `leveldb/`              |
+| **SurrealDB**   | 全文检索、图数据库、关系查询 | `surrealdb/` 或远程     |
+| **Qdrant**      | 向量嵌入、语义搜索           | `qdrant/` 或远程        |
+| **Tauri Store** | 前端状态持久化               | `chat-store.store.json` |
 
 ## 时间处理规范
 

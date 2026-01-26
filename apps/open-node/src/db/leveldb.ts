@@ -1,138 +1,138 @@
-import { Level } from 'level';
+import Keyv from 'keyv';
+import KeyvSqlite from '@keyv/sqlite';
 import path from 'path';
+import { StoragePaths } from '../config';
 import { EdgeType } from '../types';
 import logger from '../utils/logger';
 
 export class LevelDBService {
-  private db: Level<string, string>;
-  private edgesDb: Level<string, string>;
-  private reverseEdgesDb: Level<string, string>;
+  private db: Keyv;
+  private edgesDb: Keyv;
+  private reverseEdgesDb: Keyv;
 
   constructor(dbPath?: string) {
-    const basePath = dbPath || process.env.LEVELDB_PATH || './data/leveldb';
-    this.db = new Level(path.join(basePath, 'main'));
-    this.edgesDb = new Level(path.join(basePath, 'edges'));
-    this.reverseEdgesDb = new Level(path.join(basePath, 'reverse-edges'));
+    const basePath = dbPath || StoragePaths.leveldb();
+
+    this.db = new Keyv({
+      store: new KeyvSqlite(path.join(basePath, 'main.sqlite'))
+    });
+
+    this.edgesDb = new Keyv({
+      store: new KeyvSqlite(path.join(basePath, 'edges.sqlite'))
+    });
+
+    this.reverseEdgesDb = new Keyv({
+      store: new KeyvSqlite(path.join(basePath, 'reverse-edges.sqlite'))
+    });
   }
 
   async open(): Promise<void> {
-    await Promise.all([this.db.open(), this.edgesDb.open(), this.reverseEdgesDb.open()]);
-    logger.info('LevelDB opened');
+    await Promise.all([
+      this.db.set('connection_test', true),
+      this.edgesDb.set('connection_test', true),
+      this.reverseEdgesDb.set('connection_test', true)
+    ]);
+    logger.info('Keyv SQLite opened');
   }
 
   async close(): Promise<void> {
-    await Promise.all([this.db.close(), this.edgesDb.close(), this.reverseEdgesDb.close()]);
-    logger.info('LevelDB closed');
+    await Promise.all([this.db.disconnect(), this.edgesDb.disconnect(), this.reverseEdgesDb.disconnect()]);
+    logger.info('Keyv SQLite closed');
   }
 
   async put(key: string, value: any): Promise<void> {
-    await this.db.put(key, JSON.stringify(value));
+    await this.db.set(key, value);
   }
 
   async get<T>(key: string): Promise<T | null> {
-    try {
-      const value = await this.db.get(key);
-      return JSON.parse(value);
-    } catch (error: any) {
-      if (error.code === 'LEVEL_NOT_FOUND') {
-        return null;
-      }
-      throw error;
-    }
+    const value = await this.db.get<T>(key);
+    return value ?? null;
   }
 
   async delete(key: string): Promise<void> {
-    try {
-      await this.db.del(key);
-    } catch (error: any) {
-      if (error.code !== 'LEVEL_NOT_FOUND') {
-        throw error;
-      }
-    }
+    await this.db.delete(key);
   }
 
   async putEdge(from: string, type: EdgeType, tos: string[]): Promise<void> {
     const key = `${from}:${type}`;
-    await this.edgesDb.put(key, JSON.stringify(tos));
+    await this.edgesDb.set(key, tos);
   }
 
   async getEdge(from: string, type: EdgeType): Promise<string[]> {
-    try {
-      const key = `${from}:${type}`;
-      const value = await this.edgesDb.get(key);
-      return JSON.parse(value);
-    } catch (error: any) {
-      if (error.code === 'LEVEL_NOT_FOUND') {
-        return [];
-      }
-      throw error;
-    }
+    const key = `${from}:${type}`;
+    const value = await this.edgesDb.get<string[]>(key);
+    return value ?? [];
   }
 
   async deleteEdge(from: string, type: EdgeType): Promise<void> {
     const key = `${from}:${type}`;
-    try {
-      await this.edgesDb.del(key);
-    } catch (error: any) {
-      if (error.code !== 'LEVEL_NOT_FOUND') {
-        throw error;
-      }
-    }
+    await this.edgesDb.delete(key);
   }
 
   async putReverseEdge(to: string, type: EdgeType, froms: string[]): Promise<void> {
     const key = `${to}:${type}`;
-    await this.reverseEdgesDb.put(key, JSON.stringify(froms));
+    await this.reverseEdgesDb.set(key, froms);
   }
 
   async getReverseEdge(to: string, type: EdgeType): Promise<string[]> {
-    try {
-      const key = `${to}:${type}`;
-      const value = await this.reverseEdgesDb.get(key);
-      return JSON.parse(value);
-    } catch (error: any) {
-      if (error.code === 'LEVEL_NOT_FOUND') {
-        return [];
-      }
-      throw error;
-    }
+    const key = `${to}:${type}`;
+    const value = await this.reverseEdgesDb.get<string[]>(key);
+    return value ?? [];
   }
 
   async deleteReverseEdge(to: string, type: EdgeType): Promise<void> {
     const key = `${to}:${type}`;
-    try {
-      await this.reverseEdgesDb.del(key);
-    } catch (error: any) {
-      if (error.code !== 'LEVEL_NOT_FOUND') {
-        throw error;
+    await this.reverseEdgesDb.delete(key);
+  }
+
+  async *iterateEdges(): AsyncIterableIterator<[string, string]> {
+    if (!this.edgesDb.store) {
+      return;
+    }
+
+    for await (const [key, value] of this.edgesDb.store) {
+      if (value !== undefined) {
+        yield [key, JSON.stringify(value)];
       }
     }
   }
 
-  async *iterateEdges(): AsyncIterableIterator<[string, string]> {
-    for await (const [key, value] of this.edgesDb.iterator()) {
-      yield [key, value];
-    }
-  }
-
   async *iterateReverseEdges(): AsyncIterableIterator<[string, string]> {
-    for await (const [key, value] of this.reverseEdgesDb.iterator()) {
-      yield [key, value];
+    if (!this.reverseEdgesDb.store) {
+      return;
+    }
+
+    for await (const [key, value] of this.reverseEdgesDb.store) {
+      if (value !== undefined) {
+        yield [key, JSON.stringify(value)];
+      }
     }
   }
 
   async *iterateMain(prefix?: string): AsyncIterableIterator<[string, string]> {
-    for await (const [key, value] of this.db.iterator()) {
+    if (!this.db.store) {
+      return;
+    }
+
+    for await (const [key, value] of this.db.store) {
       if (!prefix || key.startsWith(prefix)) {
-        yield [key, value];
+        if (value !== undefined) {
+          yield [key, JSON.stringify(value)];
+        }
       }
     }
   }
 
   async getByPrefix<T>(prefix: string): Promise<T[]> {
     const results: T[] = [];
-    for await (const [_, value] of this.iterateMain(prefix)) {
-      results.push(JSON.parse(value));
+    if (!this.db.store) {
+      return results;
+    }
+
+    for await (const [key, value] of this.db.store) {
+      if (key.startsWith(prefix) && value !== undefined) {
+        results.push(value as T);
+      }
     }
     return results;
   }
@@ -142,39 +142,34 @@ export class LevelDBService {
   }
 
   async batchPut(entries: Array<{ key: string; value: any }>): Promise<void> {
-    const ops = entries.map((e) => ({
-      type: 'put' as const,
-      key: e.key,
-      value: JSON.stringify(e.value)
-    }));
-    await this.db.batch(ops);
+    const promises = entries.map((e) => this.db.set(e.key, e.value));
+    await Promise.all(promises);
   }
 
   async batchPutEdges(entries: Array<{ from: string; type: EdgeType; tos: string[] }>): Promise<void> {
-    const ops = entries.map((e) => ({
-      type: 'put' as const,
-      key: `${e.from}:${e.type}`,
-      value: JSON.stringify(e.tos)
-    }));
-    await this.edgesDb.batch(ops);
+    const promises = entries.map((e) => this.edgesDb.set(`${e.from}:${e.type}`, e.tos));
+    await Promise.all(promises);
   }
 
   async batchPutReverseEdges(entries: Array<{ to: string; type: EdgeType; froms: string[] }>): Promise<void> {
-    const ops = entries.map((e) => ({
-      type: 'put' as const,
-      key: `${e.to}:${e.type}`,
-      value: JSON.stringify(e.froms)
-    }));
-    await this.reverseEdgesDb.batch(ops);
+    const promises = entries.map((e) => this.reverseEdgesDb.set(`${e.to}:${e.type}`, e.froms));
+    await Promise.all(promises);
   }
 
   async deleteByPrefix(prefix: string): Promise<void> {
-    const ops: any[] = [];
-    for await (const [key] of this.iterateMain(prefix)) {
-      ops.push({ type: 'del', key });
+    if (!this.db.store) {
+      return;
     }
-    if (ops.length > 0) {
-      await this.db.batch(ops);
+
+    const keysToDelete: string[] = [];
+    for await (const [key] of this.db.store) {
+      if (key.startsWith(prefix)) {
+        keysToDelete.push(key);
+      }
+    }
+
+    if (keysToDelete.length > 0) {
+      await Promise.all(keysToDelete.map((key) => this.db.delete(key)));
     }
   }
 }

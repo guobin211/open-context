@@ -19,13 +19,31 @@
 
 Open-Context 是一个基于 Tauri 的混合桌面应用，采用 Rust + TypeScript + Node.js 三层架构：
 
-| 模块                    | 职责                                        | 技术栈                  |
-| ----------------------- | ------------------------------------------- | ----------------------- |
-| **tauri** (`open-app`)  | 客户端桌面应用的壳，负责桌面相关的 API 操作 | Rust + Tauri            |
-| **open-node**           | 后台服务，负责构建索引、文件处理等后台任务  | Node.js + Hono          |
-| **open-web**            | React 编写的 Web 端 UI，提供用户界面        | React + TanStack Router |
+| 模块                   | 职责                                        | 技术栈                  |
+| ---------------------- | ------------------------------------------- | ----------------------- |
+| **tauri** (`open-app`) | 客户端桌面应用的壳，负责桌面相关的 API 操作 | Rust + Tauri            |
+| **open-node**          | 后台服务，负责构建索引、文件处理等后台任务  | Node.js + Hono          |
+| **open-web**           | React 编写的 Web 端 UI，提供用户界面        | React + TanStack Router |
 
 详细架构和代码规范请参考 [AGENTS.md](./AGENTS.md)。
+
+## 📦 项目结构
+
+```
+open-context/
+├── apps/
+│   ├── open-app/          # Tauri 桌面应用 (Rust)
+│   ├── open-node/         # Node.js 后台服务 → 📖 [文档](./apps/open-node/README.md)
+│   └── open-web/          # React 前端应用 → 📖 [文档](./apps/open-web/README.md)
+├── docs/                  # 技术文档
+│   ├── APP_CONFIG_USAGE.md        # 持久化存储规范
+│   ├── APP_EVENT_SYSTEM.md        # 事件系统文档
+│   ├── APP_TAURI_COMMANDS.md      # Tauri 命令参考
+│   └── APP_ASYNC_TASK_PATTERN.md  # 异步任务模式
+├── AGENTS.md              # AI 编码代理指南
+├── CLAUDE.md              # Claude 专用指南
+└── README.md              # 本文件
+```
 
 ## 🚀 快速开始
 
@@ -58,22 +76,44 @@ pnpm dev:app       # Tauri 桌面应用
 
 ## 📚 技术文档
 
-### 核心系统
+### 核心系统文档
 
-| 文档 | 说明 |
-| ---- | ---- |
-| [持久化存储规范](./docs/APP_CONFIG_USAGE.md) | 数据存储路径规范、配置管理 |
-| [事件系统](./docs/APP_EVENT_SYSTEM.md) | 前后端通信机制、事件类型 |
-| [Tauri 命令](./docs/APP_TAURI_COMMANDS.md) | IPC 命令参考、数据类型 |
-| [异步任务模式](./docs/APP_ASYNC_TASK_PATTERN.md) | 任务创建、状态查询、进度追踪 |
-| [AGENTS.md](./AGENTS.md) | AI 编码代理指南、代码规范 |
+| 文档                                                | 说明                                 |
+| --------------------------------------------------- | ------------------------------------ |
+| [📖 持久化存储规范](./docs/APP_CONFIG_USAGE.md)     | 数据存储路径规范、配置管理、目录结构 |
+| [📖 事件系统](./docs/APP_EVENT_SYSTEM.md)           | 前后端通信机制、事件类型、订阅模式   |
+| [📖 Tauri 命令](./docs/APP_TAURI_COMMANDS.md)       | IPC 命令参考、数据类型、调用示例     |
+| [📖 异步任务模式](./docs/APP_ASYNC_TASK_PATTERN.md) | 任务创建、状态查询、进度追踪         |
+
+### 数据库文档
+
+| 文档                                                       | 说明                                    |
+| ---------------------------------------------------------- | --------------------------------------- |
+| [📖 SurrealDB 架构](./docs/NODE_SURREALDB_ARCHITECTURE.md) | 数据模型、表定义、图查询、全文搜索      |
+| [📖 SurrealDB 使用指南](./docs/NODE_SURREALDB_USAGE.md)    | 连接配置、CRUD 操作、图形遍历、性能建议 |
+
+### 开发指南
+
+| 文档                              | 说明                                   |
+| --------------------------------- | -------------------------------------- |
+| [📖 AI 编码代理指南](./AGENTS.md) | 项目架构、代码规范、开发流程、命令参考 |
+| [📖 Claude 专用指南](./CLAUDE.md) | Claude AI 的特定开发指导               |
 
 ### 子项目文档
 
-| 文档 | 说明 |
-| ---- | ---- |
-| [Node.js 后端](./apps/open-node/README.md) | RAG 引擎、代码索引、向量检索 |
-| [React 前端](./apps/open-web/README.md) | UI 组件、路由、状态管理 |
+| 项目                                          | 说明                                   |
+| --------------------------------------------- | -------------------------------------- |
+| [📖 Node.js 后端](./apps/open-node/README.md) | RAG 引擎、代码索引、向量检索、业务流程 |
+| [📖 React 前端](./apps/open-web/README.md)    | UI 组件、路由、状态管理、技术栈        |
+
+## 🛠️ 开发指南
+
+### 代码规范
+
+本项目使用统一的编码规范，详见：
+
+- 各 AI 工具配置：`.claude/rules/coding.md`、`.opencode/rules/coding.md`、`.codebuddy/rules/coding.md`
+- 完整架构和规范：[AGENTS.md](./AGENTS.md)
 
 ## 🤝 贡献
 

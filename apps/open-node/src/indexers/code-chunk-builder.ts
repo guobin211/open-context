@@ -1,4 +1,4 @@
-import { ExtractedSymbol } from './symbol-extractor';
+import { ExtractedSymbol } from './code-symbol-extractor';
 import { generateSymbolId, prepareEmbeddingText } from '../utils';
 import { SymbolPayload } from '../types';
 

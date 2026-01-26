@@ -1,13 +1,12 @@
-import { SymbolExtractor, CodeChunkBuilder, GraphBuilder } from '../indexers';
 import { GitService, getRepoPath } from '../utils/git';
-import { getLanguageFromExtension, getFileExtension } from '../utils/fs';
+import { getFileExtension } from '../utils/fs';
 import { Repository } from '../types';
 import logger from '../utils/logger';
+import { FileIndexer } from '@/indexers/file-indexer';
+import { extensionMapping } from '@/indexers';
 
 export class IndexerService {
-  private symbolExtractor = new SymbolExtractor();
-  private chunkBuilder = new CodeChunkBuilder();
-  private graphBuilder = new GraphBuilder();
+  private fileIndexer = new FileIndexer();
 
   async indexRepository(params: { repository: Repository; workspaceId: string; mode: 'full' | 'incremental' }) {
     const repoPath = getRepoPath(params.repository.id);
@@ -28,38 +27,23 @@ export class IndexerService {
 
     for (const file of files) {
       const ext = getFileExtension(file);
-      const language = getLanguageFromExtension(ext);
-
-      if (language !== 'typescript' && language !== 'javascript') {
+      const language = extensionMapping[ext];
+      if (!language) {
         continue;
       }
-
       languageStats[language] = (languageStats[language] || 0) + 1;
-
       const code = await git.readFile(file);
-
-      const symbols = this.symbolExtractor.extract(code, language as any);
-
-      const fileChunks = this.chunkBuilder.build({
+      const res = await this.fileIndexer.index({
+        code,
+        language,
+        filePath: file,
         workspaceId: params.workspaceId,
         repoId: params.repository.id,
         repoName: params.repository.name,
-        filePath: file,
-        language,
-        commit: currentCommit,
-        symbols
+        commit: currentCommit
       });
-
-      chunks.push(...fileChunks);
-
-      const fileEdges = this.graphBuilder.build({
-        code,
-        language: language as any,
-        filePath: file,
-        workspaceId: params.workspaceId,
-        repoId: params.repository.id
-      });
-      edges.push(...fileEdges);
+      chunks.push(...res.chunks);
+      edges.push(...res.edges);
     }
 
     return {
@@ -69,4 +53,10 @@ export class IndexerService {
       languageStats
     };
   }
+
+  async indexMarkdown() {}
+
+  async indexUrl() {}
+
+  async indexTxt() {}
 }

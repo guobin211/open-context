@@ -1,7 +1,11 @@
 import { rm } from 'node:fs/promises';
 import * as esbuild from 'esbuild';
 import { readFileSync } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
+const __workspace = path.resolve(__dirname, '../../');
 const pkg = JSON.parse(readFileSync('./package.json', 'utf8'));
 
 const isDev = process.argv.includes('--watch');
@@ -27,7 +31,12 @@ await rm('dist', { recursive: true, force: true });
 
 console.log(isDev ? 'Building in watch mode...' : 'Building for production...');
 
-const context = await esbuild.context(baseConfig);
+const context = await esbuild.context({
+  ...baseConfig,
+  define: {
+    __WORKSPACE__: JSON.stringify(__workspace)
+  }
+});
 
 if (isDev) {
   console.log('👀 Watching for changes...');

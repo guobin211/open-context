@@ -33,9 +33,12 @@ impl AppState {
     where
         F: FnOnce(&mut AppConfig) -> Result<(), Box<dyn std::error::Error>>,
     {
-        let mut config = self.config.lock().unwrap();
-        f(&mut config)?;
-        config.save()?;
+        if let Ok(mut config) = self.config.lock() {
+            f(&mut config)?;
+            config.save()?;
+        } else {
+            return Err("Failed to acquire config lock".into());
+        }
         Ok(())
     }
 }

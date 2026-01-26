@@ -1,4 +1,7 @@
-export type SymbolKind = 'function' | 'class' | 'method' | 'interface' | 'type' | 'variable' | 'enum';
+export type SymbolKind =
+  | 'function' | 'class' | 'method' | 'interface' | 'type' | 'variable' | 'enum'
+  | 'rule' | 'class-selector' | 'id-selector' | 'pseudo-selector'
+  | 'heading' | 'paragraph' | 'code-block' | 'list';
 export type Visibility = 'public' | 'private' | 'protected';
 
 export interface Symbol {

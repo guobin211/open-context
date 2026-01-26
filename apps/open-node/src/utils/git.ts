@@ -1,6 +1,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import simpleGit, { SimpleGit } from 'simple-git';
+import { StoragePaths } from '../config';
 import logger from './logger';
 
 export class GitService {
@@ -48,7 +49,9 @@ export class GitService {
   }
 }
 
+/**
+ * 获取仓库存储路径
+ */
 export function getRepoPath(repoId: string): string {
-  const basePath = process.env.GIT_CLONE_PATH || './data/repos';
-  return path.join(basePath, repoId);
+  return path.join(StoragePaths.repos(), repoId);
 }

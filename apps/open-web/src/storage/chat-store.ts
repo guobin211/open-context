@@ -1,6 +1,7 @@
 import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 
+import { getStoreFilePath } from '@/config';
 import type { ChatMessage, ChatSession } from './types';
 import { mockSessions, defaultSessionId } from './mock-data';
 import { generateId } from './utils';
@@ -21,7 +22,8 @@ interface ChatStore {
 const loadFromTauri = async <T>(key: string): Promise<T | null> => {
   try {
     const { Store } = await import('@tauri-apps/plugin-store');
-    const store = await Store.load('~/.open-context/cache/chat-store.store.json');
+    const storePath = await getStoreFilePath('CHAT');
+    const store = await Store.load(storePath);
     const value = await store.get(key);
     return value as T | null;
   } catch {
@@ -32,7 +34,8 @@ const loadFromTauri = async <T>(key: string): Promise<T | null> => {
 const saveToTauri = async (key: string, value: unknown): Promise<void> => {
   try {
     const { Store } = await import('@tauri-apps/plugin-store');
-    const store = await Store.load('~/.open-context/cache/chat-store.store.json');
+    const storePath = await getStoreFilePath('CHAT');
+    const store = await Store.load(storePath);
     await store.set(key, value);
     await store.save();
   } catch {}
@@ -41,7 +44,8 @@ const saveToTauri = async (key: string, value: unknown): Promise<void> => {
 const deleteFromTauri = async (key: string): Promise<void> => {
   try {
     const { Store } = await import('@tauri-apps/plugin-store');
-    const store = await Store.load('~/.open-context/cache/chat-store.store.json');
+    const storePath = await getStoreFilePath('CHAT');
+    const store = await Store.load(storePath);
     await store.delete(key);
     await store.save();
   } catch {}

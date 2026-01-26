@@ -1,6 +1,7 @@
 import fs from 'fs/promises';
 import path from 'path';
 import { createHash } from 'crypto';
+import { extensionMapping, SupportLanguage } from '@/indexers';
 
 export async function ensureDir(dirPath: string): Promise<void> {
   await fs.mkdir(dirPath, { recursive: true });
@@ -50,21 +51,4 @@ export function calculateChecksum(content: string): string {
 
 export function getFileExtension(filePath: string): string {
   return path.extname(filePath).slice(1);
-}
-
-export function getLanguageFromExtension(ext: string): string {
-  const mapping: Record<string, string> = {
-    ts: 'typescript',
-    tsx: 'typescript',
-    js: 'javascript',
-    jsx: 'javascript',
-    py: 'python',
-    go: 'go',
-    rs: 'rust',
-    java: 'java',
-    cpp: 'cpp',
-    c: 'c',
-    cs: 'csharp'
-  };
-  return mapping[ext] || 'unknown';
 }

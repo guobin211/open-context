@@ -36,10 +36,11 @@
   "pnpm": {
     "onlyBuiltDependencies": [
       "@parcel/watcher",
+      "@swc/core",
       "classic-level",
       "esbuild",
       "msgpackr-extract",
-      "tesseract.js",
+      "skia-canvas",
       "tree-sitter",
       "tree-sitter-bash",
       "tree-sitter-c",

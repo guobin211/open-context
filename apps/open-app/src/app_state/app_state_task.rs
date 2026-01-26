@@ -5,10 +5,10 @@
 //! - 加载未完成的持久化任务
 //! - 任务重试机制
 
+use crate::app_service::{TaskInfo, TaskStatus};
+use rusqlite::Connection;
 use rusqlite::{Result as SqliteResult, params};
 use std::sync::{Arc, Mutex};
-use rusqlite::Connection;
-use crate::app_service::{TaskInfo, TaskStatus};
 
 pub struct TaskStateManager {
     conn: Arc<Mutex<Connection>>,
@@ -133,7 +133,7 @@ impl TaskStateManager {
             "SELECT id, task_type, status, progress, message, result, error,
                     retry_count, max_retries, retry_delay_ms, input, persistent,
                     created_at, updated_at, completed_at
-             FROM tasks WHERE id = ?1"
+             FROM tasks WHERE id = ?1",
         )?;
 
         let mut rows = stmt.query(params![task_id])?;
@@ -153,7 +153,7 @@ impl TaskStateManager {
                     created_at, updated_at, completed_at
              FROM tasks
              WHERE persistent = 1 AND status IN ('pending', 'running')
-             ORDER BY created_at ASC"
+             ORDER BY created_at ASC",
         )?;
 
         let mut tasks = Vec::new();
@@ -173,7 +173,7 @@ impl TaskStateManager {
                     created_at, updated_at, completed_at
              FROM tasks
              WHERE persistent = 1 AND status = 'failed' AND retry_count < max_retries
-             ORDER BY created_at ASC"
+             ORDER BY created_at ASC",
         )?;
 
         let mut tasks = Vec::new();
@@ -185,7 +185,11 @@ impl TaskStateManager {
     }
 
     /// 列出所有任务
-    pub fn list_tasks(&self, limit: Option<u32>, offset: Option<u32>) -> SqliteResult<Vec<TaskInfo>> {
+    pub fn list_tasks(
+        &self,
+        limit: Option<u32>,
+        offset: Option<u32>,
+    ) -> SqliteResult<Vec<TaskInfo>> {
         let conn = self.conn.lock().unwrap();
         let mut stmt = conn.prepare(
             "SELECT id, task_type, status, progress, message, result, error,
@@ -193,7 +197,7 @@ impl TaskStateManager {
                     created_at, updated_at, completed_at
              FROM tasks
              ORDER BY created_at DESC
-             LIMIT ?1 OFFSET ?2"
+             LIMIT ?1 OFFSET ?2",
         )?;
 
         let mut tasks = Vec::new();
@@ -213,7 +217,7 @@ impl TaskStateManager {
                     created_at, updated_at, completed_at
              FROM tasks
              WHERE task_type = ?1
-             ORDER BY created_at DESC"
+             ORDER BY created_at DESC",
         )?;
 
         let mut tasks = Vec::new();

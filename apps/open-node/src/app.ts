@@ -2,6 +2,7 @@ import { Hono } from 'hono';
 import { serve } from '@hono/node-server';
 import { logger as honoLogger } from 'hono/logger';
 import dotenv from 'dotenv';
+import { DefaultConfig, initStorageDirs } from './config';
 import { getLevelDBInstance, getQdrantInstance } from './db';
 import { GraphService } from './services';
 import router from './api/router';
@@ -9,7 +10,7 @@ import logger from './utils/logger';
 
 dotenv.config();
 
-const PORT = parseInt(process.env.PORT || '4500', 10);
+const PORT = parseInt(process.env.PORT || String(DefaultConfig.nodeServer.port), 10);
 
 export interface AppContext {
   Variables: {
@@ -18,6 +19,10 @@ export interface AppContext {
 }
 
 async function main() {
+  // 初始化存储目录
+  await initStorageDirs();
+  logger.info('Storage directories initialized');
+
   const app = new Hono<AppContext>();
 
   app.use('*', honoLogger());

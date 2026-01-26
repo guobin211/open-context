@@ -1,16 +1,17 @@
 import { QdrantClient } from '@qdrant/js-client-rest';
+import { DefaultConfig } from '../config';
 import { SymbolPayload } from '../types';
 import logger from '../utils/logger';
 
 const COLLECTION_NAME = 'code_symbols';
-const VECTOR_SIZE = parseInt(process.env.VECTOR_SIZE || '1024', 10);
+const VECTOR_SIZE = parseInt(process.env.VECTOR_SIZE || String(DefaultConfig.qdrant.embeddingDim), 10);
 
 export class QdrantService {
   private client: QdrantClient;
 
   constructor() {
     this.client = new QdrantClient({
-      url: process.env.QDRANT_URL || 'http://localhost:6333',
+      url: process.env.QDRANT_URL || DefaultConfig.qdrant.url,
       apiKey: process.env.QDRANT_API_KEY
     });
   }

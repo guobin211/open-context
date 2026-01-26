@@ -4,15 +4,15 @@
 
 ## 项目架构概述
 
-本项目是一个多模块协同的桌面应用，主要分为 3 个代码模块：
+Open-Context 是一个基于 Tauri 2.x 的混合桌面应用，采用三层架构协作系统。
 
 ### 核心模块
 
-| 模块                              | 职责                                        | 技术栈                  |
-| --------------------------------- | ------------------------------------------- | ----------------------- |
-| **tauri** (`apps/open-app/`)      | 客户端桌面应用的壳，负责桌面相关的 API 操作 | Rust + Tauri            |
-| **open-node** (`apps/open-node/`) | 后台服务，负责构建索引、文件处理等后台任务  | Node.js + Hono          |
-| **open-web** (`apps/open-web/`)   | React 编写的 Web 端 UI，提供用户界面        | React + TanStack Router |
+| 模块                              | 职责                                         | 技术栈                     |
+| --------------------------------- | -------------------------------------------- | -------------------------- |
+| **open-app** (`apps/open-app/`)   | 桌面应用壳，处理文件系统、系统调用、启动服务 | Rust + Tauri 2.x           |
+| **open-node** (`apps/open-node/`) | RAG 引擎，代码索引、向量检索、后台任务处理   | Node.js + Hono             |
+| **open-web** (`apps/open-web/`)   | React 前端，提供用户界面和交互               | React 19 + TanStack Router |
 
 ### 交互流程
 
@@ -114,20 +114,24 @@ pnpm fmt:rs         # Cargo fmt
 # 运行所有测试 (Node.js 服务)
 pnpm --filter open-node test
 
+# 运行单个测试文件 (支持文件名或路径)
+pnpm --filter open-node test workspace-service.test.ts
+pnpm --filter open-node test tests/services/workspace-service.test.ts
+
 # 运行一次测试 (CI 模式)
 pnpm --filter open-node test:run
 
 # 监听模式运行测试
 pnpm --filter open-node test:watch
 
+# 使用 UI 运行测试
+pnpm --filter open-node test:ui
+
 # 生成覆盖率报告
 pnpm --filter open-node test:coverage
 
-# 运行单个测试文件
-pnpm --filter open-node test workspace-service.test.ts
-
-# 使用 UI 运行测试
-pnpm --filter open-node test:ui
+# 类型检查 (open-node)
+pnpm --filter open-node type-check
 ```
 
 ## 代码风格指南
@@ -168,10 +172,9 @@ pnpm --filter open-node test:ui
 
 **React 组件模式:**
 
-- **组件声明**: 允许使用两种形式
-  - 箭头函数: `export const Button = ({ className, ...props }: ButtonProps) =>`
-  - function 声明: `export function Button() { ... }`
-  - shadcn/ui 组件使用 function 声明，业务组件推荐使用箭头函数
+- **组件声明**: 严格使用箭头函数，禁止 function 声明
+  - 正确: `export const Button = ({ className, ...props }: ButtonProps) =>`
+  - 错误: `export function Button() { ... }`
 - Props 接口命名为 `{组件名}Props` (`ButtonProps`)
 - 使用 `cn()` 工具合并 Tailwind 类 (来自 `@/lib/utils`)
 - 使用 `...props` 解构以保持向前兼容
@@ -324,17 +327,17 @@ src/
 
 ### 核心系统文档
 
-- **持久化存储规范**: `docs/APP_CONFIG_USAGE.md` - 数据存储路径规范、配置管理
-- **事件系统**: `docs/APP_EVENT_SYSTEM.md` - 前后端通信机制、事件类型
-- **Tauri 命令**: `docs/APP_TAURI_COMMANDS.md` - IPC 命令参考、数据类型
-- **异步任务模式**: `docs/APP_ASYNC_TASK_PATTERN.md` - 任务创建、状态查询、进度追踪
+- **[持久化存储规范](./docs/APP_CONFIG_USAGE.md)** - 数据存储路径规范、配置管理、目录结构详解
+- **[事件系统](./docs/APP_EVENT_SYSTEM.md)** - 前后端通信机制、事件类型、订阅与发布模式
+- **[Tauri 命令](./docs/APP_TAURI_COMMANDS.md)** - IPC 命令参考、数据类型定义、调用示例
+- **[异步任务模式](./docs/APP_ASYNC_TASK_PATTERN.md)** - 任务创建、状态查询、进度追踪实现方案
 
 ### 子项目文档
 
-- **Node.js 后端**: `apps/open-node/README.md` - RAG 引擎、代码索引、向量检索
-- **React 前端**: `apps/open-web/README.md` - UI 组件、路由、状态管理
+- **[Node.js 后端](./apps/open-node/README.md)** - RAG 引擎、代码索引、向量检索实现
+- **[React 前端](./apps/open-web/README.md)** - UI 组件、路由、状态管理架构
 
 ### 数据存储
 
 - 所有数据存储在 `~/.open-context/` 目录
-- 详见 `docs/APP_CONFIG_USAGE.md` 中的完整目录结构
+- 详见 [持久化存储规范](./docs/APP_CONFIG_USAGE.md) 中的完整目录结构

@@ -1,3 +1,4 @@
+import { DefaultConfig } from '@/config';
 import type { AppConfig } from './app-settings';
 import { defaultShortcuts } from './default-shortcuts';
 
@@ -44,10 +45,10 @@ export const defaultAppConfig: AppConfig = {
     }
   },
   server: {
-    nodeServerEnabled: true,
-    nodeServerUrl: 'http://localhost:4500',
-    nodeServerPort: 4500,
-    autoStartServer: true,
+    nodeServerEnabled: DefaultConfig.nodeServer.autoStart,
+    nodeServerUrl: `http://localhost:${DefaultConfig.nodeServer.port}`,
+    nodeServerPort: DefaultConfig.nodeServer.port,
+    autoStartServer: DefaultConfig.nodeServer.autoStart,
     mcpEnabled: false,
     httpApiEnabled: false
   },

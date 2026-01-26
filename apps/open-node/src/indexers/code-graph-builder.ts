@@ -1,6 +1,6 @@
 import Parser from 'tree-sitter';
-import { ASTParser } from './ast-parser';
 import { EdgeType } from '../types';
+import { ASTParser, type ParseResult, type SupportLanguage, getASTParser } from './ast-parser';
 
 export interface GraphEdge {
   from: string;
@@ -12,28 +12,51 @@ export interface GraphEdge {
 export class GraphBuilder {
   private parser: ASTParser;
 
-  constructor() {
-    this.parser = new ASTParser();
+  constructor(parser: ASTParser) {
+    this.parser = parser;
   }
 
+  /**
+   * 从代码字符串构建依赖图（会解析代码）
+   */
   build(params: {
     code: string;
-    language: 'typescript' | 'javascript';
+    language: SupportLanguage;
     filePath: string;
     workspaceId: string;
     repoId: string;
   }): GraphEdge[] {
-    const tree = this.parser.parse(params.code, params.language);
+    const tree = this.parser.parse(params.code, params.language, params.filePath);
+    return this.buildFromTree(tree, params.code, params);
+  }
+
+  /**
+   * 从已解析的 AST 构建依赖图（复用已有的解析结果）
+   */
+  buildFromTree(
+    tree: Parser.Tree,
+    code: string,
+    params: { filePath: string; workspaceId: string; repoId: string }
+  ): GraphEdge[] {
     const edges: GraphEdge[] = [];
 
-    const symbols = this.extractSymbolLocations(tree.rootNode, params.code, '');
-
-    const imports = this.extractImports(tree.rootNode, params.code);
-    const calls = this.extractCalls(tree.rootNode, params.code, symbols, params);
+    const symbols = this.extractSymbolLocations(tree.rootNode, code, '');
+    const imports = this.extractImports(tree.rootNode, code);
+    const calls = this.extractCalls(tree.rootNode, code, symbols, params);
 
     edges.push(...imports, ...calls);
 
     return edges;
+  }
+
+  /**
+   * 从 ParseResult 构建依赖图
+   */
+  buildFromParseResult(
+    parseResult: ParseResult,
+    params: { filePath: string; workspaceId: string; repoId: string }
+  ): GraphEdge[] {
+    return this.buildFromTree(parseResult.tree, parseResult.code, params);
   }
 
   private extractSymbolLocations(

@@ -118,10 +118,8 @@ describe('My API', () => {
 ### Service 测试示例
 
 ```typescript
-import { describe, it, expect, vi } from 'vitest';
+import { describe, it, expect } from 'vitest';
 import { MyService } from '../../src/services';
-
-vi.mock('../../src/db/my-repository');
 
 describe('MyService', () => {
   it('should do something', async () => {
@@ -131,20 +129,6 @@ describe('MyService', () => {
   });
 });
 ```
-
-## Mock 策略
-
-### Service Mock
-
-使用 `vi.mock()` 模拟整个 service 模块，避免真实数据库操作。
-
-### Database Mock
-
-所有 repository 层都被 mock，不会触发真实的数据库连接。
-
-### GraphService Mock
-
-在 `createTestApp()` 中提供了 mock 的 GraphService 实例。
 
 ## 持续集成
 
@@ -158,10 +142,9 @@ describe('MyService', () => {
 
 1. **隔离性**: 每个测试应该独立，不依赖其他测试的执行顺序
 2. **清理**: 使用 `beforeEach` 和 `afterEach` 清理测试状态
-3. **Mock**: 尽量 mock 外部依赖（数据库、API 等）
-4. **覆盖率**: 目标是达到 80% 以上的代码覆盖率
-5. **命名**: 测试文件使用 `*.test.ts` 后缀
-6. **描述**: 使用清晰的描述语句，说明测试的目的
+2. **覆盖率**: 目标是达到 80% 以上的代码覆盖率
+3. **命名**: 测试文件使用 `*.test.ts` 后缀
+4. **描述**: 使用清晰的描述语句，说明测试的目的
 
 ## 调试测试
 
@@ -200,9 +183,8 @@ pnpm test -t "should create"
 
 1. 为新的 API 端点添加集成测试
 2. 为新的 service 方法添加单元测试
-3. 更新相关的 mock 数据
-4. 确保所有测试通过
-5. 保持测试覆盖率不降低
+3. 确保所有测试通过
+4. 保持测试覆盖率不降低
 
 ## 资源
 

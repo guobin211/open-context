@@ -1,4 +1,5 @@
 import { create } from 'zustand';
+import { getStoreFilePath } from '@/config';
 
 let Store: any = null;
 
@@ -84,7 +85,8 @@ export const useRightSidebarStore = create<RightSidebarState>((set, get) => ({
     try {
       const StoreClass = await loadStore();
       if (!StoreClass) return;
-      const store = await StoreClass.load('~/.open-context/cache/right-sidebar.store.json');
+      const storePath = await getStoreFilePath('RIGHT_SIDEBAR');
+      const store = await StoreClass.load(storePath);
       set({ store });
 
       const recentFolders = await store.get('recentFolders');
