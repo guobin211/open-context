@@ -1,277 +1,502 @@
-# Database Schema
+# Database Schema 文档
 
-本文档描述 Open-Context 的数据库架构，包括 SQLite、SurrealDB 和 Qdrant 的详细 schema 设计。
+本文档详细说明 Open-Context 项目的数据库架构和表结构。
 
-## 目录
+## 概述
 
-- [SQLite 数据库](#sqlite-数据库)
-  - [workspace.db](#workspacedb)
-  - [repository.db](#repositorydb)
-  - [symbol.db](#symboldb)
-  - [edge.db](#edgedb)
-  - [reverse_edge.db](#reverse_edgedb)
-- [SurrealDB 数据库](#surrealdb-数据库)
-- [Qdrant 数据库](#qdrant-数据库)
-- [数据流](#数据流)
-- [并发控制](#并发控制)
+Open-Context 使用多种数据库来存储不同类型的数据：
 
-## SQLite 数据库
+| 数据库              | 用途                 | 访问模式       | 技术栈    |
+| ------------------- | -------------------- | -------------- | --------- |
+| **app.db**          | 业务核心数据         | 双端读写       | SQLite    |
+| **symbol.db**       | 符号数据（KV 存储）  | open-node 读写 | SQLite    |
+| **edge.db**         | 正向边（依赖关系图） | open-node 读写 | SQLite    |
+| **reverse_edge.db** | 反向边（被依赖关系） | open-node 读写 | SQLite    |
+| **SurrealDB**       | 图数据、全文检索     | open-node 读写 | SurrealDB |
+| **Qdrant**          | 向量嵌入、语义检索   | open-node 读写 | Qdrant    |
 
-所有 SQLite 数据库位于 `~/.open-context/database/sqlite/` 目录。
+## 数据类型分类
 
-### workspace.db
+### 原子类型（知识库基础单元）
 
-管理工作空间、笔记、文件、链接等业务核心数据。
+| 类型           | 对应表             | 说明                             |
+| -------------- | ------------------ | -------------------------------- |
+| `file`         | imported_files     | 导入的文件对象                   |
+| `folder`       | imported_directories | 导入的文件夹对象               |
+| `link`         | web_links          | 网页链接                         |
+| `note`         | notes              | 笔记对象                         |
+| `repo`         | git_repositories   | 代码仓库对象                     |
+| `conversation` | conversations      | 会话对象，包含参与者、消息记录等 |
 
-#### 表结构
+### 界面交互类型
 
-**workspaces**
+| 类型       | 对应表    | 说明                               |
+| ---------- | --------- | ---------------------------------- |
+| `terminal` | terminals | 终端会话，包含命令历史、当前目录等 |
+| `webview`  | webviews  | 网页视图，包含 URL、加载状态等     |
+| `chat`     | chats     | 聊天对象，包含多个会话             |
 
-| 字段        | 类型    | 说明                    |
-| ----------- | ------- | ----------------------- |
-| id          | TEXT    | 工作空间 ID（主键）     |
-| name        | TEXT    | 工作空间名称            |
-| description | TEXT    | 工作空间描述            |
-| icon        | TEXT    | 图标                    |
-| color       | TEXT    | 颜色                    |
-| sort_order  | INTEGER | 排序顺序                |
-| is_active   | INTEGER | 是否激活（0/1）         |
-| is_archived | INTEGER | 是否归档（0/1）         |
-| created_at  | INTEGER | 创建时间（Unix 时间戳） |
-| updated_at  | INTEGER | 更新时间（Unix 时间戳） |
+### 复合类型
 
-**notes**
+| 类型        | 对应表     | 说明                                 |
+| ----------- | ---------- | ------------------------------------ |
+| `workspace` | workspaces | 工作区对象，可包含多个原子类型的组合 |
 
-| 字段           | 类型    | 说明                    |
-| -------------- | ------- | ----------------------- |
-| id             | TEXT    | 笔记 ID（主键）         |
-| workspace_id   | TEXT    | 所属工作空间 ID（外键） |
-| parent_id      | TEXT    | 父笔记 ID（外键）       |
-| title          | TEXT    | 笔记标题                |
-| note_type      | TEXT    | 笔记类型                |
-| content        | TEXT    | 笔记内容内容            |
-| summary        | TEXT    | 笔记摘要                |
-| file_path      | TEXT    | 文件存储路径            |
-| tags           | TEXT    | 标签（JSON 数组）       |
-| word_count     | INTEGER | 字数统计                |
-| sort_order     | INTEGER | 排序顺序                |
-| is_favorited   | INTEGER | 是否收藏（0/1）         |
-| is_pinned      | INTEGER | 是否置顶（0/1）         |
-| is_archived    | INTEGER | 是否归档（0/1）         |
-| last_viewed_at | INTEGER | 最后查看时间            |
-| created_at     | INTEGER | 创建时间                |
-| updated_at     | INTEGER | 更新时间                |
+## SQLite 数据库 - app.db
 
-**imported_files**
+### 表：workspaces
 
-| 字段                | 类型    | 说明                    |
-| ------------------- | ------- | ----------------------- |
-| id                  | TEXT    | 文件 ID（主键）         |
-| workspace_id        | TEXT    | 所属工作空间 ID（外键） |
-| parent_directory_id | TEXT    | 父目录 ID（外键）       |
-| name                | TEXT    | 文件名称                |
-| original_path       | TEXT    | 原始文件路径            |
-| stored_path         | TEXT    | 存储路径                |
-| file_type           | TEXT    | 文件类型                |
-| size_bytes          | INTEGER | 文件大小（字节）        |
-| mime_type           | TEXT    | MIME 类型               |
-| checksum            | TEXT    | 文件校验和              |
-| is_archived         | INTEGER | 是否归档（0/1）         |
-| created_at          | INTEGER | 创建时间                |
-| updated_at          | INTEGER | 更新时间                |
+工作空间表，作为复合类型容器，关联多种原子类型。
 
-**imported_directories**
+| 字段        | 类型    | 约束               | 说明                    |
+| ----------- | ------- | ------------------ | ----------------------- |
+| id          | TEXT    | PRIMARY KEY        | 工作空间 ID（ULID）     |
+| name        | TEXT    | NOT NULL           | 工作空间名称            |
+| description | TEXT    | NULL               | 描述                    |
+| icon        | TEXT    | NULL               | 图标（emoji 或 URL）    |
+| color       | TEXT    | NULL               | 主题颜色（十六进制）    |
+| sort_order  | INTEGER | NOT NULL DEFAULT 0 | 排序顺序                |
+| is_active   | INTEGER | NOT NULL DEFAULT 0 | 是否激活（当前使用）    |
+| is_archived | INTEGER | NOT NULL DEFAULT 0 | 是否归档                |
+| settings    | TEXT    | NULL               | 工作区设置（JSON）      |
+| created_at  | INTEGER | NOT NULL           | 创建时间（Unix 时间戳） |
+| updated_at  | INTEGER | NOT NULL           | 更新时间（Unix 时间戳） |
 
-| 字段             | 类型    | 说明                    |
-| ---------------- | ------- | ----------------------- |
-| id               | TEXT    | 目录 ID（主键）         |
-| workspace_id     | TEXT    | 所属工作空间 ID（外键） |
-| parent_id        | TEXT    | 父目录 ID（外键）       |
-| name             | TEXT    | 目录名称                |
-| original_path    | TEXT    | 原始目录路径            |
-| stored_path      | TEXT    | 存储路径                |
-| file_count       | INTEGER | 文件数量                |
-| total_size_bytes | INTEGER | 总大小（字节）          |
-| is_archived      | INTEGER | 是否归档（0/1）         |
-| created_at       | INTEGER | 创建时间                |
-| updated_at       | INTEGER | 更新时间                |
+**索引**：
+- `idx_workspaces_active` - is_active
+- `idx_workspaces_archived` - is_archived
+- `idx_workspaces_sort` - sort_order
 
-**web_links**
+---
 
-| 字段            | 类型    | 说明                    |
-| --------------- | ------- | ----------------------- |
-| id              | TEXT    | 链接 ID（主键）         |
-| workspace_id    | TEXT    | 所属工作空间 ID（外键） |
-| title           | TEXT    | 链接标题                |
-| url             | TEXT    | 链接 URL                |
-| description     | TEXT    | 链接描述                |
-| favicon_url     | TEXT    | 图标 URL                |
-| thumbnail_url   | TEXT    | 缩略图 URL              |
-| tags            | TEXT    | 标签（JSON 数组）       |
-| is_favorited    | INTEGER | 是否收藏（0/1）         |
-| is_archived     | INTEGER | 是否归档（0/1）         |
-| visit_count     | INTEGER | 访问次数                |
-| last_visited_at | INTEGER | 最后访问时间            |
-| created_at      | INTEGER | 创建时间                |
-| updated_at      | INTEGER | 更新时间                |
+### 表：notes
 
-**tasks**
+笔记表，原子类型，支持层级结构。
 
-| 字段           | 类型    | 说明              |
-| -------------- | ------- | ----------------- |
-| id             | TEXT    | 任务 ID（主键）   |
-| task_type      | TEXT    | 任务类型          |
-| status         | TEXT    | 任务状态          |
-| progress       | INTEGER | 任务进度（0-100） |
-| message        | TEXT    | 任务消息          |
-| result         | TEXT    | 任务结果（JSON）  |
-| error          | TEXT    | 错误信息          |
-| retry_count    | INTEGER | 重试次数          |
-| max_retries    | INTEGER | 最大重试次数      |
-| retry_delay_ms | INTEGER | 重试延迟（毫秒）  |
-| input          | TEXT    | 任务输入（JSON）  |
-| persistent     | INTEGER | 是否持久化（0/1） |
-| created_at     | INTEGER | 创建时间          |
-| updated_at     | INTEGER | 更新时间          |
-| completed_at   | INTEGER | 完成时间          |
+| 字段           | 类型    | 约束                      | 说明                              |
+| -------------- | ------- | ------------------------- | --------------------------------- |
+| id             | TEXT    | PRIMARY KEY               | 笔记 ID（ULID）                   |
+| workspace_id   | TEXT    | NOT NULL, FK(workspaces)  | 所属工作空间 ID                   |
+| parent_id      | TEXT    | NULL, FK(notes)           | 父笔记 ID（支持层级）             |
+| title          | TEXT    | NOT NULL                  | 笔记标题                          |
+| note_type      | TEXT    | NOT NULL                  | 笔记类型（markdown/richtext/canvas） |
+| content        | TEXT    | NOT NULL DEFAULT ''       | 笔记内容                          |
+| summary        | TEXT    | NULL                      | AI 生成摘要                       |
+| file_path      | TEXT    | NOT NULL                  | 笔记文件存储路径                  |
+| tags           | TEXT    | NULL                      | 标签（JSON 数组）                 |
+| word_count     | INTEGER | NOT NULL DEFAULT 0        | 字数统计                          |
+| sort_order     | INTEGER | NOT NULL DEFAULT 0        | 同级排序顺序                      |
+| is_favorited   | INTEGER | NOT NULL DEFAULT 0        | 是否收藏                          |
+| is_pinned      | INTEGER | NOT NULL DEFAULT 0        | 是否置顶                          |
+| is_archived    | INTEGER | NOT NULL DEFAULT 0        | 是否归档                          |
+| last_viewed_at | INTEGER | NULL                      | 最后查看时间                      |
+| created_at     | INTEGER | NOT NULL                  | 创建时间                          |
+| updated_at     | INTEGER | NOT NULL                  | 更新时间                          |
 
-### repository.db
+**索引**：
+- `idx_notes_workspace` - workspace_id
+- `idx_notes_parent` - parent_id
+- `idx_notes_workspace_type` - (workspace_id, note_type)
+- `idx_notes_workspace_favorited` - (workspace_id, is_favorited)
+- `idx_notes_workspace_pinned` - (workspace_id, is_pinned)
+- `idx_notes_workspace_archived` - (workspace_id, is_archived)
+- `idx_notes_workspace_updated` - (workspace_id, updated_at DESC)
+- `idx_notes_workspace_viewed` - (workspace_id, last_viewed_at DESC)
 
-管理 Git 仓库、索引任务、索引元数据。
+---
 
-#### 表结构
+### 表：imported_files
 
-**git_repositories**
+导入文件表，原子类型。
 
-| 字段             | 类型    | 说明                    |
-| ---------------- | ------- | ----------------------- |
-| id               | TEXT    | 仓库 ID（主键）         |
-| workspace_id     | TEXT    | 所属工作空间 ID（外键） |
-| name             | TEXT    | 仓库名称                |
-| remote_url       | TEXT    | 远程 URL                |
-| local_path       | TEXT    | 本地路径                |
-| branch           | TEXT    | 当前分支                |
-| default_branch   | TEXT    | 默认分支                |
-| last_commit_hash | TEXT    | 最后一次提交哈希        |
-| last_synced_at   | INTEGER | 最后同步时间            |
-| clone_status     | TEXT    | 克隆状态                |
-| clone_progress   | INTEGER | 克隆进度（0-100）       |
-| index_status     | TEXT    | 索引状态                |
-| indexed_at       | INTEGER | 索引时间                |
-| file_count       | INTEGER | 文件数量                |
-| symbol_count     | INTEGER | 符号数量                |
-| vector_count     | INTEGER | 向量数量                |
-| is_archived      | INTEGER | 是否归档（0/1）         |
-| created_at       | INTEGER | 创建时间                |
-| updated_at       | INTEGER | 更新时间                |
+| 字段                | 类型    | 约束                               | 说明               |
+| ------------------- | ------- | ---------------------------------- | ------------------ |
+| id                  | TEXT    | PRIMARY KEY                        | 文件 ID（ULID）    |
+| workspace_id        | TEXT    | NOT NULL, FK(workspaces)           | 所属工作空间 ID    |
+| parent_directory_id | TEXT    | NULL, FK(imported_directories)     | 父目录 ID          |
+| name                | TEXT    | NOT NULL                           | 文件名             |
+| original_path       | TEXT    | NOT NULL                           | 原始路径           |
+| stored_path         | TEXT    | NOT NULL                           | 存储路径           |
+| file_type           | TEXT    | NOT NULL                           | 文件类型（扩展名） |
+| size_bytes          | INTEGER | NOT NULL                           | 文件大小（字节）   |
+| mime_type           | TEXT    | NULL                               | MIME 类型          |
+| checksum            | TEXT    | NULL                               | SHA256 校验和      |
+| is_archived         | INTEGER | NOT NULL DEFAULT 0                 | 是否归档           |
+| created_at          | INTEGER | NOT NULL                           | 创建时间           |
+| updated_at          | INTEGER | NOT NULL                           | 更新时间           |
 
-**index_jobs**
+**索引**：
+- `idx_files_workspace` - workspace_id
+- `idx_files_parent` - parent_directory_id
+- `idx_files_workspace_type` - (workspace_id, file_type)
+- `idx_files_checksum` - checksum
+- `idx_files_workspace_archived` - (workspace_id, is_archived)
 
-| 字段              | 类型    | 说明                                      |
-| ----------------- | ------- | ----------------------------------------- |
-| id                | TEXT    | 任务 ID（主键）                           |
-| repo_id           | TEXT    | 仓库 ID（外键）                           |
-| job_type          | TEXT    | 任务类型（full/incremental/file/content） |
-| status            | TEXT    | 任务状态                                  |
-| progress          | INTEGER | 任务进度（0-100）                         |
-| total_files       | INTEGER | 总文件数                                  |
-| processed_files   | INTEGER | 已处理文件数                              |
-| total_symbols     | INTEGER | 总符号数                                  |
-| processed_symbols | INTEGER | 已处理符号数                              |
-| error_message     | TEXT    | 错误信息                                  |
-| metadata          | TEXT    | 元数据（JSON）                            |
-| started_at        | INTEGER | 开始时间                                  |
-| completed_at      | INTEGER | 完成时间                                  |
-| created_at        | INTEGER | 创建时间                                  |
+---
 
-**index_metadata**
+### 表：imported_directories
 
-| 字段            | 类型    | 说明              |
-| --------------- | ------- | ----------------- |
-| id              | TEXT    | 元数据 ID（主键） |
-| repo_id         | TEXT    | 仓库 ID（外键）   |
-| file_path       | TEXT    | 文件路径          |
-| content_hash    | TEXT    | 内容哈希          |
-| last_indexed_at | INTEGER | 最后索引时间      |
-| symbol_count    | INTEGER | 符号数量          |
-| language        | TEXT    | 编程语言          |
-| file_size       | INTEGER | 文件大小          |
+导入目录表，原子类型（folder）。
 
-唯一索引：(repo_id, file_path)
+| 字段             | 类型    | 约束                           | 说明             |
+| ---------------- | ------- | ------------------------------ | ---------------- |
+| id               | TEXT    | PRIMARY KEY                    | 目录 ID（ULID）  |
+| workspace_id     | TEXT    | NOT NULL, FK(workspaces)       | 所属工作空间 ID  |
+| parent_id        | TEXT    | NULL, FK(imported_directories) | 父目录 ID        |
+| name             | TEXT    | NOT NULL                       | 目录名           |
+| original_path    | TEXT    | NOT NULL                       | 原始路径         |
+| stored_path      | TEXT    | NOT NULL                       | 存储路径         |
+| file_count       | INTEGER | NOT NULL DEFAULT 0             | 包含文件数量     |
+| total_size_bytes | INTEGER | NOT NULL DEFAULT 0             | 总大小（字节）   |
+| is_archived      | INTEGER | NOT NULL DEFAULT 0             | 是否归档         |
+| created_at       | INTEGER | NOT NULL                       | 创建时间         |
+| updated_at       | INTEGER | NOT NULL                       | 更新时间         |
 
-### symbol.db
+**索引**：
+- `idx_dirs_workspace` - workspace_id
+- `idx_dirs_parent` - parent_id
+- `idx_dirs_workspace_archived` - (workspace_id, is_archived)
 
-使用 Keyv KV 存储模式存储符号数据。
+---
 
-- 键格式：`symbol:{symbolId}`
-- 值格式：JSON (SymbolPayload)
+### 表：web_links
 
-### edge.db
+网页链接表，原子类型（link）。
 
-存储正向依赖关系。
+| 字段            | 类型    | 约束                     | 说明            |
+| --------------- | ------- | ------------------------ | --------------- |
+| id              | TEXT    | PRIMARY KEY              | 链接 ID（ULID） |
+| workspace_id    | TEXT    | NOT NULL, FK(workspaces) | 所属工作空间 ID |
+| title           | TEXT    | NOT NULL                 | 链接标题        |
+| url             | TEXT    | NOT NULL                 | 链接 URL        |
+| description     | TEXT    | NULL                     | 描述            |
+| favicon_url     | TEXT    | NULL                     | 网站图标 URL    |
+| thumbnail_url   | TEXT    | NULL                     | 缩略图 URL      |
+| tags            | TEXT    | NULL                     | 标签（JSON）    |
+| content         | TEXT    | NULL                     | 抓取的网页内容  |
+| is_favorited    | INTEGER | NOT NULL DEFAULT 0       | 是否收藏        |
+| is_archived     | INTEGER | NOT NULL DEFAULT 0       | 是否归档        |
+| visit_count     | INTEGER | NOT NULL DEFAULT 0       | 访问次数        |
+| last_visited_at | INTEGER | NULL                     | 最后访问时间    |
+| created_at      | INTEGER | NOT NULL                 | 创建时间        |
+| updated_at      | INTEGER | NOT NULL                 | 更新时间        |
 
-- 键格式：`{from}:{edgeType}`
-- 值格式：JSON (string) - 目标符号 ID 数组
+**索引**：
+- `idx_links_workspace` - workspace_id
+- `idx_links_workspace_favorited` - (workspace_id, is_favorited)
+- `idx_links_workspace_archived` - (workspace_id, is_archived)
+- `idx_links_workspace_visited` - (workspace_id, last_visited_at DESC)
+- `idx_links_url` - url
 
-### reverse_edge.db
+---
 
-存储反向依赖关系（被依赖关系）。
+### 表：git_repositories
 
-- 键格式：`{to}:{edgeType}`
-- 值格式：JSON (string) - 来源符号 ID 数组
+Git 仓库表，原子类型（repo）。
 
-## SurrealDB 数据库
+| 字段             | 类型    | 约束                           | 说明                   |
+| ---------------- | ------- | ------------------------------ | ---------------------- |
+| id               | TEXT    | PRIMARY KEY                    | 仓库 ID（ULID）        |
+| workspace_id     | TEXT    | NOT NULL, FK(workspaces)       | 所属工作空间 ID        |
+| name             | TEXT    | NOT NULL                       | 仓库名称               |
+| remote_url       | TEXT    | NOT NULL                       | 远程 URL               |
+| local_path       | TEXT    | NOT NULL                       | 本地路径               |
+| branch           | TEXT    | NOT NULL                       | 当前分支               |
+| default_branch   | TEXT    | NULL                           | 默认分支               |
+| last_commit_hash | TEXT    | NULL                           | 最后提交哈希           |
+| last_synced_at   | INTEGER | NULL                           | 最后同步时间           |
+| clone_status     | TEXT    | NOT NULL DEFAULT 'pending'     | 克隆状态               |
+| clone_progress   | INTEGER | NOT NULL DEFAULT 0             | 克隆进度（0-100）      |
+| index_status     | TEXT    | NOT NULL DEFAULT 'not_indexed' | 索引状态               |
+| indexed_at       | INTEGER | NULL                           | 索引完成时间           |
+| file_count       | INTEGER | NOT NULL DEFAULT 0             | 文件数量               |
+| symbol_count     | INTEGER | NOT NULL DEFAULT 0             | 符号数量               |
+| vector_count     | INTEGER | NOT NULL DEFAULT 0             | 向量数量               |
+| is_archived      | INTEGER | NOT NULL DEFAULT 0             | 是否归档               |
+| created_at       | INTEGER | NOT NULL                       | 创建时间               |
+| updated_at       | INTEGER | NOT NULL                       | 更新时间               |
 
-SurrealDB 用于持久化符号数据和/关系边，支持全文检索和图查询。
+**clone_status 枚举值**：pending、cloning、completed、failed
+**index_status 枚举值**：not_indexed、indexing、indexed、failed
 
-### Namespace 和 Database
+**索引**：
+- `idx_repos_workspace` - workspace_id
+- `idx_repos_clone_status` - clone_status
+- `idx_repos_index_status` - index_status
+- `idx_repos_workspace_archived` - (workspace_id, is_archived)
 
-- Namespace: `code_index`
-- Database: `open_context`
+---
 
-### symbol 表
+### 表：conversations
 
-| 字段         | 类型           | 说明                                |
-| ------------ | -------------- | ----------------------------------- |
-| workspace_id | string         | 工作空间 ID                         |
-| repo_id      | string         | 仓库 ID                             |
-| repo_name    | string         | 仓库名称                            |
-| file_path    | string         | 文件路径                            |
-| content_hash | string         | 内容哈希                            |
-| symbol_id    | string         | 符号 ID                             |
-| symbol_name  | string         | 符号名称                            |
-| symbol_kind  | string         | 符号类型（function/class/method等） |
-| code         | string         | 代码内容                            |
-| signature    | option<string> | 函数签名                            |
-| language     | string         | 编程语言                            |
-| exported     | bool           | 是否导出                            |
-| visibility   | string         | 可见性（public/private/protected）  |
-| importance   | float          | 重要性（0.0-1.0）                   |
-| commit       | string         | 提交哈希                            |
-| indexed_at   | number         | 索引时间（Unix 时间戳）             |
+会话表，原子类型（conversation），用于 AI 对话记录。
 
-### 索引
+| 字段           | 类型    | 约束                     | 说明               |
+| -------------- | ------- | ------------------------ | ------------------ |
+| id             | TEXT    | PRIMARY KEY              | 会话 ID（ULID）    |
+| workspace_id   | TEXT    | NOT NULL, FK(workspaces) | 所属工作空间 ID    |
+| chat_id        | TEXT    | NULL, FK(chats)          | 所属聊天 ID        |
+| title          | TEXT    | NOT NULL                 | 会话标题           |
+| model          | TEXT    | NULL                     | 使用的 AI 模型     |
+| system_prompt  | TEXT    | NULL                     | 系统提示词         |
+| messages       | TEXT    | NOT NULL DEFAULT '[]'    | 消息记录（JSON）   |
+| message_count  | INTEGER | NOT NULL DEFAULT 0       | 消息数量           |
+| token_count    | INTEGER | NOT NULL DEFAULT 0       | Token 使用量       |
+| is_favorited   | INTEGER | NOT NULL DEFAULT 0       | 是否收藏           |
+| is_archived    | INTEGER | NOT NULL DEFAULT 0       | 是否归档           |
+| last_active_at | INTEGER | NULL                     | 最后活跃时间       |
+| created_at     | INTEGER | NOT NULL                 | 创建时间           |
+| updated_at     | INTEGER | NOT NULL                 | 更新时间           |
 
-**全文索引 (BM25)**
+**messages JSON 结构**：
+```json
+[
+  {
+    "id": "msg_001",
+    "role": "user|assistant|system",
+    "content": "消息内容",
+    "timestamp": 1706000000,
+    "metadata": {}
+  }
+]
+```
 
-- `symbol_name_idx`: 符号名称全文索引
-- `code_idx`: 代码内容全文索引
-- `signature_idx`: 函数签名全文索引
+**索引**：
+- `idx_conversations_workspace` - workspace_id
+- `idx_conversations_chat` - chat_id
+- `idx_conversations_workspace_favorited` - (workspace_id, is_favorited)
+- `idx_conversations_workspace_archived` - (workspace_id, is_archived)
+- `idx_conversations_workspace_active` - (workspace_id, last_active_at DESC)
 
-**唯一索引**
+---
 
-- `symbol_unique_idx`: (file_path, content_hash) 防止重复
+### 表：terminals
 
-**查询索引**
+终端会话表，界面交互类型。
 
-- `workspace_id_idx`: 工作空间 ID 过滤
-- `repo_id_idx`: 仓库 ID 过滤
-- `symbol_kind_idx`: 符号类型过滤
-- `language_idx`: 编程语言过滤
+| 字段            | 类型    | 约束                     | 说明                |
+| --------------- | ------- | ------------------------ | ------------------- |
+| id              | TEXT    | PRIMARY KEY              | 终端 ID（ULID）     |
+| workspace_id    | TEXT    | NOT NULL, FK(workspaces) | 所属工作空间 ID     |
+| name            | TEXT    | NOT NULL                 | 终端名称            |
+| shell           | TEXT    | NOT NULL                 | Shell 类型          |
+| cwd             | TEXT    | NOT NULL                 | 当前工作目录        |
+| env             | TEXT    | NULL                     | 环境变量（JSON）    |
+| history         | TEXT    | NOT NULL DEFAULT '[]'    | 命令历史（JSON）    |
+| history_count   | INTEGER | NOT NULL DEFAULT 0       | 历史命令数量        |
+| is_active       | INTEGER | NOT NULL DEFAULT 0       | 是否活跃            |
+| is_archived     | INTEGER | NOT NULL DEFAULT 0       | 是否归档            |
+| last_command_at | INTEGER | NULL                     | 最后命令执行时间    |
+| created_at      | INTEGER | NOT NULL                 | 创建时间            |
+| updated_at      | INTEGER | NOT NULL                 | 更新时间            |
 
-### 关系边表
+**索引**：
+- `idx_terminals_workspace` - workspace_id
+- `idx_terminals_workspace_active` - (workspace_id, is_active)
 
-| 边类型     | 说明     |
+---
+
+### 表：webviews
+
+网页视图表，界面交互类型。
+
+| 字段           | 类型    | 约束                     | 说明                 |
+| -------------- | ------- | ------------------------ | -------------------- |
+| id             | TEXT    | PRIMARY KEY              | 视图 ID（ULID）      |
+| workspace_id   | TEXT    | NOT NULL, FK(workspaces) | 所属工作空间 ID      |
+| title          | TEXT    | NOT NULL                 | 页面标题             |
+| url            | TEXT    | NOT NULL                 | 当前 URL             |
+| favicon_url    | TEXT    | NULL                     | 图标 URL             |
+| history        | TEXT    | NOT NULL DEFAULT '[]'    | 浏览历史（JSON）     |
+| is_loading     | INTEGER | NOT NULL DEFAULT 0       | 是否加载中           |
+| is_active      | INTEGER | NOT NULL DEFAULT 0       | 是否活跃             |
+| is_archived    | INTEGER | NOT NULL DEFAULT 0       | 是否归档             |
+| scroll_x       | INTEGER | NOT NULL DEFAULT 0       | 水平滚动位置         |
+| scroll_y       | INTEGER | NOT NULL DEFAULT 0       | 垂直滚动位置         |
+| zoom_level     | REAL    | NOT NULL DEFAULT 1.0     | 缩放级别             |
+| last_active_at | INTEGER | NULL                     | 最后活跃时间         |
+| created_at     | INTEGER | NOT NULL                 | 创建时间             |
+| updated_at     | INTEGER | NOT NULL                 | 更新时间             |
+
+**索引**：
+- `idx_webviews_workspace` - workspace_id
+- `idx_webviews_workspace_active` - (workspace_id, is_active)
+
+---
+
+### 表：chats
+
+聊天表，界面交互类型，包含多个会话。
+
+| 字段               | 类型    | 约束                     | 说明                |
+| ------------------ | ------- | ------------------------ | ------------------- |
+| id                 | TEXT    | PRIMARY KEY              | 聊天 ID（ULID）     |
+| workspace_id       | TEXT    | NOT NULL, FK(workspaces) | 所属工作空间 ID     |
+| name               | TEXT    | NOT NULL                 | 聊天名称            |
+| description        | TEXT    | NULL                     | 描述                |
+| default_model      | TEXT    | NULL                     | 默认 AI 模型        |
+| default_prompt     | TEXT    | NULL                     | 默认系统提示词      |
+| conversation_count | INTEGER | NOT NULL DEFAULT 0       | 会话数量            |
+| is_active          | INTEGER | NOT NULL DEFAULT 0       | 是否活跃            |
+| is_archived        | INTEGER | NOT NULL DEFAULT 0       | 是否归档            |
+| last_active_at     | INTEGER | NULL                     | 最后活跃时间        |
+| created_at         | INTEGER | NOT NULL                 | 创建时间            |
+| updated_at         | INTEGER | NOT NULL                 | 更新时间            |
+
+**索引**：
+- `idx_chats_workspace` - workspace_id
+- `idx_chats_workspace_active` - (workspace_id, is_active)
+- `idx_chats_workspace_active_time` - (workspace_id, last_active_at DESC)
+
+---
+
+### 表：tasks
+
+异步任务表，用于跟踪后台任务状态。
+
+| 字段           | 类型    | 约束                       | 说明                    |
+| -------------- | ------- | -------------------------- | ----------------------- |
+| id             | TEXT    | PRIMARY KEY                | 任务 ID（ULID）         |
+| task_type      | TEXT    | NOT NULL                   | 任务类型                |
+| status         | TEXT    | NOT NULL DEFAULT 'pending' | 任务状态                |
+| progress       | INTEGER | NOT NULL DEFAULT 0         | 进度（0-100）           |
+| message        | TEXT    | NULL                       | 状态消息                |
+| result         | TEXT    | NULL                       | 任务结果（JSON）        |
+| error          | TEXT    | NULL                       | 错误信息                |
+| retry_count    | INTEGER | NOT NULL DEFAULT 0         | 已重试次数              |
+| max_retries    | INTEGER | NOT NULL DEFAULT 3         | 最大重试次数            |
+| retry_delay_ms | INTEGER | NOT NULL DEFAULT 1000      | 重试延迟（毫秒）        |
+| input          | TEXT    | NULL                       | 任务输入（JSON）        |
+| persistent     | INTEGER | NOT NULL DEFAULT 0         | 是否持久化              |
+| created_at     | INTEGER | NOT NULL                   | 创建时间                |
+| updated_at     | INTEGER | NOT NULL                   | 更新时间                |
+| completed_at   | INTEGER | NULL                       | 完成时间                |
+
+**status 枚举值**：pending、running、completed、failed、cancelled
+
+**索引**：
+- `idx_tasks_status` - status
+- `idx_tasks_type` - task_type
+- `idx_tasks_persistent` - persistent
+- `idx_tasks_created_at` - created_at
+
+---
+
+### 表：index_jobs
+
+索引任务表，记录代码索引作业的状态和进度（双端读写）。
+
+| 字段              | 类型    | 约束                          | 说明                          |
+| ----------------- | ------- | ----------------------------- | ----------------------------- |
+| id                | TEXT    | PRIMARY KEY                   | 任务 ID（ULID）               |
+| repo_id           | TEXT    | NOT NULL, FK(git_repositories) | 仓库 ID                      |
+| job_type          | TEXT    | NOT NULL                      | 任务类型（full/incremental）  |
+| status            | TEXT    | NOT NULL DEFAULT 'pending'    | 任务状态                      |
+| progress          | INTEGER | NOT NULL DEFAULT 0            | 进度（0-100）                 |
+| total_files       | INTEGER | NULL                          | 总文件数                      |
+| processed_files   | INTEGER | NOT NULL DEFAULT 0            | 已处理文件数                  |
+| total_symbols     | INTEGER | NULL                          | 总符号数                      |
+| processed_symbols | INTEGER | NOT NULL DEFAULT 0            | 已处理符号数                  |
+| error_message     | TEXT    | NULL                          | 错误信息                      |
+| metadata          | TEXT    | NULL                          | 元数据（JSON）                |
+| started_at        | INTEGER | NULL                          | 开始时间                      |
+| completed_at      | INTEGER | NULL                          | 完成时间                      |
+| created_at        | INTEGER | NOT NULL                      | 创建时间                      |
+
+**job_type 枚举值**：full、incremental
+**status 枚举值**：pending、running、completed、failed、cancelled
+
+**索引**：
+- `idx_index_jobs_repo` - repo_id
+- `idx_index_jobs_status` - status
+- `idx_index_jobs_repo_status` - (repo_id, status)
+
+---
+
+### 表：index_metadata
+
+索引元数据表，记录文件的索引状态和内容哈希（双端读写）。
+
+| 字段            | 类型    | 约束                          | 说明               |
+| --------------- | ------- | ----------------------------- | ------------------ |
+| id              | TEXT    | PRIMARY KEY                   | 元数据 ID（ULID）  |
+| repo_id         | TEXT    | NOT NULL, FK(git_repositories) | 仓库 ID           |
+| file_path       | TEXT    | NOT NULL                      | 文件路径           |
+| content_hash    | TEXT    | NOT NULL                      | 内容哈希（SHA256） |
+| last_indexed_at | INTEGER | NOT NULL                      | 最后索引时间       |
+| symbol_count    | INTEGER | NOT NULL DEFAULT 0            | 符号数量           |
+| language        | TEXT    | NULL                          | 文件语言           |
+| file_size       | INTEGER | NULL                          | 文件大小（字节）   |
+
+**索引**：
+- `idx_index_metadata_repo` - repo_id
+- `idx_index_metadata_repo_path` - (repo_id, file_path) UNIQUE
+- `idx_index_metadata_hash` - content_hash
+
+---
+
+## SQLite 数据库 - symbol.db
+
+符号数据表，使用 KV 存储模式（由 open-node 管理）。
+
+| 字段  | 类型 | 说明                 |
+| ----- | ---- | -------------------- |
+| key   | TEXT | 键（symbol:{id}）    |
+| value | TEXT | 符号数据（JSON）     |
+
+**键格式**：`symbol:{symbolId}`
+
+---
+
+## SQLite 数据库 - edge.db
+
+正向边表，存储依赖关系图（由 open-node 管理）。
+
+| 字段  | 类型 | 说明                       |
+| ----- | ---- | -------------------------- |
+| key   | TEXT | 边键（{from}:{edgeType}）  |
+| value | TEXT | 目标符号 ID 列表（JSON）   |
+
+---
+
+## SQLite 数据库 - reverse_edge.db
+
+反向边表，存储被依赖关系（由 open-node 管理）。
+
+| 字段  | 类型 | 说明                       |
+| ----- | ---- | -------------------------- |
+| key   | TEXT | 边键（{to}:{edgeType}）    |
+| value | TEXT | 来源符号 ID 列表（JSON）   |
+
+---
+
+## SurrealDB
+
+SurrealDB 用于存储图数据和全文检索（由 open-node 管理）。
+
+### 表：symbol
+
+| 字段         | 类型   | 约束        | 说明            |
+| ------------ | ------ | ----------- | --------------- |
+| id           | string | PRIMARY KEY | 符号 ID         |
+| workspace_id | string | NOT NULL    | 所属工作空间 ID |
+| repo_id      | string | NOT NULL    | 仓库 ID         |
+| file_path    | string | NOT NULL    | 文件路径        |
+| content_hash | string | NOT NULL    | 内容哈希        |
+| symbol_id    | string | NOT NULL    | 符号 ID         |
+| symbol_name  | string | NOT NULL    | 符号名称        |
+| symbol_kind  | string | NOT NULL    | 符号类型        |
+| code         | string | NOT NULL    | 代码内容        |
+| language     | string | NOT NULL    | 编程语言        |
+
+**索引**：
+- `symbol_name_idx` - BM25 全文索引
+- `code_idx` - BM25 全文索引
+- `symbol_unique_idx` - (file_path, content_hash) UNIQUE
+
+### 关系表
+
+| 表名       | 说明     |
 | ---------- | -------- |
 | IMPORTS    | 导入关系 |
 | CALLS      | 调用关系 |
@@ -280,81 +505,91 @@ SurrealDB 用于持久化符号数据和/关系边，支持全文检索和图查
 | USES       | 使用关系 |
 | REFERENCES | 引用关系 |
 
-所有关系边表都是 RELATION 类型，IN 和 OUT 都指向 symbol 表。
+---
 
-## Qdrant 数据库
+## Qdrant
 
-Qdrant 用于向量嵌入和语义检索。
+向量数据库，用于语义检索（由 open-node 管理）。
 
-### Collection
+### Collection：code_symbols
 
-- 名称：`code_symbols`
-- 向量维度：1024（从配置文件读取）
+**配置**：
+- 向量维度：1024（可配置）
 - 距离度量：Cosine
+- Payload 索引：workspace_id, repo_id, symbol_kind, exported, language
 
-### Payload Schema
-
-| 字段         | 类型    | 说明                |
-| ------------ | ------- | ------------------- |
-| workspace_id | keyword | 工作空间 ID（过滤） |
-| repo_id      | keyword | 仓库 ID（过滤）     |
-| symbol_kind  | keyword | 符号类型（过滤）    |
-| exported     | bool    | 是否导出（过滤）    |
-| language     | keyword | 编程语言（过滤）    |
-| importance   | float   | 重要性（排序）      |
-| indexed_at   | integer | 索引时间（排序）    |
-
-## 数据流
-
-### 索引流程
-
-```
-代码文件
-  → tree-sitter 解析
-  → 提取符号信息
-  → 写入 symbol.db (KV 存储)
-  → 写入 edge.db / reverse_edge.db (图关系)
-  → 写入 SurrealDB (持久化 + 全文索引)
-  → 生成向量嵌入
-  → 写入 Qdrant (向量检索)
-  → 更新 repository.db (元数据)
+**Payload 结构**：
+```json
+{
+  "workspace_id": "workspace-id",
+  "repo_id": "repo-id",
+  "symbol_id": "symbol-id",
+  "symbol_name": "function-name",
+  "symbol_kind": "function",
+  "language": "typescript",
+  "exported": true,
+  "file_path": "/path/to/file.ts"
+}
 ```
 
-### 查询流程
+---
+
+## ER 关系图
 
 ```
-用户查询
-  → 并发查询：
-    ├→ Q.向量检索
-    ├→ SurrealDB.全文检索
-    └→ SurrealDB.图查询
-  → 结果融合（权重排序、去重、Top-K）
-  → 返回符号列表
+workspaces (1)
+    ├──< notes (N)
+    ├──< imported_files (N)
+    ├──< imported_directories (N)
+    ├──< web_links (N)
+    ├──< git_repositories (N)
+    ├──< conversations (N)
+    ├──< terminals (N)
+    ├──< webviews (N)
+    └──< chats (N)
+           └──< conversations (N)
+
+imported_directories (1)
+    ├──< imported_files (N)
+    └──< imported_directories (N)  [自引用]
+
+notes (1)
+    └──< notes (N)  [自引用，层级结构]
+
+git_repositories (1)
+    ├──< index_jobs (N)
+    └──< index_metadata (N)
 ```
 
-## 并发控制
+---
 
-### SQLite
+## 性能优化
 
-- WAL 模式：支持并发读写
-- busy_timeout: 5000ms
-- cache_size: 64MB
-- mmap_size: 30GB
+### SQLite 优化
 
-### 访问模式
+1. **WAL 模式**：启用 WAL 模式支持并发读写
+2. **连接池**：使用连接池复用连接
+3. **批量操作**：使用事务批量插入
+4. **预编译语句**：使用预编译语句提高性能
+5. **复合索引**：为常用查询创建复合索引
 
-| 数据库          | open-app | open-node | 并发控制     |
-| --------------- | -------- | --------- | ------------ |
-| workspace.db    | 读写     | 只读      | WAL 模式     |
-| repository.db   | 读写     | 读写      | WAL 模式     |
-| symbol.db       | 不访问   | 读写      | WAL 模式     |
-| edge.db         | 不访问   | 读写      | WAL 模式     |
-| reverse_edge.db | 不访问   | 读写      | WAL 模式     |
-| SurrealDB       | 只读     | 读写      | 内置事务     |
-| Qdrant          | 只读     | 读写      | 内置并发控制 |
+### 索引策略
 
-## 数据一致性
+```sql
+-- 启用 WAL 模式
+PRAGMA journal_mode = WAL;
 
-- SQLite 和 SurrealDB 数据双写
-- 定期数据一致性校验
-- 使用 content_hash 检测重复和变更
+-- 优化设置
+PRAGMA synchronous = NORMAL;
+PRAGMA cache_size = -64000;  -- 64MB
+PRAGMA temp_store = MEMORY;
+```
+
+---
+
+## 参考资料
+
+- [SQLite 官方文档](https://www.sqlite.org/docs.html)
+- [SurrealDB 官方文档](https://surrealdb.com/docs)
+- [Qdrant 官方文档](https://qdrant.tech/documentation/)
+- [SHARED_STORAGE.md](./SHARED_STORAGE.md)

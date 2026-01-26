@@ -10,9 +10,7 @@ mod app_state_terminal;
 mod app_state_webview;
 mod app_state_workspace;
 mod database;
-mod repository_db;
 mod state;
-mod workspace_db;
 
 pub use app_config::*;
 pub use app_state_file::*;
@@ -23,6 +21,4 @@ pub use app_state_repo::*;
 pub use app_state_task::*;
 pub use app_state_workspace::*;
 pub use database::*;
-pub use repository_db::*;
 pub use state::*;
-pub use workspace_db::*;

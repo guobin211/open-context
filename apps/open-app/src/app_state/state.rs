@@ -1,7 +1,7 @@
 use std::sync::{Arc, Mutex};
 
-use super::app_config::AppConfig;
 use super::DatabaseManager;
+use super::app_config::AppConfig;
 
 #[derive(Clone)]
 pub struct AppState {
@@ -12,11 +12,11 @@ pub struct AppState {
 impl AppState {
     pub fn new() -> Result<Self, Box<dyn std::error::Error>> {
         let config = AppConfig::load()?;
-        let db_path = AppConfig::config_dir().join("app_state.db");
-        let db = DatabaseManager::new(db_path)?;
+        let workspace_db_path = AppConfig::config_dir().join("app.db");
+        let workspace_db = DatabaseManager::new(workspace_db_path)?;
 
         Ok(Self {
-            db: Arc::new(db),
+            db: Arc::new(workspace_db),
             config: Arc::new(Mutex::new(config)),
         })
     }
