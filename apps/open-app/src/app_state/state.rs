@@ -12,11 +12,11 @@ pub struct AppState {
 impl AppState {
     pub fn new() -> Result<Self, Box<dyn std::error::Error>> {
         let config = AppConfig::load()?;
-        let workspace_db_path = AppConfig::config_dir().join("app.db");
-        let workspace_db = DatabaseManager::new(workspace_db_path)?;
+        let app_db_path = AppConfig::sqlite_app_db_path();
+        let app_db = DatabaseManager::new(app_db_path)?;
 
         Ok(Self {
-            db: Arc::new(workspace_db),
+            db: Arc::new(app_db),
             config: Arc::new(Mutex::new(config)),
         })
     }

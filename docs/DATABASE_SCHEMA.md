@@ -9,9 +9,9 @@ Open-Context 使用多种数据库来存储不同类型的数据：
 | 数据库                 | 用途            | 访问模式         | 技术栈                             |
 |---------------------|---------------|--------------|---------------------------------|
 | **app.db**          | 业务核心数据        | 双端读写         | SQLite (better-sqlite3)         |
-| **symbol_db**       | 符号数据库路径(图数据兜底)   | open-node 读写 | SQLite (better-sqlite3)         |
-| **edge_db**         | 边数据库路径(图数据兜底)    | open-node 读写 | SQLite (better-sqlite3)         |
-| **reverse_edge_db** | 反向边数据库路径(图数据兜底) | open-node 读写 | SQLite (better-sqlite3)         |
+| **symbol.db**       | 符号数据库路径(图数据兜底)   | open-node 读写 | SQLite (better-sqlite3)         |
+| **edge.db**         | 边数据库路径(图数据兜底)    | open-node 读写 | SQLite (better-sqlite3)         |
+| **reverse_edge.db** | 反向边数据库路径(图数据兜底) | open-node 读写 | SQLite (better-sqlite3)         |
 | **SurrealDB**       | 图数据、全文检索、符号存储 | open-node 读写 | SurrealDB (@surrealdb/node)     |
 | **Qdrant**          | 向量嵌入、语义检索     | open-node 读写 | Qdrant (@qdrant/js-client-rest) |
 

@@ -21,9 +21,9 @@
 
 ```
 ~/.open-context/
+├── config.json     # 配置文件（config.json）
 ├── bin/            # 二进制文件（sidecar 模式）
 ├── cache/          # 缓存数据（Tauri Store 持久化文件）
-├── config/         # 配置文件（config.json）
 ├── database/       # 数据库数据
 │   ├── sqlite/             # SQLite 数据库目录
 │   │   └── app.db          # 应用核心数据库（工作空间、笔记、文件等）
@@ -42,8 +42,6 @@
 ├── plugins/        # 插件配置
 ├── commands/       # 命令历史/配置
 ├── skills/         # Skills 数据
-├── todos/          # Todo 数据
-├── projects/       # 项目数据
 ├── rules/          # 规则数据
 └── hooks/          # Hooks 配置
 ```
@@ -53,7 +51,6 @@
 | 子目录       | 用途          | 文件类型                             |
 | ------------ | ------------- | ------------------------------------ |
 | `cache/`     | 临时缓存数据  | `.cache`, `.store.json`              |
-| `config/`    | 应用配置      | `config.json`                        |
 | `database/`  | 数据库文件    | `.db`, LevelDB/Qdrant/SurrealDB 数据 |
 | `notebook/`  | 笔记数据      | `.json`, `.md`                       |
 | `session/`   | 会话数据      | `.json`                              |
@@ -63,8 +60,6 @@
 | `plugins/`   | 插件配置      | `.json`, `.md`                       |
 | `commands/`  | 命令历史/配置 | `.json`                              |
 | `skills/`    | Skills 数据   | `.json`, `.md`                       |
-| `todos/`     | Todo 数据     | `.json`                              |
-| `projects/`  | 项目数据      | `.json`                              |
 | `rules/`     | 规则数据      | `.json`, `.md`                       |
 | `hooks/`     | Hooks 配置    | `.json`                              |
 
@@ -207,7 +202,6 @@ fn get_store_path(subdir: &str, filename: &str) -> PathBuf {
 ```typescript
 const requiredDirs = [
   'cache',
-  'config',
   'database',
   'notebook',
   'session',
@@ -217,8 +211,6 @@ const requiredDirs = [
   'plugins',
   'commands',
   'skills',
-  'todos',
-  'projects',
   'rules',
   'hooks'
 ];
