@@ -11,7 +11,7 @@ Open-Context 是一个基于 Tauri 2.x 的混合桌面应用，采用三层架�
 | 模块                              | 职责                                         | 技术栈                     |
 | --------------------------------- | -------------------------------------------- | -------------------------- |
 | **open-app** (`apps/open-app/`)   | 桌面应用壳，处理文件系统、系统调用、启动服务 | Rust + Tauri 2.x           |
-| **open-node** (`apps/open-node/`) | RAG 引擎，代码索引、向量检索、后台任务处理   | Node.js + Hono             |
+| **open-node** (`apps/open-node/`) | RAG 引擎，代码索引、向量检索、后台任务处理   | Node.js + H.ono            |
 | **open-web** (`apps/open-web/`)   | React 前端，提供用户界面和交互               | React 19 + TanStack Router |
 
 ### 交互流程
@@ -99,7 +99,7 @@ pnpm build:app      # 构建 Tauri 桌面应用
 ```bash
 # 检查并修复所有代码
 pnpm lint           # 运行 Rust (clippy) 和 JavaScript (oxlint) 检查
-pnpm lint:rs       ` # Cargo clippy 自动修复
+pnpm lint:rs        # Cargo clippy 自动修复
 pnpm lint:js        # Oxlint TypeScript 感知检查器自动修复
 
 # 格式化所有代码
@@ -161,7 +161,7 @@ pnpm --filter open-node type-check
 - 始终返回类型化 Promise: `Promise<Workspace | null>`
 - 公开方法显式返回类型，内部方法允许推断
 - 禁止 `any` 类型 (oxlint 阻止)
-- 禁止类型错误抑制 (`@ts-ignore`, `as any` 禁止)
+- 禁止类型错误抑制 (`@ts-ignore`, `@ts-expect-error`, `as any` 禁止)
 
 **错误处理:**
 
@@ -169,6 +169,7 @@ pnpm --filter open-node type-check
 - 自然传播错误 (最少 try/catch)
 - 服务方法返回 `null` 表示未找到
 - 当前无自定义错误类 (避免过度设计)
+- 禁止空 catch 块
 
 **React 组件模式:**
 
@@ -182,7 +183,7 @@ pnpm --filter open-node type-check
 - Tiptap 组件: 分层架构 (extension → node → ui-primitive → ui → templates)
 - 使用 `forwardRef` 的组件: `export const Button = forwardRef<HTMLButtonElement, ButtonProps>(...)`
 - 使用 `memo` 的组件: `export const Icon = memo(({ ... }: Props) => ...)`
-- 箭头函数组件添加`displayName`属性，以便于调试
+- 箭头函数组件添加 `displayName` 属性，以便于调试
 
 **路由模式:**
 
@@ -205,11 +206,11 @@ pnpm --filter open-node type-check
 
 **测试模式:**
 
-- open 当前无测试配置 (测试仅在 open-node 中)
+- open-web 当前无测试配置 (测试仅在 open-node 中)
 
 ### Rust (apps/open-app/)
 
-**`命名规范:**
+**命名规范:**
 
 - 模块: snake_case (`mod app_commands`)
 - 函数: snake_case (`pub fn run()`)
@@ -283,7 +284,7 @@ src/
 ├── hooks/               # 自定义 hooks (use- 前缀)
 ├── services/            # 服务层 (http-services, tauri-services)
 ├── lib/                 # 工具 (cn(), utils.ts)
-└── i18n/                # 国际化 (locales/ 目录包含 zh-CN, en, ja ko, zh-TW)
+└── i18n/                # 国际化 (locales/ 目录包含 zh-CN, en, ja, ko, zh-TW)
 ```
 
 **样式:**
@@ -341,7 +342,7 @@ src/
 - 所有数据存储在 `~/.open-context/` 目录
 - 详见 [共享存储规范](./docs/SHARED_STORAGE.md) 中的完整目录结构
 - **数据库**：
-  - SQLite：`~/.open-context/database/app_state.db`（Tauri 端）
+  - SQLite：`~/.open-context/database/sqlite.app.db`（Tauri 端）
   - SurrealDB：`~/.open-context/database/surrealdb/`（图数据库）
   - LevelDB：`~/.open-context/database/leveldb/`（符号、依赖关系）
   - Qdrant：向量数据库（需独立部署）

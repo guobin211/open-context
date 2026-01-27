@@ -3,7 +3,7 @@ module.exports = {
     {
       name: 'surreal',
       script: 'surreal',
-      args: 'start --user root --pass root --bind 0.0.0.0:8080 ./.open-context/database/surrealdb',
+      args: 'start --user root --pass root --bind 0.0.0.0:8080 rocksdb://./.open-context/database/surrealdb',
       instances: 1,
       exec_mode: 'fork',
       watch: false,
