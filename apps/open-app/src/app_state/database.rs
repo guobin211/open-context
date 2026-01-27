@@ -284,6 +284,44 @@ impl DatabaseManager {
             [],
         )?;
 
+        // index_jobs 表
+        conn.execute(
+            "CREATE TABLE IF NOT EXISTS index_jobs (
+                id TEXT PRIMARY KEY,
+                repo_id TEXT NOT NULL,
+                job_type TEXT NOT NULL,
+                status TEXT NOT NULL DEFAULT 'pending',
+                progress INTEGER NOT NULL DEFAULT 0,
+                total_files INTEGER,
+                processed_files INTEGER NOT NULL DEFAULT 0,
+                total_symbols INTEGER,
+                processed_symbols INTEGER NOT NULL DEFAULT 0,
+                error_message TEXT,
+                metadata TEXT,
+                started_at INTEGER,
+                completed_at INTEGER,
+                created_at INTEGER NOT NULL,
+                FOREIGN KEY (repo_id) REFERENCES git_repositories(id) ON DELETE CASCADE
+            )",
+            [],
+        )?;
+
+        // index_metadata 表
+        conn.execute(
+            "CREATE TABLE IF NOT EXISTS index_metadata (
+                id TEXT PRIMARY KEY,
+                repo_id TEXT NOT NULL,
+                file_path TEXT NOT NULL,
+                content_hash TEXT NOT NULL,
+                last_indexed_at INTEGER NOT NULL,
+                symbol_count INTEGER NOT NULL DEFAULT 0,
+                language TEXT,
+                file_size INTEGER,
+                FOREIGN KEY (repo_id) REFERENCES git_repositories(id) ON DELETE CASCADE
+            )",
+            [],
+        )?;
+
         self.run_migrations(&conn)?;
         self.create_indexes(&conn)?;
 
@@ -496,6 +534,34 @@ impl DatabaseManager {
         )?;
         conn.execute(
             "CREATE INDEX IF NOT EXISTS idx_tasks_created_at ON tasks(created_at)",
+            [],
+        )?;
+
+        // index_jobs 索引
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_index_jobs_repo ON index_jobs(repo_id)",
+            [],
+        )?;
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_index_jobs_status ON index_jobs(status)",
+            [],
+        )?;
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_index_jobs_repo_status ON index_jobs(repo_id, status)",
+            [],
+        )?;
+
+        // index_metadata 索引
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_index_metadata_repo ON index_metadata(repo_id)",
+            [],
+        )?;
+        conn.execute(
+            "CREATE UNIQUE INDEX IF NOT EXISTS idx_index_metadata_repo_path ON index_metadata(repo_id, file_path)",
+            [],
+        )?;
+        conn.execute(
+            "CREATE INDEX IF NOT EXISTS idx_index_metadata_hash ON index_metadata(content_hash)",
             [],
         )?;
 

@@ -1,7 +1,7 @@
+use std::path::PathBuf;
 use chrono::Utc;
 use rusqlite::{Result as SqliteResult, params};
 use serde::{Deserialize, Serialize};
-use std::path::PathBuf;
 use uuid::Uuid;
 
 use crate::app_state::DatabaseManager;
@@ -9,11 +9,19 @@ use crate::app_state::DatabaseManager;
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "lowercase")]
 pub enum NoteType {
+    /// richtext - 富文本编辑器
     RichText,
+    /// markdown - Markdown 编辑器
     Markdown,
+    /// canvas - 画布/白板
+    Canvas,
+    /// code - 代码编辑器
     Code,
+    /// table - 表格编辑器
     Table,
+    /// mindmap - 思维导图
     MindMap,
+    /// flowchart - 流程图
     Flowchart,
 }
 
@@ -22,6 +30,7 @@ impl NoteType {
         match self {
             NoteType::RichText => "richtext",
             NoteType::Markdown => "markdown",
+            NoteType::Canvas => "canvas",
             NoteType::Code => "code",
             NoteType::Table => "table",
             NoteType::MindMap => "mindmap",
@@ -33,6 +42,7 @@ impl NoteType {
         match s {
             "richtext" => Some(NoteType::RichText),
             "markdown" => Some(NoteType::Markdown),
+            "canvas" => Some(NoteType::Canvas),
             "code" => Some(NoteType::Code),
             "table" => Some(NoteType::Table),
             "mindmap" => Some(NoteType::MindMap),
@@ -147,7 +157,7 @@ impl DatabaseManager {
                 note_type: NoteType::parse(&note_type_str).unwrap_or(NoteType::RichText),
                 content: row.get(4)?,
                 summary: None,
-                file_path: std::path::PathBuf::from(row.get::<_, String>(5)?),
+                file_path: PathBuf::from(row.get::<_, String>(5)?),
                 tags,
                 word_count: 0,
                 sort_order: 0,
@@ -186,7 +196,7 @@ impl DatabaseManager {
                 note_type: NoteType::parse(&note_type_str).unwrap_or(NoteType::RichText),
                 content: row.get(4)?,
                 summary: None,
-                file_path: std::path::PathBuf::from(row.get::<_, String>(5)?),
+                file_path: PathBuf::from(row.get::<_, String>(5)?),
                 tags,
                 word_count: 0,
                 sort_order: 0,
@@ -233,7 +243,7 @@ impl DatabaseManager {
                 note_type: NoteType::parse(&note_type_str).unwrap_or(NoteType::RichText),
                 content: row.get(4)?,
                 summary: None,
-                file_path: std::path::PathBuf::from(row.get::<_, String>(5)?),
+                file_path: PathBuf::from(row.get::<_, String>(5)?),
                 tags,
                 word_count: 0,
                 sort_order: 0,
@@ -313,7 +323,7 @@ impl DatabaseManager {
                 note_type: NoteType::parse(&note_type_str).unwrap_or(NoteType::RichText),
                 content: row.get(4)?,
                 summary: None,
-                file_path: std::path::PathBuf::from(row.get::<_, String>(5)?),
+                file_path: PathBuf::from(row.get::<_, String>(5)?),
                 tags,
                 word_count: 0,
                 sort_order: 0,
@@ -407,7 +417,7 @@ impl DatabaseManager {
                 note_type: NoteType::parse(&note_type_str).unwrap_or(NoteType::RichText),
                 content: row.get(4)?,
                 summary: None,
-                file_path: std::path::PathBuf::from(row.get::<_, String>(5)?),
+                file_path: PathBuf::from(row.get::<_, String>(5)?),
                 tags,
                 word_count: 0,
                 sort_order: 0,
@@ -435,7 +445,7 @@ mod tests {
     use std::env;
 
     fn setup_test_db() -> (DatabaseManager, Workspace) {
-        let test_db_path = env::temp_dir().join(format!("test_notes_{}.db", uuid::Uuid::new_v4()));
+        let test_db_path = env::temp_dir().join(format!("test_notes_{}.db", Uuid::new_v4()));
         let db = DatabaseManager::new(test_db_path).unwrap();
 
         let workspace = Workspace::new("Test Workspace".to_string(), None);
@@ -452,7 +462,7 @@ mod tests {
             "Test Note".to_string(),
             NoteType::Markdown,
             "# Test Content".to_string(),
-            std::path::PathBuf::from("/tmp/test.md"),
+            PathBuf::from("/tmp/test.md"),
         );
 
         db.create_note(&note).unwrap();
@@ -474,14 +484,14 @@ mod tests {
             "Note 1".to_string(),
             NoteType::RichText,
             "Content 1".to_string(),
-            std::path::PathBuf::from("/tmp/note1.txt"),
+            PathBuf::from("/tmp/note1.txt"),
         );
         let note2 = Note::new(
             workspace.id.clone(),
             "Note 2".to_string(),
             NoteType::Code,
             "Content 2".to_string(),
-            std::path::PathBuf::from("/tmp/note2.txt"),
+            PathBuf::from("/tmp/note2.txt"),
         );
 
         db.create_note(&note1).unwrap();
@@ -499,7 +509,7 @@ mod tests {
             "Original Title".to_string(),
             NoteType::Markdown,
             "Original content".to_string(),
-            std::path::PathBuf::from("/tmp/note.md"),
+            PathBuf::from("/tmp/note.md"),
         );
 
         db.create_note(&note).unwrap();
@@ -521,7 +531,7 @@ mod tests {
             "Tagged Note".to_string(),
             NoteType::Markdown,
             "Content".to_string(),
-            std::path::PathBuf::from("/tmp/note.md"),
+            PathBuf::from("/tmp/note.md"),
         );
 
         db.create_note(&note).unwrap();

@@ -11,7 +11,7 @@ use crate::app_state::DatabaseManager;
 pub enum CloneStatus {
     Pending,
     Cloning,
-    Cloned,
+    Completed,
     Failed,
 }
 
@@ -20,7 +20,7 @@ impl CloneStatus {
         match self {
             CloneStatus::Pending => "pending",
             CloneStatus::Cloning => "cloning",
-            CloneStatus::Cloned => "cloned",
+            CloneStatus::Completed => "completed",
             CloneStatus::Failed => "failed",
         }
     }
@@ -29,7 +29,7 @@ impl CloneStatus {
         match s {
             "pending" => Some(CloneStatus::Pending),
             "cloning" => Some(CloneStatus::Cloning),
-            "cloned" => Some(CloneStatus::Cloned),
+            "completed" => Some(CloneStatus::Completed),
             "failed" => Some(CloneStatus::Failed),
             _ => None,
         }
@@ -43,7 +43,6 @@ pub enum IndexStatus {
     Indexing,
     Indexed,
     Failed,
-    Outdated,
 }
 
 impl IndexStatus {
@@ -53,7 +52,6 @@ impl IndexStatus {
             IndexStatus::Indexing => "indexing",
             IndexStatus::Indexed => "indexed",
             IndexStatus::Failed => "failed",
-            IndexStatus::Outdated => "outdated",
         }
     }
 
@@ -63,7 +61,6 @@ impl IndexStatus {
             "indexing" => Some(IndexStatus::Indexing),
             "indexed" => Some(IndexStatus::Indexed),
             "failed" => Some(IndexStatus::Failed),
-            "outdated" => Some(IndexStatus::Outdated),
             _ => None,
         }
     }
@@ -86,6 +83,8 @@ pub struct GitRepository {
     pub index_status: IndexStatus,
     pub indexed_at: Option<i64>,
     pub file_count: i32,
+    pub symbol_count: i32,
+    pub vector_count: i32,
     pub is_archived: bool,
     pub created_at: i64,
     pub updated_at: i64,
@@ -115,6 +114,8 @@ impl GitRepository {
             index_status: IndexStatus::NotIndexed,
             indexed_at: None,
             file_count: 0,
+            symbol_count: 0,
+            vector_count: 0,
             is_archived: false,
             created_at: now,
             updated_at: now,
@@ -130,8 +131,8 @@ impl DatabaseManager {
         let conn = conn_arc.lock().unwrap();
         conn.execute(
             "INSERT INTO git_repositories
-             (id, workspace_id, name, remote_url, local_path, branch, last_commit_hash, last_synced_at, created_at, updated_at)
-             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10)",
+             (id, workspace_id, name, remote_url, local_path, branch, default_branch, last_commit_hash, last_synced_at, clone_status, clone_progress, index_status, indexed_at, file_count, symbol_count, vector_count, is_archived, created_at, updated_at)
+             VALUES (?1, ?2, ?3, ?4, ?5, ?6, ?7, ?8, ?9, ?10, ?11, ?12, ?13, ?14, ?15, ?16, ?17, ?18, ?19)",
             params![
                 repo.id,
                 repo.workspace_id,
@@ -139,8 +140,17 @@ impl DatabaseManager {
                 repo.remote_url,
                 repo.local_path.to_str().unwrap(),
                 repo.branch,
+                repo.default_branch,
                 repo.last_commit_hash,
                 repo.last_synced_at,
+                repo.clone_status.as_str(),
+                repo.clone_progress,
+                repo.index_status.as_str(),
+                repo.indexed_at,
+                repo.file_count,
+                repo.symbol_count,
+                repo.vector_count,
+                repo.is_archived as i32,
                 repo.created_at,
                 repo.updated_at,
             ],
@@ -153,12 +163,15 @@ impl DatabaseManager {
         let conn_arc = self.conn();
         let conn = conn_arc.lock().unwrap();
         let mut stmt = conn.prepare(
-            "SELECT id, workspace_id, name, remote_url, local_path, branch, last_commit_hash, last_synced_at, created_at, updated_at
+            "SELECT id, workspace_id, name, remote_url, local_path, branch, default_branch, last_commit_hash, last_synced_at, clone_status, clone_progress, index_status, indexed_at, file_count, symbol_count, vector_count, is_archived, created_at, updated_at
              FROM git_repositories WHERE id = ?1",
         )?;
 
         let mut rows = stmt.query(params![id])?;
         if let Some(row) = rows.next()? {
+            let clone_status_str: String = row.get(9)?;
+            let index_status_str: String = row.get(11)?;
+
             Ok(Some(GitRepository {
                 id: row.get(0)?,
                 workspace_id: row.get(1)?,
@@ -166,17 +179,19 @@ impl DatabaseManager {
                 remote_url: row.get(3)?,
                 local_path: std::path::PathBuf::from(row.get::<_, String>(4)?),
                 branch: row.get(5)?,
-                default_branch: None,
-                last_commit_hash: row.get(6)?,
-                last_synced_at: row.get(7)?,
-                clone_status: CloneStatus::Pending,
-                clone_progress: 0,
-                index_status: IndexStatus::NotIndexed,
-                indexed_at: None,
-                file_count: 0,
-                is_archived: false,
-                created_at: row.get(8)?,
-                updated_at: row.get(9)?,
+                default_branch: row.get(6)?,
+                last_commit_hash: row.get(7)?,
+                last_synced_at: row.get(8)?,
+                clone_status: CloneStatus::parse(&clone_status_str).unwrap_or(CloneStatus::Pending),
+                clone_progress: row.get(10)?,
+                index_status: IndexStatus::parse(&index_status_str).unwrap_or(IndexStatus::NotIndexed),
+                indexed_at: row.get(12)?,
+                file_count: row.get(13)?,
+                symbol_count: row.get(14)?,
+                vector_count: row.get(15)?,
+                is_archived: row.get::<_, i32>(16)? != 0,
+                created_at: row.get(17)?,
+                updated_at: row.get(18)?,
             }))
         } else {
             Ok(None)
@@ -188,11 +203,14 @@ impl DatabaseManager {
         let conn_arc = self.conn();
         let conn = conn_arc.lock().unwrap();
         let mut stmt = conn.prepare(
-            "SELECT id, workspace_id, name, remote_url, local_path, branch, last_commit_hash, last_synced_at, created_at, updated_at
+            "SELECT id, workspace_id, name, remote_url, local_path, branch, default_branch, last_commit_hash, last_synced_at, clone_status, clone_progress, index_status, indexed_at, file_count, symbol_count, vector_count, is_archived, created_at, updated_at
              FROM git_repositories WHERE workspace_id = ?1 ORDER BY updated_at DESC",
         )?;
 
         let rows = stmt.query_map(params![workspace_id], |row| {
+            let clone_status_str: String = row.get(9)?;
+            let index_status_str: String = row.get(11)?;
+
             Ok(GitRepository {
                 id: row.get(0)?,
                 workspace_id: row.get(1)?,
@@ -200,17 +218,19 @@ impl DatabaseManager {
                 remote_url: row.get(3)?,
                 local_path: std::path::PathBuf::from(row.get::<_, String>(4)?),
                 branch: row.get(5)?,
-                default_branch: None,
-                last_commit_hash: row.get(6)?,
-                last_synced_at: row.get(7)?,
-                clone_status: CloneStatus::Pending,
-                clone_progress: 0,
-                index_status: IndexStatus::NotIndexed,
-                indexed_at: None,
-                file_count: 0,
-                is_archived: false,
-                created_at: row.get(8)?,
-                updated_at: row.get(9)?,
+                default_branch: row.get(6)?,
+                last_commit_hash: row.get(7)?,
+                last_synced_at: row.get(8)?,
+                clone_status: CloneStatus::parse(&clone_status_str).unwrap_or(CloneStatus::Pending),
+                clone_progress: row.get(10)?,
+                index_status: IndexStatus::parse(&index_status_str).unwrap_or(IndexStatus::NotIndexed),
+                indexed_at: row.get(12)?,
+                file_count: row.get(13)?,
+                symbol_count: row.get(14)?,
+                vector_count: row.get(15)?,
+                is_archived: row.get::<_, i32>(16)? != 0,
+                created_at: row.get(17)?,
+                updated_at: row.get(18)?,
             })
         })?;
 
@@ -247,6 +267,67 @@ impl DatabaseManager {
              SET name = ?1, remote_url = ?2, branch = ?3, updated_at = ?4
              WHERE id = ?5",
             params![repo.name, repo.remote_url, repo.branch, updated_at, repo.id,],
+        )?;
+        Ok(())
+    }
+
+    /// Update Git repository clone status
+    pub fn update_git_repository_clone_status(
+        &self,
+        repo_id: &str,
+        status: CloneStatus,
+        progress: i32,
+    ) -> SqliteResult<()> {
+        let conn_arc = self.conn();
+        let conn = conn_arc.lock().unwrap();
+        let updated_at = Utc::now().timestamp_millis();
+
+        conn.execute(
+            "UPDATE git_repositories
+             SET clone_status = ?1, clone_progress = ?2, updated_at = ?3
+             WHERE id = ?4",
+            params![status.as_str(), progress, updated_at, repo_id],
+        )?;
+        Ok(())
+    }
+
+    /// Update Git repository index status
+    pub fn update_git_repository_index_status(
+        &self,
+        repo_id: &str,
+        status: IndexStatus,
+        indexed_at: Option<i64>,
+    ) -> SqliteResult<()> {
+        let conn_arc = self.conn();
+        let conn = conn_arc.lock().unwrap();
+        let updated_at = Utc::now().timestamp_millis();
+
+        conn.execute(
+            "UPDATE git_repositories
+             SET index_status = ?1, indexed_at = ?2, updated_at = ?3
+             WHERE id = ?4",
+            params![status.as_str(), indexed_at, updated_at, repo_id],
+        )?;
+        Ok(())
+    }
+
+    /// Update Git repository statistics
+    pub fn update_git_repository_stats(
+        &self,
+        repo_id: &str,
+        file_count: i32,
+        symbol_count: i32,
+        vector_count: i32,
+    ) -> SqliteResult<()> {
+        let conn_arc = self.conn();
+        let conn = conn_arc.lock().unwrap();
+        let updated_at = Utc::now().timestamp_millis();
+
+        conn.execute(
+            "UPDATE git_repositories
+             SET file_count = ?1, symbol_count = ?2, vector_count = ?3, updated_at = ?4
+             WHERE id = ?5",
+            params![file_count, symbol_count, vector_count, updated_at, repo_id],
         )?;
         Ok(())
     }
