@@ -1,4 +1,5 @@
 <!-- OPENSPEC:START -->
+
 # OpenSpec 使用说明
 
 这些说明适用于在此项目中工作的AI助手。
@@ -6,6 +7,7 @@
 ## 语言偏好设置
 
 **默认使用中文**：除非明确说明使用英文，否则所有输出都应使用中文，包括：
+
 - 文档内容
 - 代码注释
 - 提交信息
@@ -14,11 +16,13 @@
 ## 工作流程
 
 当请求满足以下条件时，始终打开`@/openspec/AGENTS.md`：
+
 - 提及规划或提案（如提案、规范、变更、计划等词语）
 - 引入新功能、重大变更、架构变更或大型性能/安全工作时
 - 听起来不明确，需要在编码前了解权威规范时
 
 使用`@/openspec/AGENTS.md`了解：
+
 - 如何创建和应用变更提案
 - 规范格式和约定
 - 项目结构和指南
@@ -113,13 +117,13 @@ pnpm dev
 
 # 启动单个组件
 pnpm dev:web        # React 前端 (http://localhost:1420)
-pnpm dev:server     # Node.js 服务 (http://localhost:4500)
+pnpm dev:node     # Node.js 服务 (http://localhost:4500)
 pnpm dev:app        # Tauri 应用 (无文件监听)
 
 # 构建组件
 pnpm build:all      # 构建服务 + 应用
 pnpm build:web      # 构建 React 前端
-pnpm build:server   # 构建 Node.js 服务
+pnpm build:node     # 构建 Node.js 服务
 pnpm build:app      # 构建 Tauri 桌面应用
 ```
 
@@ -194,6 +198,13 @@ pnpm --filter open-node type-check
 **错误处理:**
 
 - 使用结构化日志: `logger.info({ id }, 'Deleting workspace')`
+- 日志级别支持: trace/debug/info/warn/error
+- 日志环境变量配置:
+  - `LOG_LEVEL`: trace/debug/info/warn/error (默认: debug 开发环境, info 生产环境)
+  - `LOG_TARGET`: console/file/both (默认: both 开发环境, file 生产环境)
+  - `LOG_DIR`: 日志目录 (默认: `~/.open-context/logs/`)
+  - `LOG_RETENTION_DAYS`: 日志保留天数 (默认: 7)
+- 日志文件轮转: 按天分文件，自动清理过期日志
 - 自然传播错误 (最少 try/catch)
 - 服务方法返回 `null` 表示未找到
 - 当前无自定义错误类 (避免过度设计)

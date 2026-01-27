@@ -39,6 +39,9 @@
 ├── workspace/      # 工作空间数据
 ├── files/          # 文件索引数据
 ├── logs/           # 应用日志
+│   ├── open-app-YYYY-MM-DD.log    # Tauri 应用日志
+│   ├── open-node-YYYY-MM-DD.log   # Node.js 服务日志
+│   └── open-web-YYYY-MM-DD.log    # React 前端日志
 ├── plugins/        # 插件配置
 ├── commands/       # 命令历史/配置
 ├── skills/         # Skills 数据

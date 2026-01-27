@@ -1,84 +1,86 @@
-/**
- * 日志级别常量
- */
-const logLevel = {
-  LOG: 0,
-  INFO: 1,
-  WARN: 2,
-  ERROR: 3,
-  SILENT: 4
+import { invoke } from '@tauri-apps/api/core';
+
+const LOG_LEVEL = {
+  TRACE: 0,
+  DEBUG: 1,
+  INFO: 2,
+  WARN: 3,
+  ERROR: 4,
+  SILENT: 5
 } as const;
 
-export type LogLevel = (typeof logLevel)[keyof typeof logLevel];
+export type LogLevel = (typeof LOG_LEVEL)[keyof typeof LOG_LEVEL];
 
-/**
- * 当前日志级别，生产环境默认过滤log级别
- */
-let currentLevel: LogLevel = import.meta.env.PROD ? logLevel.INFO : logLevel.LOG;
+let currentLevel: LogLevel = import.meta.env.DEV ? LOG_LEVEL.DEBUG : LOG_LEVEL.INFO;
 
-/**
- * 设置日志级别
- */
-function setLevel(level: LogLevel): void {
+async function setLevel(level: LogLevel) {
   currentLevel = level;
+  await invoke('plugin:log|set_level', { level: level.toString() });
 }
 
-/**
- * 获取当前日志级别
- */
-function getLevel(): LogLevel {
+async function getLevel() {
   return currentLevel;
 }
 
-/**
- * 格式化日志前缀
- */
-function formatPrefix(level: string): string {
+async function formatPrefix(level: string) {
   const timestamp = new Date().toISOString();
   return `[${timestamp}] [${level}]`;
 }
 
-/**
- * 输出log级别日志
- */
-function log(...args: unknown[]): void {
-  if (currentLevel <= logLevel.LOG) {
-    console.log(formatPrefix('LOG'), ...args);
+async function log(...args: unknown[]) {
+  if (currentLevel <= LOG_LEVEL.TRACE) {
+    const prefix = await formatPrefix('LOG');
+    console.log(prefix, ...args);
   }
 }
 
-/**
- * 输出info级别日志
- */
-function info(...args: unknown[]): void {
-  if (currentLevel <= logLevel.INFO) {
-    console.info(formatPrefix('INFO'), ...args);
+async function trace(...args: unknown[]) {
+  if (currentLevel <= LOG_LEVEL.TRACE) {
+    const prefix = await formatPrefix('TRACE');
+    console.log(prefix, ...args);
+    await invoke('plugin:log|trace', { message: args.map(String).join(' ') });
   }
 }
 
-/**
- * 输出warn级别日志
- */
-function warn(...args: unknown[]): void {
-  if (currentLevel <= logLevel.WARN) {
-    console.warn(formatPrefix('WARN'), ...args);
+async function debug(...args: unknown[]) {
+  if (currentLevel <= LOG_LEVEL.DEBUG) {
+    const prefix = await formatPrefix('DEBUG');
+    console.debug(prefix, ...args);
+    await invoke('plugin:log|debug', { message: args.map(String).join(' ') });
   }
 }
 
-/**
- * 输出error级别日志
- */
-function error(...args: unknown[]): void {
-  if (currentLevel <= logLevel.ERROR) {
-    console.error(formatPrefix('ERROR'), ...args);
+async function info(...args: unknown[]) {
+  if (currentLevel <= LOG_LEVEL.INFO) {
+    const prefix = await formatPrefix('INFO');
+    console.info(prefix, ...args);
+    await invoke('plugin:log|info', { message: args.map(String).join(' ') });
+  }
+}
+
+async function warn(...args: unknown[]) {
+  if (currentLevel <= LOG_LEVEL.WARN) {
+    const prefix = await formatPrefix('WARN');
+    console.warn(prefix, ...args);
+    await invoke('plugin:log|warn', { message: args.map(String).join(' ') });
+  }
+}
+
+async function error(...args: unknown[]) {
+  if (currentLevel <= LOG_LEVEL.ERROR) {
+    const prefix = await formatPrefix('ERROR');
+    console.error(prefix, ...args);
+    await invoke('plugin:log|error', { message: args.map(String).join(' ') });
   }
 }
 
 export const logger = {
-  logLevel,
+  logLevel: LOG_LEVEL,
   setLevel,
   getLevel,
   log,
+  trace,
+  debug,
   info,
   warn,
   error

@@ -49,8 +49,7 @@ export class MarkdownIndexer {
     return this.buildChunks(sections, params);
   }
 
-  indexFile(text: string, filePath: string): MarkdownChunk[] {
-    const sections = this.extractSections(text);
+  indexFile(_text: string, _filePath: string): MarkdownChunk[] {
     return [];
   }
 

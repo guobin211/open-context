@@ -70,7 +70,7 @@ pnpm dev
 
 # 单独启动组件
 pnpm dev:web       # 前端 (http://localhost:1420)
-pnpm dev:server    # Node.js 服务器 (http://localhost:4500)
+pnpm dev:node    # Node.js 服务器 (http://localhost:4500)
 pnpm dev:app       # Tauri 桌面应用
 ```
 

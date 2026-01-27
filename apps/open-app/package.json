@@ -5,7 +5,6 @@
   "name": "open-app",
   "private": true,
   "scripts": {
-    "build:all": "pnpm build:server && pnpm build:app",
     "build:app": "tauri build",
     "build:web": "cd ./../../ && pnpm --filter open-web build",
     "dev": "pnpm dev:all",

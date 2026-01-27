@@ -79,7 +79,7 @@ docker run -p 6333:6333 qdrant/qdrant
 pnpm dev
 
 # 或从根目录启动
-pnpm dev:server
+pnpm dev:node
 ```
 
 服务将在 `http://localhost:4500` 启动。
