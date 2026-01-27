@@ -3,8 +3,8 @@
 import Database from 'better-sqlite3';
 import { join } from 'node:path';
 import { StoragePaths, ensureStorageDir } from '../config/paths';
-import { SurrealDBService } from './surrealdb-client';
-import { QdrantService } from './qdrant-client';
+import { SurrealDBService } from './surreal/surreal-client';
+import { QdrantService } from './qdrant/qdrant-client';
 import logger from '../utils/logger';
 
 export interface DatabaseHealth {

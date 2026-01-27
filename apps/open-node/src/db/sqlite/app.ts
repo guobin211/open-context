@@ -3,8 +3,8 @@
 
 import Database from 'better-sqlite3';
 import { join } from 'node:path';
-import { StoragePaths, ensureStorageDir } from '../config/paths';
-import logger from '../utils/logger';
+import { ensureStorageDir, StoragePaths } from '../../config/paths';
+import logger from '../../utils/logger';
 
 // Workspace 表接口
 export interface WorkspaceRow {
@@ -477,6 +477,7 @@ export class AppDatabase {
   }
 
   upsertIndexMetadata(metadata: IndexMetadataRow): void {
+    // language=SQLite
     const stmt = this.connection.prepare(`
       INSERT INTO index_metadata (id, repo_id, file_path, content_hash, last_indexed_at, symbol_count, language, file_size)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?)
@@ -501,6 +502,7 @@ export class AppDatabase {
   }
 
   batchUpsertIndexMetadata(metadataList: IndexMetadataRow[]): void {
+    // language=SQLite
     const stmt = this.connection.prepare(`
       INSERT INTO index_metadata (id, repo_id, file_path, content_hash, last_indexed_at, symbol_count, language, file_size)
       VALUES (?, ?, ?, ?, ?, ?, ?, ?)

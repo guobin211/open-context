@@ -1,7 +1,7 @@
 import { QdrantClient } from '@qdrant/js-client-rest';
-import { DefaultConfig } from '../config';
-import { SymbolPayload } from '../types';
-import logger from '../utils/logger';
+import { DefaultConfig } from '../../config';
+import { SymbolPayload } from '../../types';
+import logger from '../../utils/logger';
 
 const COLLECTION_NAME = 'code_symbols';
 const VECTOR_SIZE = parseInt(process.env.VECTOR_SIZE || String(DefaultConfig.qdrant.embeddingDim), 10);

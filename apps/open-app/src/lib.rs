@@ -4,18 +4,18 @@ pub mod app_plugins;
 pub mod app_service;
 pub mod app_state;
 
+use crate::app_state::init_app_dirs;
 use app_service::TaskManager;
 use app_state::AppState;
 use futures::lock::Mutex;
 use tauri::{Context, Wry};
-use crate::app_state::init_app_dirs;
 
 pub type TauriBuilder = tauri::Builder<Wry>;
 
 /// Run the application
 pub fn run() {
     let app_state = AppState::new().expect("Failed to initialize app state");
-    init_app_dirs();
+    init_app_dirs().expect("Failed to initialize app dirs");
     let task_manager = TaskManager::new();
 
     let mut builder = tauri::Builder::default();

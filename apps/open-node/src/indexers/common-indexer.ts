@@ -2,7 +2,7 @@ import { CodeIndexer, type IndexParams } from '@/indexers/impl/code-indexer';
 import { CodeChunk } from './core/code-chunk-builder';
 import { GraphEdge } from './core/code-graph-builder';
 import { MarkdownChunk, MarkdownIndexer } from './impl/markdown-indexer';
-import { getSurrealDBInstance, SurrealSymbol } from '@/db/surrealdb-client';
+import { getSurrealDBInstance, SurrealSymbol } from '@/db/surreal';
 import { generateContentHash, generateShortId } from '@/utils/hash';
 import { SupportLanguage } from './core/ast-parser';
 import { GitService } from '@/utils/git';

@@ -1,11 +1,11 @@
-import { SQLiteDBService } from './index-db';
-import { SurrealDBService, SurrealSymbol } from './surrealdb-client';
+import { SQLiteIndexService } from './sqlite';
+import { SurrealDBService, SurrealSymbol } from './surreal';
 import { SymbolPayload, EdgeType } from '../types';
 import logger from '../utils/logger';
 
 export class DataSyncService {
   constructor(
-    private sqliteDb: SQLiteDBService,
+    private sqliteDb: SQLiteIndexService,
     private surrealDb: SurrealDBService
   ) {}
 
@@ -74,7 +74,7 @@ export class DataSyncService {
 
 let instance: DataSyncService | null = null;
 
-export function getDataSyncService(sqliteDb: SQLiteDBService, surrealDb: SurrealDBService): DataSyncService {
+export function getDataSyncService(sqliteDb: SQLiteIndexService, surrealDb: SurrealDBService): DataSyncService {
   if (!instance) {
     instance = new DataSyncService(sqliteDb, surrealDb);
   }

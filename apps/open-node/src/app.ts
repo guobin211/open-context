@@ -7,6 +7,7 @@ import { getSQLiteDBInstance, getQdrantInstance, getSurrealDBInstance } from './
 import { GraphService } from './services';
 import router from './api/router';
 import logger from './utils/logger';
+import { getSurrealEmbedInstance } from './db/surreal';
 
 dotenv.config();
 
@@ -38,6 +39,9 @@ async function main() {
 
   const qdrant = getQdrantInstance();
   await qdrant.init();
+
+  const surrealEmbed = getSurrealEmbedInstance();
+  await surrealEmbed.connect();
 
   const surrealdb = getSurrealDBInstance();
   await surrealdb.connect();

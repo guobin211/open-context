@@ -1,4 +1,4 @@
-import { getSurrealDBInstance } from '../db/surrealdb-client';
+import { getSurrealDBInstance } from '../db/surreal';
 import { EdgeType, DependencyResult, TraverseResult } from '../types';
 import logger from '../utils/logger';
 

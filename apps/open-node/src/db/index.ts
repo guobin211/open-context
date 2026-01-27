@@ -1,14 +1,14 @@
 // 数据库模块导出
 
 // 核心数据库
-export * from './app-db';
-export * from './index-db';
+export * from './sqlite/app';
+export * from './sqlite/index-db';
 
 // 向量数据库
-export * from './qdrant-client';
+export * from './qdrant/qdrant-client';
 
 // 图数据库
-export * from './surrealdb-client';
+export * from './surreal/surreal-client';
 
 // 数据同步
 export * from './data-sync-service';

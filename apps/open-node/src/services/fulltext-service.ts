@@ -1,4 +1,4 @@
-import { getSurrealDBInstance, FullTextSearchOptions, FullTextSearchResult } from '../db/surrealdb-client';
+import { getSurrealDBInstance, FullTextSearchOptions, FullTextSearchResult } from '../db/surreal';
 import logger from '../utils/logger';
 
 export interface FullTextServiceSearchOptions {

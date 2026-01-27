@@ -383,10 +383,7 @@ impl DatabaseManager {
     pub fn delete_index_metadata(&self, id: &str) -> SqliteResult<()> {
         let conn_arc = self.conn();
         let conn = conn_arc.lock().unwrap();
-        conn.execute(
-            "DELETE FROM index_metadata WHERE id = ?1",
-            params![id],
-        )?;
+        conn.execute("DELETE FROM index_metadata WHERE id = ?1", params![id])?;
         Ok(())
     }
 

@@ -184,7 +184,8 @@ impl DatabaseManager {
                 last_synced_at: row.get(8)?,
                 clone_status: CloneStatus::parse(&clone_status_str).unwrap_or(CloneStatus::Pending),
                 clone_progress: row.get(10)?,
-                index_status: IndexStatus::parse(&index_status_str).unwrap_or(IndexStatus::NotIndexed),
+                index_status: IndexStatus::parse(&index_status_str)
+                    .unwrap_or(IndexStatus::NotIndexed),
                 indexed_at: row.get(12)?,
                 file_count: row.get(13)?,
                 symbol_count: row.get(14)?,
@@ -223,7 +224,8 @@ impl DatabaseManager {
                 last_synced_at: row.get(8)?,
                 clone_status: CloneStatus::parse(&clone_status_str).unwrap_or(CloneStatus::Pending),
                 clone_progress: row.get(10)?,
-                index_status: IndexStatus::parse(&index_status_str).unwrap_or(IndexStatus::NotIndexed),
+                index_status: IndexStatus::parse(&index_status_str)
+                    .unwrap_or(IndexStatus::NotIndexed),
                 indexed_at: row.get(12)?,
                 file_count: row.get(13)?,
                 symbol_count: row.get(14)?,

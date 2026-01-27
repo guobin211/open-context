@@ -35,10 +35,10 @@ export function getBaseDir(): string {
  * 子目录路径配置
  */
 export const StoragePaths = {
+  baseDir: () => getBaseDir(),
   // 基础目录
   bin: () => join(getBaseDir(), 'bin'),
   cache: () => join(getBaseDir(), 'cache'),
-  config: () => join(getBaseDir(), 'config'),
   logs: () => join(getBaseDir(), 'logs'),
 
   // 数据库目录
@@ -55,8 +55,6 @@ export const StoragePaths = {
   plugins: () => join(getBaseDir(), 'plugins'),
   commands: () => join(getBaseDir(), 'commands'),
   skills: () => join(getBaseDir(), 'skills'),
-  todos: () => join(getBaseDir(), 'todos'),
-  projects: () => join(getBaseDir(), 'projects'),
   rules: () => join(getBaseDir(), 'rules'),
   hooks: () => join(getBaseDir(), 'hooks'),
 
@@ -68,7 +66,7 @@ export const StoragePaths = {
  * 获取配置文件路径
  */
 export function getConfigFilePath(): string {
-  return join(StoragePaths.config(), 'config.json');
+  return join(StoragePaths.baseDir(), 'config.json');
 }
 
 /**

@@ -3,8 +3,7 @@ import { getConfigFilePath, DefaultConfig } from './paths';
 import logger from '../utils/logger';
 
 export interface SqliteConfig {
-  workspace_db: string;
-  repository_db: string;
+  app_db: string;
   symbol_db: string;
   edge_db: string;
   reverse_edge_db: string;
@@ -98,8 +97,7 @@ export class ConfigLoader {
       version: '0.1.0',
       database: {
         sqlite: {
-          workspace_db: '~/.open-context/database/sqlite/workspace.db',
-          repository_db: '~/.open-context/database/sqlite/repository.db',
+          app_db: '~/.open-context/database/sqlite/app.db',
           symbol_db: '~/.open-context/database/sqlite/symbol.db',
           edge_db: '~/.open-context/database/sqlite/edge.db',
           reverse_edge_db: '~/.open-context/database/sqlite/reverse_edge.db',
