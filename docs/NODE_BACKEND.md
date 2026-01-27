@@ -31,9 +31,9 @@
         │               │
         ▼               ▼
 ┌───────────────┐   ┌───────────────────┐
-│   Qdrant      │   │   Graph System    │
-│  (Vectors)    │   │  SurrealDB +      │
-│               │   │  LevelDB          │
+│   Qdrant       │    │   Graph System     │
+│  (Vectors)     │    │  SurrealDB         │
+│                │    │                    │
 └───────────────┘   └───────────────────┘
 ```
 
@@ -238,70 +238,109 @@ filter: {
 
 ---
 
-## 四、图数据库（SurrealDB + LevelDB）
+## 四、图数据库（SurrealDB）
 
-### SurrealDB 配置
+### 技术栈
+
+- **库**：`@surrealdb/node` (1.0.0-beta.3)
+- **存储模式**：嵌入式文件存储 / 服务器模式
+- **数据路径**：`~/.open-context/database/surrealdb/`
+
+### 连接配置
 
 ```typescript
-// 命名空间和数据库
-NAMESPACE: open_context
-DATABASE: code_graph
+import Surreal from '@surrealdb/node';
 
-// 存储路径
-~/.open-context/database/surrealdb/
+const db = new Surreal();
+
+// 嵌入式模式（推荐）
+await db.connect('file://~/.open-context/database/surrealdb/data.db');
+
+// 服务器模式
+// await db.connect('http://localhost:8000');
+// await db.signin({ username: 'root', password: 'root' });
+
+await db.use({ namespace: 'code_index', database: 'open_context' });
 ```
 
-### 表结构
+### 数据模型
 
 #### symbols 表
 
 ```sql
 DEFINE TABLE symbols SCHEMAFULL;
-DEFINE FIELD symbol_id ON symbols TYPE string;
-DEFINE FIELD workspace_id ON symbols TYPE string;
-DEFINE FIELD repo_id ON symbols TYPE string;
-DEFINE FIELD file_path ON symbols TYPE string;
-DEFINE FIELD symbol_name ON symbols TYPE string;
-DEFINE FIELD symbol_kind ON symbols TYPE string;
-DEFINE FIELD code ON symbols TYPE string;
+
+DEFINE FIELD symbol_id ON symbols TYPE string ASSERT $value != NONE;
+DEFINE FIELD workspace_id ON symbols TYPE string ASSERT $value != NONE;
+DEFINE FIELD repo_id ON symbols TYPE string ASSERT $value != NONE;
+DEFINE FIELD file_path ON symbols TYPE string ASSERT $value != NONE;
+DEFINE FIELD symbol_name ON symbols TYPE string ASSERT $value != NONE;
+DEFINE FIELD symbol_kind ON symbols TYPE string ASSERT $value != NONE;
+DEFINE FIELD code ON symbols TYPE string ASSERT $value != NONE;
+DEFINE FIELD language ON symbols TYPE string ASSERT $value != NONE;
+
+-- 索引
+DEFINE INDEX symbol_id_idx ON symbols FIELDS symbol_id UNIQUE;
+DEFINE INDEX workspace_repo_idx ON symbols FIELDS workspace_id, repo_id;
 
 -- 全文搜索索引
-DEFINE INDEX symbol_name_search ON symbols FIELDS symbol_name SEARCH ANALYZER BM25;
-DEFINE INDEX code_search ON symbols FIELDS code SEARCH ANALYZER BM25;
+DEFINE INDEX symbol_name_search ON symbols FIELDS symbol_name SEARCH ANALYZER simple BM25;
+DEFINE INDEX code_search ON symbols FIELDS code SEARCH ANALYZER simple BM25;
 ```
 
-#### relations 表
+#### 关系表
 
 ```sql
-DEFINE TABLE relations SCHEMAFULL;
-DEFINE FIELD from_symbol_id ON relations TYPE string;
-DEFINE FIELD to_symbol_id ON relations TYPE string;
-DEFINE FIELD relation_type ON relations TYPE string;
-DEFINE FIELD confidence ON relations TYPE number;
-
-DEFINE INDEX from_to ON relations COLUMNS from_symbol_id, to_symbol_id UNIQUE;
+-- IMPORTS/CALLS/IMPLEMENTS/EXTENDS/USES/REFERENCES
+DEFINE TABLE calls SCHEMAFULL TYPE RELATION IN symbols OUT symbols;
+DEFINE FIELD confidence ON calls TYPE number DEFAULT 1.0;
+DEFINE FIELD created_at ON calls TYPE number DEFAULT time::now();
 ```
 
 ### 图查询示例
 
-```sql
--- 查找依赖
-SELECT to_symbol_id, relation_type, confidence
-FROM relations
-WHERE from_symbol_id = $symbol_id AND relation_type = 'CALLS';
+```typescript
+// 查找某个符号调用的所有函数
+const calls = await db.query(
+  `
+  SELECT ->calls->symbols.* AS called_functions
+  FROM symbols WHERE symbol_id = $symbolId
+`,
+  { symbolId }
+);
 
--- 图遍历（2层深度）
-CALL graph::traverse($from_id, 'outbound', { relation_type: 'CALLS' }, null, 2)
-RETURN path;
-```
+// 查找调用链（2层深度）
+const callChain = await db.query(
+  `
+  SELECT 
+    ->calls->symbols AS level1,
+    ->calls->symbols->calls->symbols AS level2
+  FROM symbols WHERE symbol_id = $symbolId
+`,
+  { symbolId }
+);
 
-### LevelDB 存储结构
+// 查找反向依赖（谁调用了这个函数）
+const callers = await db.query(
+  `
+  SELECT <-calls<-symbols.* AS caller_functions
+  FROM symbols WHERE symbol_id = $symbolId
+`,
+  { symbolId }
+);
 
-```
-~/.open-context/database/leveldb/
-├── main/           # 符号元数据
-├── edges/          # 正向边 edge:<from>:<type> -> [to1, to2]
-└── reverse-edges/  # 反向边 redge:<to>:<type> -> [from1, from2]
+// 全文搜索
+const searchResults = await db.query(
+  `
+  SELECT *, search::score(1) AS relevance
+  FROM symbols
+  WHERE workspace_id = $workspaceId
+    AND (symbol_name @1@ $query OR code @1@ $query)
+  ORDER BY relevance DESC
+  LIMIT 20
+`,
+  { workspaceId, query: 'authentication' }
+);
 ```
 
 ---
@@ -327,6 +366,7 @@ RETURN path;
 │   - function           │
 │   - class              │
 │   - method             │
+│   - interface          │
 └────────────┬───────────┘
              │
      ┌───────┴─────────┐
@@ -334,14 +374,14 @@ RETURN path;
 ┌───────────────┐   ┌───────────────┐
 │  Embedding    │   │  Graph Build  │
 │  → Qdrant     │   │  → SurrealDB  │
-└───────────────┘   │  → LevelDB    │
-                    └───────────────┘
+└───────────────┘   └───────────────┘
 ```
 
 ### 增量更新策略
 
-- **向量**：基于 `symbol_id + commit` 判断是否更新
-- **图**：文件级删除重建（删旧边 → 写新边）
+- **向量更新**：基于 `content_hash` 判断文件是否变化
+- **图更新**：删除旧符号及其关系，重建新符号和关系
+- **优化**：仅处理 Git diff 中变化的文件
 
 ---
 
@@ -389,50 +429,122 @@ POST /api/v1/query/code
 
 ---
 
-## 七、SurrealDB 使用
+## 七、代码示例
 
-### 初始化
+### SurrealDB 操作
 
 ```typescript
 import Surreal from '@surrealdb/node';
 
 const db = new Surreal();
-await db.connect('file://~/.open-context/database/surrealdb/data');
-await db.use('open_context', 'code_graph');
-```
+await db.connect('file://~/.open-context/database/surrealdb/data.db');
+await db.use({ namespace: 'code_index', database: 'open_context' });
 
-### CRUD 操作
+// 插入符号
+const [symbol] = await db.create('symbols', {
+  symbol_id: 'sym_123',
+  workspace_id: 'ws_456',
+  repo_id: 'repo_789',
+  symbol_name: 'getUserInfo',
+  symbol_kind: 'function',
+  code: 'function getUserInfo() { ... }',
+  language: 'typescript',
+  file_path: '/src/user.ts'
+});
 
-```typescript
-// 插入
-await db.insert('symbols', { symbol_id: '...', symbol_name: 'foo', ... });
+// 创建调用关系
+await db.query(
+  `
+  RELATE (symbols WHERE symbol_id = $from)->calls->(symbols WHERE symbol_id = $to)
+  SET confidence = 1.0, created_at = time::now()
+`,
+  { from: 'sym_123', to: 'sym_456' }
+);
 
-// 查询
-const symbols = await db.query(`
+// 查询符号
+const symbols = await db.query(
+  `
   SELECT * FROM symbols
-  WHERE workspace_id = $ws AND symbol_kind = $kind
-`, { ws: 'ws-123', kind: 'function' });
+  WHERE workspace_id = $wsId AND symbol_kind = $kind
+  LIMIT 20
+`,
+  { wsId: 'ws-123', kind: 'function' }
+);
 
-// 更新
-await db.merge('symbols:id', { importance: 0.9 });
+// 更新符号
+await db.merge('symbols:sym_123', {
+  importance: 0.9,
+  updated_at: Date.now()
+});
 
-// 删除
-await db.query('DELETE FROM symbols WHERE repo_id = $repo', { repo: 'repo-456' });
-```
+// 删除仓库的所有数据
+await db.query(
+  `
+  DELETE FROM symbols WHERE repo_id = $repoId;
+  DELETE FROM calls WHERE in.repo_id = $repoId OR out.repo_id = $repoId;
+`,
+  { repoId: 'repo-456' }
+);
 
-### 全文搜索
-
-```typescript
+// 全文搜索
 const results = await db.query(
   `
-  SELECT *, score::relevance(symbol_name) AS relevance
+  SELECT *, search::score(1) AS relevance
   FROM symbols
-  WHERE symbol_name SEARCH $query
+  WHERE symbol_name @1@ $query
   ORDER BY relevance DESC
   LIMIT 20
 `,
   { query: 'authentication' }
 );
+```
+
+### Qdrant 操作
+
+```typescript
+import { QdrantClient } from '@qdrant/js-client-rest';
+
+const client = new QdrantClient({ url: 'http://localhost:6333' });
+
+// 插入向量
+await client.upsert('code_symbols', {
+  points: [
+    {
+      id: 'sym_123',
+      vector: embedding, // [1024]维向量
+      payload: {
+        workspace_id: 'ws_456',
+        repo_id: 'repo_789',
+        symbol_id: 'sym_123',
+        symbol_name: 'getUserInfo',
+        symbol_kind: 'function',
+        language: 'typescript',
+        file_path: '/src/user.ts',
+        exported: true,
+        code: 'function getUserInfo() { ... }'
+      }
+    }
+  ]
+});
+
+// 语义搜索
+const results = await client.search('code_symbols', {
+  vector: queryEmbedding,
+  limit: 10,
+  filter: {
+    must: [
+      { key: 'workspace_id', match: { value: 'ws_456' } },
+      { key: 'symbol_kind', match: { any: ['function', 'method'] } }
+    ]
+  }
+});
+
+// 删除仓库的所有向量
+await client.delete('code_symbols', {
+  filter: {
+    must: [{ key: 'repo_id', match: { value: 'repo_789' } }]
+  }
+});
 ```
 
 ---

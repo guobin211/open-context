@@ -188,7 +188,10 @@ export class GraphService {
     }
   }
 
-  async searchRelated(options: { query: string; workspaceId: string }): Promise<Array<{ symbolId: string; pathLength: number }>> {
+  async searchRelated(options: {
+    query: string;
+    workspaceId: string;
+  }): Promise<Array<{ symbolId: string; pathLength: number }>> {
     const results = await this.surrealdb.fullTextSearch({
       query: options.query,
       workspaceId: options.workspaceId,
@@ -215,4 +218,3 @@ export class GraphService {
     return related;
   }
 }
-

@@ -82,12 +82,14 @@
 #### ✅ 已完成的核心功能
 
 **1. 重构核心索引器（100%）**
+
 - ✅ 实现三个细粒度索引 API：`indexFile`、`indexContent`、`indexGitRepo`
 - ✅ 内容哈希生成工具（xxhash）
 - ✅ 索引去重检测机制
 - 📄 代码位置：`apps/open-node/src/indexers/common-indexer.ts`
 
 **2. SurrealDB 存储层（100%）**
+
 - ✅ SurrealDB 客户端封装和 Schema 设计
 - ✅ 符号元数据表 + 关系边表（IMPORTS, CALLS, EXTENDS, etc.）
 - ✅ 全文索引（BM25 + ascii_analyzer）
@@ -97,6 +99,7 @@
 - 📄 代码位置：`apps/open-node/src/db/surrealdb-client.ts`
 
 **3. 服务层重构（100%）**
+
 - ✅ 全文检索服务（FullTextService）
 - ✅ RAG 混合查询（向量 + 全文 + 图）
 - ✅ 权重融合算法（默认：vector 0.6, fulltext 0.3, graph 0.1）
@@ -107,6 +110,7 @@
   - `apps/open-node/src/services/graph-service.ts` (完全重构)
 
 **4. API 端点（100%）**
+
 - ✅ `POST /api/v1/index/file` - 文件索引
 - ✅ `POST /api/v1/index/content` - 内容索引
 - ✅ `POST /api/v1/index/repo` - 仓库索引
@@ -115,6 +119,7 @@
 - 📄 代码位置：`apps/open-node/src/api/index-routes.ts`
 
 **5. 工具函数（100%）**
+
 - ✅ 内容哈希：`generateContentHash()`
 - ✅ 短 ID 生成：`generateShortId()`
 - 📄 代码位置：`apps/open-node/src/utils/hash.ts`
@@ -122,6 +127,7 @@
 #### ⚠️ 未完成/跳过的任务
 
 **1. GraphService 迁移（已完成）**
+
 - ✅ GraphService 已迁移到 SurrealDB，充分利用原生图查询能力
 - ✅ 新增方法：
   - `batchAddEdges()` - 批量添加边
@@ -130,10 +136,12 @@
 - ✅ 更新 IndexJob 和 RAGService 使用新 API
 
 **2. 数据迁移（跳过）**
+
 - [~] 按用户要求跳过 LevelDB → SurrealDB 数据迁移
 - 📝 说明：新数据直接写入 SurrealDB，无需迁移历史数据
 
 **3. 完整测试（跳过）**
+
 - [~] 按用户要求跳过单元测试和集成测试
 - ✅ 存在手动测试脚本：
   - `apps/open-node/scripts/test-indexer-apis.ts`
@@ -151,10 +159,12 @@
 #### 🎯 后续建议
 
 **优先级 P0（已完成）**
+
 - ✅ 实现 `SurrealDBService.findByFilePathAndHash()` 方法
 - ✅ 重构 GraphService 使用 SurrealDB 原生图查询
 
 **优先级 P1（生产就绪）**
+
 - 编写完整的单元测试和集成测试
 - 性能压力测试（10万+ 符号规模）
 - 优化 SurrealDB 图查询语法（修复 `queryGraphFromDB` 方法）
@@ -170,6 +180,7 @@
 5. **RESTful API**：4 个新端点，参数验证完备
 
 **核心代码文件**：
+
 - `apps/open-node/src/indexers/common-indexer.ts` (新增 200+ 行)
 - `apps/open-node/src/db/surrealdb-client.ts` (新增 370 行)
 - `apps/open-node/src/services/fulltext-service.ts` (新增 96 行)
@@ -180,11 +191,13 @@
 - `apps/open-node/src/jobs/index-job.ts` (更新使用 SurrealDB)
 
 **测试脚本**：
+
 - `apps/open-node/scripts/test-indexer-apis.ts`
 - `apps/open-node/scripts/test-surrealdb.ts`
 - `apps/open-node/scripts/test-graph-service.ts`
 
 **依赖包**：
+
 - `surrealdb` - SurrealDB 客户端
 - `@node-rs/xxhash` - 快速哈希算法（已有）
 
@@ -202,16 +215,19 @@
 6. ✅ **RESTful API** - 4 个新端点，参数验证完备
 
 **性能提升**：
+
 - 图查询从 LevelDB 多次读取改为 SurrealDB 原生图遍历
 - 支持全文检索（BM25）+ 向量检索的混合查询
 - 批量操作优化（batchAddEdges, batchUpsertSymbols）
 
 **代码质量**：
+
 - 新增代码 ~1000 行
 - 测试脚本验证通过
 - 类型安全，错误处理完善
 
 **后续优化方向**：
+
 - 编写完整的单元测试和集成测试
 - 性能压力测试（10万+ 符号规模）
 - 优化 SurrealDB 复杂图查询语法

@@ -1,5 +1,5 @@
 use chrono::Utc;
-use rusqlite::{params, Result as SqliteResult};
+use rusqlite::{Result as SqliteResult, params};
 use serde::{Deserialize, Serialize};
 use std::path::PathBuf;
 use uuid::Uuid;

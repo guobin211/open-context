@@ -163,11 +163,11 @@ open-context/
 
 Open-Context 采用 Tauri 混合架构，三层协作：
 
-| 模块              | 职责                              | 技术栈                  | 运行端口 |
-| ----------------- | --------------------------------- | ----------------------- | -------- |
-| **open-app**      | 桌面外壳，本地 FS 操作、系统调用  | Rust + Tauri 2.x        | -        |
-| **open-node**     | RAG 引擎，代码索引、向量检索      | Node.js + Hono          | 4500     |
-| **open-web**      | React UI，用户界面和交互          | React 19 + TanStack Router | 1420     |
+| 模块          | 职责                             | 技术栈                     | 运行端口 |
+| ------------- | -------------------------------- | -------------------------- | -------- |
+| **open-app**  | 桌面外壳，本地 FS 操作、系统调用 | Rust + Tauri 2.x           | -        |
+| **open-node** | RAG 引擎，代码索引、向量检索     | Node.js + Hono             | 4500     |
+| **open-web**  | React UI，用户界面和交互         | React 19 + TanStack Router | 1420     |
 
 ### 模块通信流程
 
@@ -181,6 +181,7 @@ Open-Context 采用 Tauri 混合架构，三层协作：
 ```
 
 详细架构文档请参考：
+
 - [AGENTS.md](./AGENTS.md) - 完整的项目架构和编码规范
 - [共享存储规范](./docs/SHARED_STORAGE.md) - 数据存储路径
 - [Tauri 端文档](./docs/APP_TAURI.md) - Tauri 命令和事件系统
@@ -359,13 +360,13 @@ pnpm fmt:js         # JavaScript/TypeScript (Prettier)
 
 ### 数据库技术栈
 
-| 数据库          | 用途                         | 位置                            |
-| --------------- | ---------------------------- | ------------------------------- |
-| **SQLite**      | 元数据、状态管理             | `database/app_state.db`         |
-| **LevelDB**     | 符号、依赖关系图（实时索引） | `database/leveldb/`             |
-| **SurrealDB**   | 全文检索、图数据库、关系查询 | `database/surrealdb/` 或远程    |
-| **Qdrant**      | 向量嵌入、语义搜索           | 独立部署或远程                  |
-| **Tauri Store** | 前端状态持久化               | `cache/*.store.json`            |
+| 数据库          | 用途                         | 位置                         |
+| --------------- | ---------------------------- | ---------------------------- |
+| **SQLite**      | 元数据、状态管理             | `database/app_state.db`      |
+| **LevelDB**     | 符号、依赖关系图（实时索引） | `database/leveldb/`          |
+| **SurrealDB**   | 全文检索、图数据库、关系查询 | `database/surrealdb/` 或远程 |
+| **Qdrant**      | 向量嵌入、语义搜索           | 独立部署或远程               |
+| **Tauri Store** | 前端状态持久化               | `cache/*.store.json`         |
 
 详细存储规范请参考 [docs/SHARED_STORAGE.md](./docs/SHARED_STORAGE.md)。
 
@@ -531,15 +532,15 @@ export class ServiceName {
 
 ## 配置文件
 
-| 文件                           | 说明                              |
-| ------------------------------ | --------------------------------- |
-| `tauri.conf.json`              | Tauri 应用配置（窗口、打包、更新） |
-| `Cargo.toml`                   | Rust 依赖和构建配置               |
-| `apps/open-node/package.json`  | Node.js 服务依赖                  |
-| `apps/open-web/package.json`   | 前端依赖                         |
-| `.oxlintrc.json`               | JavaScript/TypeScript 检查规则    |
-| `.prettierrc`                  | 代码格式化规则                    |
-| `pnpm-workspace.yaml`          | Monorepo 工作区配置               |
+| 文件                          | 说明                               |
+| ----------------------------- | ---------------------------------- |
+| `tauri.conf.json`             | Tauri 应用配置（窗口、打包、更新） |
+| `Cargo.toml`                  | Rust 依赖和构建配置                |
+| `apps/open-node/package.json` | Node.js 服务依赖                   |
+| `apps/open-web/package.json`  | 前端依赖                           |
+| `.oxlintrc.json`              | JavaScript/TypeScript 检查规则     |
+| `.prettierrc`                 | 代码格式化规则                     |
+| `pnpm-workspace.yaml`         | Monorepo 工作区配置                |
 
 ## 文档参考
 

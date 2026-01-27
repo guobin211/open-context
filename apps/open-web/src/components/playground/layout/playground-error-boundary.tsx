@@ -45,7 +45,7 @@ function ErrorFallback({ error, onRetry }: { error: Error | null; onRetry: () =>
   const router = useRouter();
 
   const handleGoBack = () => {
-    router.navigate({ to: '/playground' });
+    router.navigate({ to: '/playground' }).catch(console.error);
   };
 
   return (

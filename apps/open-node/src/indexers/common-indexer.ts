@@ -120,7 +120,9 @@ export class CommonIndexer {
   /**
    * 索引代码片段（无文件路径）
    */
-  async indexContent(options: IndexContentOptions): Promise<{ chunks: CodeChunk[] | MarkdownChunk[]; edges: GraphEdge[] }> {
+  async indexContent(
+    options: IndexContentOptions
+  ): Promise<{ chunks: CodeChunk[] | MarkdownChunk[]; edges: GraphEdge[] }> {
     const { content, language, metadata } = options;
 
     // 生成虚拟文件路径
@@ -214,10 +216,7 @@ export class CommonIndexer {
           result.totalSymbols += indexResult.chunks.length;
 
           if (result.indexedFiles % 10 === 0) {
-            logger.info(
-              { indexed: result.indexedFiles, total: result.totalFiles },
-              'Indexing progress'
-            );
+            logger.info({ indexed: result.indexedFiles, total: result.totalFiles }, 'Indexing progress');
           }
         } catch (error) {
           result.errors.push({

@@ -137,11 +137,13 @@ export class ConfigLoader {
 
     return {
       version: config.version || defaults.version,
-      database: config.database ? {
-        sqlite: { ...defaults.database!.sqlite, ...config.database.sqlite },
-        surrealdb: { ...defaults.database!.surrealdb, ...config.database.surrealdb },
-        qdrant: { ...defaults.database!.qdrant, ...config.database.qdrant }
-      } : defaults.database,
+      database: config.database
+        ? {
+            sqlite: { ...defaults.database!.sqlite, ...config.database.sqlite },
+            surrealdb: { ...defaults.database!.surrealdb, ...config.database.surrealdb },
+            qdrant: { ...defaults.database!.qdrant, ...config.database.qdrant }
+          }
+        : defaults.database,
       node_server: config.node_server ? { ...defaults.node_server, ...config.node_server } : defaults.node_server,
       log_level: config.log_level || defaults.log_level
     };

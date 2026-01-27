@@ -12,8 +12,7 @@ pub struct DatabaseConfig {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SqliteConfig {
-    pub workspace_db: String,
-    pub repository_db: String,
+    pub app_db: String,
     pub symbol_db: String,
     pub edge_db: String,
     pub reverse_edge_db: String,

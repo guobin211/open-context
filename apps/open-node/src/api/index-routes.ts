@@ -162,7 +162,7 @@ indexRoutes.post('/query/hybrid', async (c) => {
     // 验证权重
     if (weights) {
       const { vector = 0, fulltext = 0, graph = 0 } = weights;
-      if (vector < 0 || fulltext < 0 || graph < 0 || (vector + fulltext + graph === 0)) {
+      if (vector < 0 || fulltext < 0 || graph < 0 || vector + fulltext + graph === 0) {
         return c.json({ error: 'Invalid weights: all values must be non-negative and sum > 0' }, 400);
       }
     }

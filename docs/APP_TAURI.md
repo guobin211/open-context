@@ -8,18 +8,18 @@
 
 ```
 ┌─────────────────────────────────────────────────────────────────────┐
-│                           Web 前端                                   │
+│                           Web 前端                                         │
 ├─────────────────────────────────────────────────────────────────────┤
-│  1. invoke('command', dto)     →  调用 Tauri 命令                    │
-│  2. listen('event:name')       →  监听事件                          │
+│  1. invoke('command', dto)     →  调用 Tauri 命令                          │
+│  2. listen('event:name')       →  监听事件                                 │
 └───────────────────────────────┬─────────────────────────────────────┘
                                 │ Tauri IPC
 ┌───────────────────────────────▼─────────────────────────────────────┐
-│                        Rust 后端                                     │
+│                        Rust 后端                                           │
 ├─────────────────────────────────────────────────────────────────────┤
-│  DatabaseManager  →  SQLite 数据持久化                               │
-│  TaskManager      →  异步任务管理                                    │
-│  EventEmitter     →  事件发射                                        │
+│  DatabaseManager  →  SQLite 数据持久化                                     │
+│  TaskManager      →  异步任务管理                                          │
+│  EventEmitter     →  事件发射                                              │
 └─────────────────────────────────────────────────────────────────────┘
 ```
 
@@ -91,61 +91,7 @@ try {
 
 ## 二、数据类型
 
-### Workspace
-
-```typescript
-interface Workspace {
-  id: string;
-  name: string;
-  description?: string;
-  createdAt: number;
-  updatedAt: number;
-}
-```
-
-### Note
-
-```typescript
-interface Note {
-  id: string;
-  title: string;
-  content?: string;
-  type: 'rich-text' | 'markdown' | 'code' | 'table' | 'mindmap' | 'flowchart';
-  parentId?: string;
-  createdAt: number;
-  updatedAt: number;
-}
-```
-
-### ImportedFile
-
-```typescript
-interface FileResource {
-  id: string;
-  name: string;
-  path: string;
-  size?: number;
-  type: 'file' | 'folder';
-  mimeType?: string;
-  parentId?: string;
-  createdAt: number;
-  updatedAt: number;
-}
-```
-
-### GitRepository
-
-```typescript
-interface Repository {
-  id: string;
-  name: string;
-  url: string;
-  branch?: string;
-  workspaceId?: string;
-  createdAt: number;
-  updatedAt: number;
-}
-```
+[数据类型](docs/DATABASE_SCHEMA.md)
 
 ---
 
@@ -172,7 +118,7 @@ app.emit("task:completed", serde_json::json!({
     "taskId": task_id,
     "taskType": task_type,
     "result": result
-}))?;
+})) ?;
 ```
 
 ### 前端监听事件
@@ -188,23 +134,6 @@ const unlisten = await listen('task:completed', (event) => {
 
 // 组件卸载时取消监听
 onCleanup(() => unlisten());
-```
-
-### React Hook 封装
-
-```typescript
-import { useAppEvent, useThemeEvent, useServiceStatus } from '@/hooks/use-app-events';
-
-function Dashboard() {
-  const theme = useThemeEvent('system');
-  const nodeServer = useServiceStatus('node-server');
-
-  useAppEvent('task:completed', (payload) => {
-    console.log('Task completed:', payload);
-  });
-
-  return <div>Theme: {theme}</div>;
-}
 ```
 
 ---
@@ -292,83 +221,9 @@ await listen('task:completed', (e) => {
 });
 ```
 
-### 任务持久化与重试
-
-```rust
-// 创建持久化任务（支持重启后恢复）
-let task = task_manager.create_persistent_task_with_input(
-    "clone_repository",
-    serde_json::json!({ "url": "...", "branch": "main" }),
-    3,  // 最大重试次数
-);
-
-// 应用启动时加载未完成任务
-let pending = task_manager.load_persistent_tasks()?;
-for task in pending {
-    // 重新调度执行
-}
-```
-
 ---
 
-## 五、数据库表结构
-
-### workspaces 表
-
-```sql
-CREATE TABLE workspaces (
-    id TEXT PRIMARY KEY,
-    name TEXT NOT NULL,
-    description TEXT,
-    is_active INTEGER DEFAULT 0,
-    created_at INTEGER NOT NULL,
-    updated_at INTEGER NOT NULL
-);
-```
-
-### notes 表
-
-```sql
-CREATE TABLE notes (
-    id TEXT PRIMARY KEY,
-    workspace_id TEXT NOT NULL,
-    title TEXT NOT NULL,
-    note_type TEXT NOT NULL,
-    content TEXT,
-    file_path TEXT NOT NULL,
-    tags TEXT,
-    created_at INTEGER NOT NULL,
-    updated_at INTEGER NOT NULL
-);
-```
-
-### tasks 表（持久化任务）
-
-```sql
-CREATE TABLE tasks (
-    id TEXT PRIMARY KEY,
-    task_type TEXT NOT NULL,
-    status TEXT NOT NULL DEFAULT 'pending',
-    progress INTEGER NOT NULL DEFAULT 0,
-    message TEXT,
-    result TEXT,
-    error TEXT,
-    retry_count INTEGER NOT NULL DEFAULT 0,
-    max_retries INTEGER NOT NULL DEFAULT 3,
-    input TEXT,
-    persistent INTEGER NOT NULL DEFAULT 0,
-    created_at INTEGER NOT NULL,
-    updated_at INTEGER NOT NULL,
-    completed_at INTEGER
-);
-
-CREATE INDEX idx_tasks_status ON tasks(status);
-CREATE INDEX idx_tasks_persistent ON tasks(persistent);
-```
-
----
-
-## 六、最佳实践
+## 五、最佳实践
 
 1. **错误处理**：所有命令使用 `Result<T, String>` 返回
 2. **日志记录**：使用 `log::info!()`, `log::error!()` 记录关键操作

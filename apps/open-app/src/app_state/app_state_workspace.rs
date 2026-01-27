@@ -3,7 +3,7 @@
 //! 提供工作空间的 CRUD 操作和资源统计功能。
 
 use chrono::Utc;
-use rusqlite::{params, Result as SqliteResult};
+use rusqlite::{Result as SqliteResult, params};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 

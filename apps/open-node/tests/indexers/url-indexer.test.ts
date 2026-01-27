@@ -355,9 +355,7 @@ describe('UrlIndexer', () => {
         ...baseParams
       });
 
-      const relativeEdge = result.edges.find((e) =>
-        e.to.includes('https://example.com/relative/path')
-      );
+      const relativeEdge = result.edges.find((e) => e.to.includes('https://example.com/relative/path'));
       expect(relativeEdge).toBeDefined();
     });
 

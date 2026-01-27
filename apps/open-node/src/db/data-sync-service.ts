@@ -51,9 +51,7 @@ export class DataSyncService {
     }
   }
 
-  async batchSyncEdgesToSurreal(
-    edges: Array<{ from: string; to: string; type: EdgeType }>
-  ): Promise<void> {
+  async batchSyncEdgesToSurreal(edges: Array<{ from: string; to: string; type: EdgeType }>): Promise<void> {
     try {
       await this.surrealDb.batchCreateEdges(edges);
       logger.info({ count: edges.length }, 'Batch edges synced to SurrealDB');
@@ -82,4 +80,3 @@ export function getDataSyncService(sqliteDb: SQLiteDBService, surrealDb: Surreal
   }
   return instance;
 }
-

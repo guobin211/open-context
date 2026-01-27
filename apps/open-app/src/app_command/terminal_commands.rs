@@ -3,7 +3,9 @@
 use crate::app_state::{AppState, Terminal};
 use chrono::Utc;
 
-use super::dto::{CreateTerminalDto, UpdateTerminalCwdDto, UpdateTerminalDto, UpdateTerminalHistoryDto};
+use super::dto::{
+    CreateTerminalDto, UpdateTerminalCwdDto, UpdateTerminalDto, UpdateTerminalHistoryDto,
+};
 
 #[tauri::command]
 pub fn get_all_terminals(

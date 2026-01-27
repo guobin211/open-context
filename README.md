@@ -36,6 +36,9 @@ open-context/
 │   ├── open-node/         # Node.js 后台服务 → 📖 [文档](./apps/open-node/README.md)
 │   └── open-web/          # React 前端应用 → 📖 [文档](./apps/open-web/README.md)
 ├── docs/                  # 技术文档
+│   ├── ARCHITECTURE.md    # 架构设计
+│   ├── TECH_STACK.md      # 技术栈概览
+│   ├── DATABASE_SCHEMA.md # 数据库架构
 │   ├── SHARED_STORAGE.md  # 共享存储规范
 │   ├── APP_TAURI.md       # Tauri 端文档（命令、事件、异步任务）
 │   └── NODE_BACKEND.md    # Node.js 后端文档（API、数据模型、RAG 系统）
@@ -79,8 +82,11 @@ pnpm dev:app       # Tauri 桌面应用
 
 | 文档                                          | 说明                                             |
 | --------------------------------------------- | ------------------------------------------------ |
+| [📖 架构设计](./docs/ARCHITECTURE.md)         | 系统架构、模块职责、数据流、通信机制             |
+| [📖 技术栈概览](./docs/TECH_STACK.md)         | 项目使用的技术栈、核心依赖库、运行时要求         |
+| [📖 数据库架构](./docs/DATABASE_SCHEMA.md)    | SQLite、SurrealDB、Qdrant 数据库表结构和查询示例 |
 | [📖 共享存储规范](./docs/SHARED_STORAGE.md)   | 数据存储路径规范、配置管理、目录结构             |
-| [📖 Tauri 端文档](./docs/APP_TIRI.md)         | Tauri 命令、事件系统、异步任务模式、数据类型定义 |
+| [📖 Tauri 端文档](./docs/APP_TAURI.md)        | Tauri 命令、事件系统、异步任务模式、数据类型定义 |
 | [📖 Node.js 后端文档](./docs/NODE_BACKEND.md) | API 设计、数据模型、RAG 系统、向量/图数据库架构  |
 
 ### 开发指南

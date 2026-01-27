@@ -106,7 +106,7 @@ export class UrlIndexer {
           type: 'REFERENCES',
           confidence: 0.8
         });
-      } catch (e) {
+      } catch {
         continue;
       }
     }

@@ -3,7 +3,7 @@
 //! 提供聊天和会话的 CRUD 操作。
 
 use chrono::Utc;
-use rusqlite::{params, Result as SqliteResult};
+use rusqlite::{Result as SqliteResult, params};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 

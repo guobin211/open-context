@@ -350,7 +350,9 @@ export class AppDatabase {
   }
 
   getAllRepositories(): GitRepositoryRow[] {
-    const stmt = this.connection.prepare('SELECT * FROM git_repositories WHERE is_archived = 0 ORDER BY created_at DESC');
+    const stmt = this.connection.prepare(
+      'SELECT * FROM git_repositories WHERE is_archived = 0 ORDER BY created_at DESC'
+    );
     return stmt.all() as GitRepositoryRow[];
   }
 
@@ -362,9 +364,7 @@ export class AppDatabase {
   }
 
   getIndexJobsByRepo(repoId: string, limit = 10): IndexJobRow[] {
-    const stmt = this.connection.prepare(
-      'SELECT * FROM index_jobs WHERE repo_id = ? ORDER BY created_at DESC LIMIT ?'
-    );
+    const stmt = this.connection.prepare('SELECT * FROM index_jobs WHERE repo_id = ? ORDER BY created_at DESC LIMIT ?');
     return stmt.all(repoId, limit) as IndexJobRow[];
   }
 
@@ -374,9 +374,7 @@ export class AppDatabase {
   }
 
   getLatestIndexJob(repoId: string): IndexJobRow | null {
-    const stmt = this.connection.prepare(
-      'SELECT * FROM index_jobs WHERE repo_id = ? ORDER BY created_at DESC LIMIT 1'
-    );
+    const stmt = this.connection.prepare('SELECT * FROM index_jobs WHERE repo_id = ? ORDER BY created_at DESC LIMIT 1');
     return stmt.get(repoId) as IndexJobRow | null;
   }
 
@@ -419,12 +417,7 @@ export class AppDatabase {
     stmt.run(progress, processedFiles, processedSymbols, id);
   }
 
-  updateIndexJobStatus(
-    id: string,
-    status: string,
-    errorMessage?: string | null,
-    completedAt?: number | null
-  ): void {
+  updateIndexJobStatus(id: string, status: string, errorMessage?: string | null, completedAt?: number | null): void {
     const stmt = this.connection.prepare(`
       UPDATE index_jobs
       SET status = ?, error_message = ?, completed_at = ?
@@ -521,7 +514,16 @@ export class AppDatabase {
 
     const transaction = this.connection.transaction((items: IndexMetadataRow[]) => {
       for (const m of items) {
-        stmt.run(m.id, m.repo_id, m.file_path, m.content_hash, m.last_indexed_at, m.symbol_count, m.language, m.file_size);
+        stmt.run(
+          m.id,
+          m.repo_id,
+          m.file_path,
+          m.content_hash,
+          m.last_indexed_at,
+          m.symbol_count,
+          m.language,
+          m.file_size
+        );
       }
     });
 
@@ -644,9 +646,7 @@ export class AppDatabase {
   }
 
   getActiveTerminal(workspaceId: string): TerminalRow | null {
-    const stmt = this.connection.prepare(
-      'SELECT * FROM terminals WHERE workspace_id = ? AND is_active = 1 LIMIT 1'
-    );
+    const stmt = this.connection.prepare('SELECT * FROM terminals WHERE workspace_id = ? AND is_active = 1 LIMIT 1');
     return stmt.get(workspaceId) as TerminalRow | null;
   }
 
@@ -665,9 +665,7 @@ export class AppDatabase {
   }
 
   getActiveWebview(workspaceId: string): WebviewRow | null {
-    const stmt = this.connection.prepare(
-      'SELECT * FROM webviews WHERE workspace_id = ? AND is_active = 1 LIMIT 1'
-    );
+    const stmt = this.connection.prepare('SELECT * FROM webviews WHERE workspace_id = ? AND is_active = 1 LIMIT 1');
     return stmt.get(workspaceId) as WebviewRow | null;
   }
 

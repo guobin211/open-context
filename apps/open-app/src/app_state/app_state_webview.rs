@@ -3,7 +3,7 @@
 //! 提供网页视图的 CRUD 操作。
 
 use chrono::Utc;
-use rusqlite::{params, Result as SqliteResult};
+use rusqlite::{Result as SqliteResult, params};
 use serde::{Deserialize, Serialize};
 use uuid::Uuid;
 
@@ -206,7 +206,12 @@ impl DatabaseManager {
         Ok(())
     }
 
-    pub fn update_webview_scroll(&self, id: &str, scroll_x: i32, scroll_y: i32) -> SqliteResult<()> {
+    pub fn update_webview_scroll(
+        &self,
+        id: &str,
+        scroll_x: i32,
+        scroll_y: i32,
+    ) -> SqliteResult<()> {
         let conn_arc = self.conn();
         let conn = conn_arc.lock().unwrap();
 

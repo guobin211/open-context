@@ -3,9 +3,7 @@
 use crate::app_state::{AppState, Webview};
 use chrono::Utc;
 
-use super::dto::{
-    CreateWebviewDto, UpdateWebviewDto, UpdateWebviewScrollDto, UpdateWebviewUrlDto,
-};
+use super::dto::{CreateWebviewDto, UpdateWebviewDto, UpdateWebviewScrollDto, UpdateWebviewUrlDto};
 
 #[tauri::command]
 pub fn get_all_webviews(
