@@ -1,480 +1,248 @@
-# 项目上下文
+# 项目 上下文
 
 ## 目的
 
-Open-Context 是一个开源的笔记、文件、工作空间管理工具，旨在帮助 AI Agent 更好地理解和利用上下文信息。
-
-**核心目标**：
-
-- 为 AI Agent 提供丰富的上下文信息支持
-- 支持多模态笔记管理（富文本、Markdown、代码、表格、思维导图、流程图）
-- 提供基于向量数据库的语义检索能力
-- 构建代码依赖关系图，支持 RAG（检索增强生成）查询
-- 通过 MCP（模型上下文协议）对外提供标准化服务
-
-**目标用户**：
-
-- AI 应用开发者
-- 需要管理大量上下文信息的知识工作者
-- 开发团队（代码索引和检索）
+Open-Context 是一款开源的 AI Agent 上下文管理工具，提供对话、笔记、文件、工作空间一体化的协作环境，帮助 AI Agent 更好地理解和利用上下文信息。项目采用混合桌面应用架构，结合 Rust 的系统级能力、Node.js 的后端服务能力和 React 的现代化前端，为用户提供 VS Code 风格的协作体验。
 
 ## 技术栈
 
-### 桌面外壳
+### 前端（open-web）
 
-- **Tauri 2.x**：跨平台桌面应用框架
-- **Rust 1.90.0+**：系统编程语言，用于后端核心逻辑
+- **框架**: React 19 + TypeScript
+- **路由**: TanStack Router (文件系统路由)
+- **状态管理**: Zust Zustand (客户端全局状态) + React (Query 服务端状态)
+- **UI 组件**: Radix UI 原语 + shadcn/ui
+- **样式**: Tailwind CSS 4 + SCSS 模块
+- **富文本编辑**: Tiptap (分层架构)
+- **国际化**: i18next + react-i18next
 
-### 后端服务
+### 后端服务（open-node）
 
-- **Node.js 18.0.0+**：JavaScript 运行时
-- **Hono**：轻量级 Web 框架
-- **TypeScript**：类型安全的 JavaScript 超集
-- **Tree-sitter**：增量语法解析器（代码索引）
+- **运行时**: Node.js 18.0.0+
+- **Web 框架**: Hono
+- **数据库**:
+  - LevelDB (符号、依赖关系)
+  - SurrealDB (图数据库)
+  - Qdrant (向量数据库，需独立部署)
+- **索引引擎**: tree-sitter (TypeScript/JavaScript 解析)
+- **任务队列**: BullMQ
+- **日志**: pino
 
-### 前端界面
+### 桌面应用（open-app）
 
-- **React 19**：用户界面库
-- **Vite**：构建工具和开发服务器
-- **TypeScript**：类型安全
-- **Tailwind CSS 4**：原子化 CSS 框架
-- **Radix UI**：无障碍 UI 组件库
-- **shadcn/ui**：UI 组件集合
-- **TanStack Router**：类型安全的文件系统路由
-- **Tiptap**：富文本编辑器框架（基于 ProseMirror）
-
-### 数据存储
-
-- **SQLite**：关系型数据库（Rust 端，元数据和状态管理）
-- **LevelDB**：键值数据库（Node.js 端，符号和依赖关系图）
-- **Qdrant**：向量数据库（语义搜索）
-- **Tauri Store**：前端状态持久化
-
-### 状态管理
-
-- **Zustand**：轻量级状态管理（客户端）
-- **React Query**：服务端状态管理和数据缓存
+- **框架**: Rust + Tauri 2.x
+- **错误处理**: anyhow + thiserror
+- **本地数据**: SQLite
 
 ### 开发工具
 
-- **pnpm 9.0.0+**：包管理器（Monorepo 支持）
-- **cargo**：Rust 包管理器和构建工具
-- **oxlint**：JavaScript/TypeScript 代码检查
-- **Prettier**：代码格式化
-- **Vitest**：测试框架（Node.js）
-
-### 其他技术
-
-- **chrono**：Rust 时间处理库
-- **dayjs**：JavaScript 时间处理库
-- **i18next**：国际化框架（支持 5 种语言）
-- **serde**：Rust 序列化/反序列化
-- **Monaco Editor**：代码编辑器
-- **Handsontable**：表格编辑器
-- **Konva.js**：Canvas 图形库（思维导图）
-- **Mermaid.js**：图表渲染（流程图）
+- **包管理**: pnpm 9.0.0+
+- **代码检查**: oxlint (TypeScript/JavaScript) + clippy (Rust)
+- **格式化**: Prettier + cargo fmt
+- **测试**: Vitest (open-node)
+- **版本控制**: Git
 
 ## 项目约定
 
 ### 代码风格
 
-**Rust 代码**：
+#### TypeScript/JavaScript (open-node, open-web)
 
-- 使用 `cargo fmt` 格式化（标准 Rust 风格）
-- 使用 `cargo clippy` 进行代码检查
-- 文件命名：`snake_case.rs`（如 `app_events.rs`）
-- 模块命名：以 `app_` 为前缀表示应用核心模块
-- 错误处理：统一使用 `Result<T, Box<dyn std::error::Error>>`
-- 并发安全：使用 `Arc<Mutex<T>>` 或 `RwLock<T>`
+- **文件命名**: kebab-case (`nav-item.tsx`, `workspace-service.ts`)
+- **标识符命名**:
+  - 类/接口/类型: PascalCase (`WorkspaceService`, `NavItemProps`)
+  - 函数/方法/变量: camelCase (`createWorkspace`)
+  - React Hooks: `use` 前缀 (`useSidebarStore`)
+- **组件模式**: 严格使用箭头函数，禁止 function 声明
+  ```tsx
+  // 正确
+  export const Button = ({ className, ...props }: ButtonProps) => { ... }
+  // 错误
+  export function Button() { ... }
+  ```
+- **Props 接口**: `{组件名}Props` (`ButtonProps`)
+- **导入规范**:
+  - open-node: 相对导入 (`import { X } from '../utils'`)
+  - open-web: 绝对导入 (`import { cn } from '@/lib/utils'`)
+  - 顺序: 外部库 → 内部模块
+- **注释规范**:
+  - 不使用行尾注释，注释单独成行
+  - 函数使用 Doc 注释，不标注参数类型
+- **文件行数**: TypeScript 文件不超过 1000 行，超出需拆分
 
-**TypeScript/JavaScript 代码**：
+#### Rust (open-app)
 
-- 使用 Prettier 格式化
-- 使用 oxlint 进行类型感知检查
-- 文件命名：`kebab-case.ts` 或 `kebab-case.tsx`（如 `use-app-events.ts`）
-- React 组件：函数式组件 + Hooks
-- 类型定义：优先使用 `interface`，枚举使用 `type`
-- 导入顺序：外部库 → 内部模块 → 类型定义 → 样式
-
-**文档**：
-
-- 文件命名：`UPPER_SNAKE_CASE.md`（如 `EVENT_SYSTEM.md`）
-- 使用中文编写（除非明确说明使用英文）
-- Markdown 格式遵循 CommonMark 规范
-
-**脚本**：
-
-- 文件命名：`kebab-case.sh` 或 `.mjs`
-- 所有脚本添加 shebang 和执行权限
-- Shell 脚本使用 bash
-
-### 命名约定
-
-| 类型            | 约定                            | 示例                               |
-| --------------- | ------------------------------- | ---------------------------------- |
-| Rust 变量       | snake_case                      | `event_emitter`                    |
-| Rust 类型       | PascalCase                      | `AppState`                         |
-| Rust 常量       | SCREAMING_SNAKE_CASE            | `MAX_RETRY_COUNT`                  |
-| TypeScript 变量 | camelCase                       | `eventHandler`                     |
-| TypeScript 类型 | PascalCase                      | `AppConfig`                        |
-| TypeScript 常量 | SCREAMING_SNAKE_CASE            | `API_BASE_URL`                     |
-| React 组件      | PascalCase（文件用 kebab-case） | `SimpleEditor` (simple-editor.tsx) |
-| CSS 类名        | kebab-case                      | `button-primary`                   |
+- **文件命名**: snake_case (`app_commands.rs`)
+- **标识符命名**:
+  - 模块/函数/变量: snake_case
+  - 类型/结构体/枚举: PascalCase
+  - 常量: SCREAMING_SNAKE_CASE
+- **代码风格**: 缩进 4 空格
+- **注释规范**: `//!` 模块文档，`///` 函数文档
 
 ### 架构模式
 
-**整体架构**：
+#### 分层架构（open-node）
 
-- **混合桌面应用**：Tauri (Rust) + Node.js RAG 引擎 + React 前端
-- **Monorepo 结构**：使用 pnpm workspaces 管理子项目
-- **分层架构**：
-  - 桌面外壳层（Tauri/Rust）：窗口管理、系统集成、IPC
-  - 后端服务层（Node.js）：RAG 引擎、代码索引、向量检索
-  - 前端界面层（React）：用户交互、数据展示
+```
+api/          → REST 端点 (Hono 路由)
+services/     → 业务逻辑
+db/           → 数据访问 (LevelDB, Qdrant, SurrealDB)
+indexers/     → 代码解析 (tree-sitter)
+jobs/         → 异步任务 (BullMQ)
+utils/        → 工具 (git, fs, logger, vector)
+types/        → TypeScript 定义
+```
 
-**Rust 后端模式**：
+#### 服务模式
 
-- **模块化设计**：每个功能一个模块文件（`app_*.rs`）
-- **状态管理**：使用 SQLite + 线程安全包装（Arc<Mutex>）
-- **事件驱动**：完整的事件系统，27+ 种事件类型
-- **配置管理**：线程安全的配置管理器（RwLock）
-- **错误处理**：Result 类型 + 自定义错误类型
+- 每个目录包含 `index.ts` 作为桶导出
+- 类型与实现共置 (`types/` 目录)
+- 测试文件镜像 `src/` 结构到 `tests/`
 
-**Node.js 后端模式**：
+#### 前端目录结构
 
-- **服务层模式**：Service → Repository → Database
-- **索引流程**：GitService → SymbolExtractor → CodeChunkBuilder → VectorService → LevelDB/Qdrant
-- **查询流程**：VectorService（相似度搜索） + GraphService（依赖关系扩展）
-- **任务队列**：简单内存队列（顺序处理）
+```
+src/
+├── components/
+│   ├── ui/              # shadcn/ui 组件
+│   ├── ti layout/          # 布局组件
+│   └── sidebar/         # 侧边栏组件
+├── routes/              # TanStack Router 文件系统路由
+├── zustand/             # Zustand stores
+├── hooks/               # 自定义 hooks
+├── lib/                 # 工具函数
+└── i18n/                # 国际化 (zh-CN, en, ja, ko, zh-TW)
+```
 
-**React 前端模式**：
+#### 通信机制
 
-- **文件系统路由**：TanStack Router 自动生成路由
-- **组件分层**：
-  - UI primitives（Radix UI）
-  - UI components（shadcn/ui）
-  - Feature components（业务组件）
-  - Page components（路由页面）
-- **状态管理**：
-  - 客户端全局状态：Zustand
-  - 服务端状态：React Query
-  - 持久化状态：Tauri Store
-- **Tiptap 编辑器分层**：extension → node → ui-primitive → ui → templates
+- **open-web → tauri**: Tauri IPC (本地 FS 操作、系统调用)
+- **tauri → open-node**: IPC 启动命令 (启动/停止后台服务)
+- **open-web → open-node**: HTTP/WebSocket (REST API 调用、实时通信)
+- **tauri → open-node**: HTTP/WebSocket (服务管理、状态同步)
 
 ### 测试策略
 
-**Rust 测试**：
+#### 测试范围
 
-- 单元测试：放在源文件的 `#[cfg(test)]` 模块中
-- 集成测试：放在 `tests/integration/` 目录
-- 运行测试：`cargo test --lib`
-- 测试覆盖：核心模块（events、state、config）需要完整测试
-- 命名约定：测试函数以 `test_` 为前缀
+- **当前实现**: 仅在 open-node 中配置测试 (Vitest)
+- **open-web**: 当前无测试配置
+- **open-app**: 当前无测试配置
 
-**Node.js 测试**：
+#### 测试命令
 
-- 测试框架：Vitest
-- 测试文件：`*.test.ts` 或 `*.spec.ts`
-- 运行测试：`pnpm --filter open-node test`
-- 覆盖率：使用 `pnpm --filter open-node test:coverage`
-- 监听模式：`pnpm --filter open-node test:watch`
+```bash
+pnpm --filter open-node test           # 运行所有测试
+pnpm --filter open-node test:run       # CI 模式
+pnpm --filter open-node test:watch     # 监听模式
+pnpm --filter open-node test:ui        # UI 模式
+pnpm --filter open-node test:coverage  # 覆盖率报告
+```
 
-**前端测试**：
+#### 测试文件
 
-- 测试框架：Vitest + React Testing Library
-- 测试文件：`*.test.tsx` 或 `*.spec.tsx`
-- 运行测试：`pnpm --filter open-web test`
-- 组件测试：优先测试用户交互和业务逻辑
-
-**测试原则**：
-
-- 避免过度测试：不测试第三方库和框架
-- 关注业务逻辑：核心功能必须有测试
-- 保持简洁：测试代码应该易读易维护
+- 后缀: `*.test.ts`
+- 镜像 `src/` 结构到 `tests/`
 
 ### Git 工作流
 
-**分支策略**：
+#### 分支策略
 
-- `master`：主分支，始终保持可发布状态
-- `feature/*`：功能分支，从 master 创建
-- `fix/*`：修复分支，从 master 创建
-- `hotfix/*`：紧急修复分支
+- **主分支**: `main` (稳定发布)
+- **开发分支**: `develop` (日常开发)
+- **功能分支**: `feature/xxx` (新功能)
+- **修复分支**: `fix/xxx` (bug 修复)
+- **重构分支**: `refactor/xxx` (代码重构)
 
-**提交约定**：
+#### 提交约定
 
-- 使用中文提交信息
-- 提交格式：`<type>: <description>`
-- 类型：
-  - `feat`：新功能
-  - `fix`：Bug 修复
-  - `docs`：文档更新
-  - `style`：代码格式（不影响功能）
-  - `refactor`：重构
-  - `test`：测试
-  - `chore`：构建或工具变更
+- 遵循 Conventional Commits 规范
+- 不自动提交，等待用户明确指示
+- 不使用 `--force`、`--amend` (除非用户要求)
 
-**提交示例**：
+#### 提交信息格式
 
 ```
-feat: 添加事件系统支持多窗口实例
+<type>(<scope>): <subject>
 
-- 新增 WindowId 结构体用于区分窗口
-- 实现 emit_to_window() 方法
-- 添加 10+ 个 React Hooks 简化事件监听
+<body>
 
-Co-Authored-By: Claude <noreply@anthropic.com>
+<footer>
 ```
 
-**Pull Request 流程**：
-
-1. 创建功能分支
-2. 完成开发并通过所有测试
-3. 更新相关文档
-4. 提交 PR，填写清晰的描述
-5. Code Review
-6. 合并到 master
-
-**重要规则**：
-
-- ❌ 禁止 force push 到 main/master
-- ❌ 禁止跳过 pre-commit hooks（除非明确请求）
-- ✅ 提交前运行 `pnpm lint` 和 `pnpm test`
-- ✅ 功能完成后更新文档（README、CLAUDE.md、docs/）
-
-### 时间处理约定
-
-**统一格式**：毫秒级时间戳（Milliseconds since Unix Epoch）
-
-**Rust**：
-
-- 使用 `chrono::Utc::now().timestamp_millis()` 获取时间戳
-- 类型：`i64`
-- 格式化仅用于日志和调试
-
-**TypeScript/JavaScript**：
-
-- 使用 `dayjs().valueOf()` 获取时间戳
-- 类型：`number`
-- 格式化使用 `dayjs(timestamp).format()`
-- 相对时间使用 `dayjs(timestamp).fromNow()`
-
-**原则**：
-
-- 存储和传输：始终使用时间戳
-- 展示：仅在用户界面展示时才格式化
-- 时区：dayjs 自动处理时区转换
+- type: `feat`, `fix`, `refactor`, `docs`, `style`, `test`, `chore`
+- scope: 影响的模块 (open-web, open-node, open-app)
 
 ## 领域上下文
 
-### RAG（检索增强生成）
+### 数据存储
 
-本项目的核心是为 AI Agent 提供 RAG 能力：
+- 所有数据存储在 `~/.open-context/` 目录
+- **SQLite**: `~/.open-context/database/sqlite.app.db` (Tauri 端)
+- **SurrealDB**: `~/.open-context/database/surrealdb/` (图数据库)
+- **LevelDB**: `~/.open-context/database/leveldb/` (符号、依赖关系)
+- **Qdrant**: 向量数据库 (需独立部署)
 
-**代码索引**：
+### 核心功能
 
-- 使用 Tree-sitter 解析代码 AST
-- 提取符号：函数、类、方法、接口、变量
-- 生成代码块：包含上下文的可搜索代码片段
-- 构建依赖图：IMPORTS、CALLS、IMPLEMENTS、EXTENDS 等关系
+- **对话管理**: 多会话、消息历史、智能上下文追踪
+- **笔记系统**: 多类型笔记 (富文本、Markdown)、收藏、分类
+- **文件管理**: 本地文件夹浏览、文件预览、最近文件
+- **工作空间**: Git 仓库管理、文档组织、资源聚合
+- **全局搜索**: 快速搜索、命令面板 (⌘P)、智能联想
+- **多标签页**: 对话、笔记、文件多标签管理
 
-**向量检索**：
+### 语言支持
 
-- 使用 Qdrant 存储代码块的嵌入向量（1024 维）
-- 语义搜索：根据自然语言查询找到相关代码
-- Top-K 检索：返回最相似的 K 个结果
-
-**图遍历**：
-
-- 使用 LevelDB 存储双向依赖关系图
-- 正向边：A 依赖 B
-- 反向边：B 被 A 依赖
-- 扩展搜索结果：包含相关依赖的上下文
-
-### 事件系统
-
-完整的类型安全事件系统，支持前后端通信：
-
-**事件分类**（27+ 种事件）：
-
-1. 应用生命周期（4 种）：启动、就绪、退出
-2. 窗口管理（13 种）：创建、聚焦、移动、调整大小、关闭
-3. 应用状态（3 种）：主题、语言、网络状态
-4. 服务管理（3 种）：服务启动、停止、错误
-5. 系统事件（4 种）：通知、更新、错误报告
-6. 自定义事件：业务特定事件
-
-**关键特性**：
-
-- 多窗口支持：通过 WindowId 区分实例
-- 类型同步：Rust 和 TypeScript 类型完全一致
-- 自动清理：React Hooks 自动管理监听器生命周期
-
-### MCP（模型上下文协议）
-
-项目通过 MCP 对外提供服务：
-
-**提供的能力**：
-
-- 笔记检索：根据查询检索相关笔记
-- 代码检索：根据自然语言查询检索代码
-- 文件检索：语义检索文件内容
-- 工作空间管理：查询和管理工作空间资源
-
-**协议实现**：
-
-- RESTful API：标准 HTTP 接口
-- WebSocket：实时事件推送
-- 类型定义：完整的 TypeScript 类型定义
+- **当前实现**: 仅 TypeScript/JavaScript (tree-sitter 集成)
+- **计划中**: Bash, CSS, HTML, JSON 解析器已安装但未集成
 
 ## 重要约束
 
 ### 技术约束
 
-**语言支持**：
-
-- ⚠️ 当前仅支持 TypeScript/JavaScript 代码索引
-- Tree-sitter 已集成 Bash、CSS、HTML、JSON 解析器，但未实现符号提取
-- 未来计划：Python、Rust、Go、Java
-
-**性能约束**：
-
-- 向量数据库：建议使用远程 Qdrant 服务（本地部署占用资源较大）
-- 任务队列：当前为简单内存队列，不支持并发（已导入 BullMQ 但未使用）
-- 索引速度：大型仓库（10000+ 文件）索引较慢
-
-**平台约束**：
-
-- Tauri 支持：macOS、Windows、Linux
-- Node.js 版本：18.0.0+（使用了 ES2022 特性）
-- Rust 版本：1.90.0+（使用了最新稳定版特性）
+- **类型安全**: 禁止 `any` 类型、`@ts-ignore`、`@ts-expect-error`、`as any`
+- **错误处理**: 禁止空 catch 块，必须处理或重新抛出错误
+- **测试**: 禁止删除失败的测试，必须修复根本原因
+- **Rust**: 禁止 `.unwrap()` 用于可能失败的操作，使用 `.expect("说明")`
 
 ### 业务约束
 
-**数据隐私**：
+- **Monorepo**: 使用 `pnpm --filter <package>` 在特定包中运行命令
+- **包**: `open-node`, `open-web`, `open-app`
 
-- 所有数据本地存储（`~/.config/open-context/`）
-- 支持自定义配置目录（环境变量 `OPEN_CONTEXT_CONFIG_DIR`）
-- 向量检索可配置使用本地或远程 Qdrant
+### 代码质量
 
-**资源管理**：
-
-- 工作空间数量：无硬性限制，但建议不超过 50 个
-- 单个工作空间大小：建议不超过 10GB
-- 笔记数量：建议单个工作空间不超过 10000 条
-
-### 开发约束
-
-**避免过度工程**：
-
-- 只实现当前需要的功能
-- 不添加未被要求的特性、注释、错误处理
-- 不为假设的未来需求设计
-
-**保持简洁**：
-
-- 3 行相似代码优于过早抽象
-- 只在系统边界（用户输入、外部 API）进行验证
-- 信任内部代码和框架保证
-
-**删除未使用代码**：
-
-- 不使用 `_var` 重命名或 `// removed` 注释
-- 直接删除未使用的代码
-- 不添加向后兼容性的 hack
+- **代码检查**: `pnpm lint` (Rust clippy + JavaScript oxlint)
+- **格式化**: `pnpm fmt` (cargo fmt + Prettier)
+- **类型检查**: `pnpm --filter open-node type-check`
 
 ## 外部依赖
 
-### 必需服务
+### 关键外部服务
 
-**Qdrant 向量数据库**：
+- **Qdrant**: 向量数据库 (需独立部署)
+- **SurrealDB**: 图数据库
+- **LevelDB**: 键值存储
 
-- 用途：存储和检索代码块的嵌入向量
-- 默认地址：`http://localhost:6333`
-- 可配置：支持远程服务
-- 向量维度：1024
-- 集合：`code_symbols`
+### 核心 API 库
 
-### 可选服务
+- **Tauri 2.x**: 桌面应用框架
+- **Hono**: Node.js Web 框架
+- **TanStack Router**: 文件系统路由
+- **Radix UI**: UI 组件原语
+- **tree-sitter**: 代码解析
+- **BullMQ**: 任务队列
+- **pino**: 结构化日志
+- **anyhow**: Rust 错误处理
+- **thiserror**: Rust 库错误处理
 
-**COS 云存储**：
+### 开发依赖
 
-- 用途：文件同步到云端
-- 当前状态：规划中，未实现
-
-### 系统依赖
-
-**开发环境**：
-
-- Rust：1.90.0+（`cargo --version`）
-- Node.js：18.0.0+（`node --version`）
-- pnpm：9.0.0+（`pnpm --version`）
-
-**运行时依赖**：
-
-- SQLite：3.x（Rust 使用 bundled 版本，无需单独安装）
-- LevelDB：通过 npm 包安装，无需单独安装
-
-### 开发工具依赖
-
-**代码检查**：
-
-- cargo clippy（Rust）
-- oxlint（JavaScript/TypeScript）
-
-**代码格式化**：
-
-- cargo fmt（Rust）
-- Prettier（JavaScript/TypeScript）
-
-**测试框架**：
-
-- Rust 内置测试框架
-- Vitest（Node.js 和前端）
-
-## 数据存储位置
-
-所有数据存储在配置目录：`~/.config/open-context/`
-
-```
-~/.config/open-context/
-├── config.json          # 全局配置
-├── app_state.db         # SQLite 数据库（工作空间、笔记、文件）
-├── store.bin            # Tauri Store（前端状态持久化）
-├── leveldb/             # LevelDB 数据库
-│   ├── main/            # 主数据库（符号、元数据）
-│   ├── edges/           # 正向边（依赖关系）
-│   └── reverse-edges/   # 反向边（被依赖关系）
-├── qdrant/              # Qdrant 向量数据库（本地部署时）
-├── logs/                # 应用日志
-│   ├── app.log
-│   ├── node-server.log
-│   └── error.log
-└── workspaces/          # 工作空间数据
-    └── {workspace-id}/
-        ├── repos/       # Git 仓库缓存
-        ├── files/       # 文件资源
-        └── notes/       # 笔记数据
-```
-
-## 文档资源
-
-### 核心文档
-
-- [README.md](../README.md) - 项目概述和快速开始
-- [CLAUDE.md](../CLAUDE.md) - 完整的项目开发指南
-- [EVENT_SYSTEM.md](../docs/APP_EVENT_SYSTEM.md) - 事件系统详细文档
-- [APP_STATE_USAGE.md](../docs/APP_STATE_USAGE.md) - 状态管理使用指南
-- [APP_CONFIG_USAGE.md](../docs/APP_CONFIG_USAGE.md) - 配置管理使用指南
-- [TAURI_COMMANDS.md](../docs/APP_TAURI_COMMANDS.md) - Tauri IPC 命令参考
-
-### 子项目文档
-
-- [open-node README](../packages/open-node/README.md) - Node.js 后端详细文档
-- [open-web README](../packages/open-web/README.md) - React 前端详细文档
-
-### 代码示例
-
-- [examples/event_usage.rs](../examples/event_usage.rs) - 事件系统 Rust 示例
-- [examples/config_usage.rs](../examples/config_usage.rs) - 配置管理 Rust 示例
-- [packages/open-web/src/components/event-demo.tsx](../packages/open-web/src/components/event-demo.tsx) - React 事件示例
+- **pnpm**: 包管理器
+- **oxlint**: TypeScript/JavaScript 检查
+- **clippy**: Rust 检查
+- **Prettier**: 代码格式化
+- **Vitest**: 测试框架
+- **Git**: 版本控制

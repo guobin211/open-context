@@ -1,10 +1,12 @@
 ---
-name: OpenSpec: 归档
 description: 归档已部署的OpenSpec变更并更新规范。
-category: OpenSpec
-tags: [openspec, archive]
 ---
 
+The user wants to archive the following deployed change. Use the openspec instructions to archive the change and update specs.
+
+<ChangeId>
+  $ARGUMENTS
+</ChangeId>
 <!-- OPENSPEC:START -->
 **护栏规则**
 - 优先使用简单、最小的实现，仅在请求或明确需要时才添加复杂性。

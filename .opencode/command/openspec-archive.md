@@ -1,7 +1,6 @@
 ---
 description: 归档已部署的OpenSpec变更并更新规范。
 ---
-
 <ChangeId>
   $ARGUMENTS
 </ChangeId>
@@ -12,7 +11,6 @@ description: 归档已部署的OpenSpec变更并更新规范。
 - 如果需要额外的OpenSpec约定或澄清，请参考`openspec/AGENTS.md`（位于`openspec/`目录中—如果看不到，请运行`ls openspec`或`openspec-cn update`）。
 
 **步骤**
-
 1. 确定要归档的变更ID：
    - 如果此提示已包含特定变更ID（例如在由斜杠命令参数填充的`<ChangeId>`块内），在修剪空格后使用该值。
    - 如果对话松散地引用变更（例如通过标题或摘要），运行`openspec-cn list`以显示可能的ID，分享相关候选者，并确认用户意图归档哪一个。
@@ -24,7 +22,6 @@ description: 归档已部署的OpenSpec变更并更新规范。
 5. 使用`openspec-cn validate --strict`验证，如果出现异常，使用`openspec-cn show <id>`检查。
 
 **参考**
-
 - 在归档前使用`openspec-cn list`确认变更ID。
 - 使用`openspec-cn list --specs`检查刷新的规范，并在交前解决任何验证问题。
 <!-- OPENSPEC:END -->
