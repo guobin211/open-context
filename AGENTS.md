@@ -315,8 +315,6 @@ src/
 ├── components/
 │   ├── ui/              # shadcn/ui 组件 (通过 index.tsx 桶导出)
 │   ├── tiptap-*/        # 富文本编辑器层级 (extension, icons, node, ui, ui-primitive, templates)
-│   ├── layout/          # 布局组件
-│   └── sidebar/         # 侧边栏组件
 ├── routes/              # 文件系统路由
 ├── context/             # Context Providers (global-context, query-provider)
 ├── storage/             # Zustand stores (workspace-store, document-store, sidebar-store 等)

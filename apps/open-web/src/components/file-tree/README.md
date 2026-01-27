@@ -2,7 +2,7 @@
 
 ## 概述
 
-FileTree 是一个类似 VS Code 的高性能文件树组件，支持虚拟滚动、按需加载、实时文件监听、右键菜单、面包屑导航和文件搜索等功能。
+FileTree 是一个类似 VSCode 的高性能文件树组件，支持虚拟滚动、按需加载、实时文件监听、右键菜单、面包屑导航和文件搜索等功能。组件设计遵循可复用原则，所有子组件均支持独立使用。
 
 ## 核心功能
 
@@ -265,7 +265,14 @@ listen('file-tree-state-change', (event) => {
 
 参考示例文件：
 
-- `packages/open-web/src/components/file-tree/file-tree-demo.tsx`
+- 组件目录：`apps/open-web/src/components/file-tree/`
+- 使用示例：`apps/open-web/src/routes/workspace/components/workspace-sidebar/file-tree.tsx`
+
+## 相关组件
+
+- **file-preview**: 文件预览组件，支持多种文件类型预览
+- **file-editor**: 文件编辑器组件，集成 Monaco Editor、Tiptap 和 Markdown-it
+- **file-manager**: 文件管理器组件（待实现）
 
 ## 待完成功能
 

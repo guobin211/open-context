@@ -140,13 +140,13 @@ open-context/
 
 ### 文件命名规范
 
-| 文件类型          | 命名规范                  | 示例                  |
-|---------------|-----------------------|---------------------|
+| 文件类型        | 命名规范              | 示例                |
+| --------------- | --------------------- | ------------------- |
 | Rust 文件       | `snake_case.rs`       | `app_events.rs`     |
 | TypeScript 文件 | `kebab-case.ts`       | `use-app-events.ts` |
 | React 组件      | `kebab-case.tsx`      | `simple-editor.tsx` |
-| 文档文件          | `UPPER_SNAKE_CASE.md` | `EVENT_SYSTEM.md`   |
-| 脚本文件          | `kebab-case.sh`       | `build-all.sh`      |
+| 文档文件        | `UPPER_SNAKE_CASE.md` | `EVENT_SYSTEM.md`   |
+| 脚本文件        | `kebab-case.sh`       | `build-all.sh`      |
 
 ### 重要约定
 
@@ -158,11 +158,11 @@ open-context/
 
 Open-Context 采用 Tauri 混合架构，三层协作：
 
-| 模块            | 职责                 | 技术栈                        | 运行端口 |
-|---------------|--------------------|----------------------------|------|
-| **open-app**  | 桌面外壳，本地 FS 操作、系统调用 | Rust + Tauri 2.x           | -    |
-| **open-node** | RAG 引擎，代码索引、向量检索   | Node.js + Hono             | 4500 |
-| **open-web**  | React UI，用户界面和交互   | React 19 + TanStack Router | 1420 |
+| 模块          | 职责                             | 技术栈                     | 运行端口 |
+| ------------- | -------------------------------- | -------------------------- | -------- |
+| **open-app**  | 桌面外壳，本地 FS 操作、系统调用 | Rust + Tauri 2.x           | -        |
+| **open-node** | RAG 引擎，代码索引、向量检索     | Node.js + Hono             | 4500     |
+| **open-web**  | React UI，用户界面和交互         | React 19 + TanStack Router | 1420     |
 
 ### 模块通信流程
 
@@ -202,8 +202,8 @@ emitter.emit_global( & event) ?;
 import { useThemeEvent } from '@/hooks/use-app-events';
 
 function MyComponent() {
-    const theme = useThemeEvent('system');
-    return <div>Theme: {theme}</div>;
+  const theme = useThemeEvent('system');
+  return <div>Theme: {theme}</div>;
 }
 ```
 
@@ -243,22 +243,22 @@ import { FileTree } from '@/components/file-tree';
 1. 用户触发：`POST /repos/:repoId/index`
 2. JobService 创建任务 → JobQueue 入队
 3. IndexJob 执行：
-    - GitService 读取文件 → SymbolExtractor 解析 AST → 提取符号
-    - CodeChunkBuilder 生成代码块 → VectorService 生成嵌入向量
-    - GraphBuilder 构建依赖关系：
-        - 存储到 LevelDB（实时索引）
-        - 同步到 SurrealDB（全文检索 + 图查询）
-        - 存储到 Qdrant（向量检索）
-    - GraphService 加载到内存
+   - GitService 读取文件 → SymbolExtractor 解析 AST → 提取符号
+   - CodeChunkBuilder 生成代码块 → VectorService 生成嵌入向量
+   - GraphBuilder 构建依赖关系：
+     - 存储到 LevelDB（实时索引）
+     - 同步到 SurrealDB（全文检索 + 图查询）
+     - 存储到 Qdrant（向量检索）
+   - GraphService 加载到内存
 4. 任务状态更新：0% → 30% → 60% → 80% → 100%
 
 ### RAG 查询流程
 
 1. 用户查询：`POST /query/code`
 2. RAGService 根据查询类型选择存储层：
-    - **向量搜索**：VectorService 生成查询向量 → Qdrant 搜索 top-K 相似符号
-    - **全文搜索**：SurrealDB BM25 搜索符号名称或代码内容
-    - **图查询**：SurrealDB 查找符号依赖链、调用关系
+   - **向量搜索**：VectorService 生成查询向量 → Qdrant 搜索 top-K 相似符号
+   - **全文搜索**：SurrealDB BM25 搜索符号名称或代码内容
+   - **图查询**：SurrealDB 查找符号依赖链、调用关系
 3. GraphService 扩展结果，包含依赖关系
 4. 返回包含上下文的丰富结果
 
@@ -352,13 +352,13 @@ pnpm fmt:js         # JavaScript/TypeScript (Prettier)
 
 ### 数据库技术栈
 
-| 数据库             | 用途             | 位置                          |
-|-----------------|----------------|-----------------------------|
-| **SQLite**      | 元数据、状态管理       | `database/sqlite/app.db`    |
-| **SQLite**      | 符号、依赖关系图（实时索引） | `database/sqlite/symbol.db` |
-| **SurrealDB**   | 全文检索、图数据库、关系查询 | `database/surrealdb/` 或远程   |
-| **Qdrant**      | 向量嵌入、语义搜索      | 独立部署或远程                     |
-| **Tauri Store** | 前端状态持久化        | `cache/*.store.json`        |
+| 数据库          | 用途                         | 位置                         |
+| --------------- | ---------------------------- | ---------------------------- |
+| **SQLite**      | 元数据、状态管理             | `database/sqlite/app.db`     |
+| **SQLite**      | 符号、依赖关系图（实时索引） | `database/sqlite/symbol.db`  |
+| **SurrealDB**   | 全文检索、图数据库、关系查询 | `database/surrealdb/` 或远程 |
+| **Qdrant**      | 向量嵌入、语义搜索           | 独立部署或远程               |
+| **Tauri Store** | 前端状态持久化               | `cache/*.store.json`         |
 
 详细存储规范请参考 [docs/SHARED_STORAGE.md](./docs/SHARED_STORAGE.md)。
 
@@ -481,14 +481,14 @@ src/
 
 ```typescript
 export class ServiceName {
-    private repo = new RepositoryName();
+  private repo = new RepositoryName();
 
-    async operation(dto: CreateDto): Promise<Entity> {
-        logger.info({ field: value }, 'Operation');
-        const entity = await this.repo.create(dto);
-        logger.info({ id: entity.id }, 'Created');
-        return entity;
-    }
+  async operation(dto: CreateDto): Promise<Entity> {
+    logger.info({ field: value }, 'Operation');
+    const entity = await this.repo.create(dto);
+    logger.info({ id: entity.id }, 'Created');
+    return entity;
+  }
 }
 ```
 
@@ -498,21 +498,20 @@ export class ServiceName {
 
 - **语言支持**：仅实现了 TypeScript/JavaScript 索引
 - **Rust 后端**：
-    - ✅ 事件系统、状态管理、配置管理已完整实现
-    - ✅ 文件树管理（缓存、监听）已完整实现
-    - ✅ 任务调度系统已完整实现
-    - ⏳ Tauri 与 Node.js IPC 功能待实现
-    - ⏳ 进程管理器（app_sidecar.rs）待实现
+  - ✅ 事件系统、状态管理、配置管理已完整实现
+  - ✅ 文件树管理（缓存、监听）已完整实现
+  - ✅ 任务调度系统已完整实现
+  - ⏳ Tauri 与 Node.js IPC 功能待实现
+  - ⏳ 进程管理器（app_sidecar.rs）待实现
 - **前端**：
-    - ✅ UI 框架、事件系统 Hooks 已完整实现
-    - ✅ 三栏布局（左侧栏、中间区、右侧 Explorer）已实现
-    - ✅ 文件树组件（递归、右键菜单）已实现
-    - ✅ 标签页系统（多标签管理）已实现
-    - ⏳ 与 Node.js RAG 服务的 API 集成待完成
-    - ⏳ 笔记富文本编辑器集成待完成
+  - ✅ UI 框架、事件系统 Hooks 已完整实现
+  - ✅ 文件树组件（递归、右键菜单）已实现
+  - ✅ 标签页系统（多标签管理）已实现
+  - ⏳ 与 Node.js RAG 服务的 API 集成待完成
+  - ⏳ 笔记富文本编辑器集成待完成
 - **Node.js 后端**：
-    - ✅ RAG 引擎已实现
-    - ⏳ 使用简单的内存队列（BullMQ 已导入但未使用）
+  - ✅ RAG 引擎已实现
+  - ⏳ 使用简单的内存队列（BullMQ 已导入但未使用）
 
 ### 开发建议
 
@@ -524,15 +523,15 @@ export class ServiceName {
 
 ## 配置文件
 
-| 文件                            | 说明                         |
-|-------------------------------|----------------------------|
-| `tauri.conf.json`             | Tauri 应用配置（窗口、打包、更新）       |
-| `Cargo.toml`                  | Rust 依赖和构建配置               |
-| `apps/open-node/package.json` | Node.js 服务依赖               |
-| `apps/open-web/package.json`  | 前端依赖                       |
-| `.oxlintrc.json`              | JavaScript/TypeScript 检查规则 |
-| `.prettierrc`                 | 代码格式化规则                    |
-| `pnpm-workspace.yaml`         | Monorepo 工作区配置             |
+| 文件                          | 说明                               |
+| ----------------------------- | ---------------------------------- |
+| `tauri.conf.json`             | Tauri 应用配置（窗口、打包、更新） |
+| `Cargo.toml`                  | Rust 依赖和构建配置                |
+| `apps/open-node/package.json` | Node.js 服务依赖                   |
+| `apps/open-web/package.json`  | 前端依赖                           |
+| `.oxlintrc.json`              | JavaScript/TypeScript 检查规则     |
+| `.prettierrc`                 | 代码格式化规则                     |
+| `pnpm-workspace.yaml`         | Monorepo 工作区配置                |
 
 ## 文档参考
 

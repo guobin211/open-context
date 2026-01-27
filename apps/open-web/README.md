@@ -76,7 +76,6 @@
 
 - **@floating-ui/react** - 浮动 UI 定位
 - **react-hotkeys-hook** - 快捷键绑定
-- **lodash.throttle** - 节流函数
 
 ## 目录结构
 

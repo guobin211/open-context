@@ -220,13 +220,13 @@ println!("日志目录: {}", log_dir.display());
 
 ## 与 open-node 日志系统的对比
 
-| 特性 | open-app (Rust) | open-node (Node.js) |
-|-----|----------------|-------------------|
-| 日志库 | tauri-plugin-log | pino / winston |
-| 文件轮转 | FileRotator | 按天自动轮转 |
-| 日志级别 | trace/debug/info/warn/error | 相同 |
-| 输出目标 | 控制台/文件/Webview | 控制台/文件 |
-| 配置方式 | 环境变量 | 环境变量 |
+| 特性     | open-app (Rust)             | open-node (Node.js) |
+| -------- | --------------------------- | ------------------- |
+| 日志库   | tauri-plugin-log            | pino / winston      |
+| 文件轮转 | FileRotator                 | 按天自动轮转        |
+| 日志级别 | trace/debug/info/warn/error | 相同                |
+| 输出目标 | 控制台/文件/Webview         | 控制台/文件         |
+| 配置方式 | 环境变量                    | 环境变量            |
 
 ## 技术细节
 

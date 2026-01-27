@@ -81,8 +81,6 @@ type: always
 src/
 ├── components/
 │   ├── ui/           # shadcn/ui 组件
-│   ├── layout/       # 布局组件（三栏布局）
-│   ├── sidebar/      # 侧边栏组件
 │   ├── file-tree/    # 文件树组件
 │   └── tiptap-*/     # Tiptap 编辑器相关组件
 ├── routes/           # TanStack Router 路由

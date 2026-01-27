@@ -1,8 +1,11 @@
 # logging 规范
 
 ## 目的
+
 待定 - 由归档变更 add-unified-logger 创建。归档后请更新目的。
+
 ## 需求
+
 ### 需求：统一日志 API 设计
 
 系统必须提供跨三端（open-app Rust、open-node Node.js、open-web React）的一致性日志 API，确保日志接口和参数结构保持统一。
@@ -119,4 +122,3 @@ open-app Rust 端必须增强现有 log crate 实现，必须添加文件轮转�
 - **当** Tauri 日志插件接收到来自 Web 端的日志请求
 - **那么** 必须将日志写入 open-web 对应的日志文件
 - **并且** 必须应用统一的日志格式和级别控制
-

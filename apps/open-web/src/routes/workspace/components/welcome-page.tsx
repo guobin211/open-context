@@ -3,7 +3,7 @@ import { open } from '@tauri-apps/plugin-dialog';
 import { useCallback } from 'react';
 import { useRightSidebarStore, type RecentFolder } from '@/storage';
 import { readDirectoryRecursive } from '@/services/folder-service';
-import { Logo } from './workspace-sidebar';
+import { Logo } from './logo';
 
 interface ActionCardProps {
   icon: React.ReactNode;

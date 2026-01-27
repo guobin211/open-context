@@ -1,4 +1,4 @@
-import throttle from 'lodash.throttle';
+import { throttle } from 'es-toolkit';
 
 import { useUnmount } from '@/hooks/use-unmount';
 import { useMemo } from 'react';

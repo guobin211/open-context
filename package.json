@@ -26,8 +26,8 @@
     "@tauri-apps/cli": "^2.9.6",
     "@types/react": "^19.2.9",
     "@types/react-dom": "^19.2.3",
-    "oxlint": "^1.41.0",
-    "oxlint-tsgolint": "^0.11.1",
+    "oxlint": "^1.42.0",
+    "oxlint-tsgolint": "^0.11.2",
     "prettier": "^3.8.1",
     "prettier-plugin-tailwindcss": "^0.7.2",
     "typescript": "~5.8.3",
@@ -37,6 +37,7 @@
     "onlyBuiltDependencies": [
       "@parcel/watcher",
       "@swc/core",
+      "better-sqlite3",
       "classic-level",
       "cos-js-sdk-v5",
       "esbuild",

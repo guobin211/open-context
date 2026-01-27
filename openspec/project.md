@@ -106,8 +106,6 @@ types/        → TypeScript 定义
 src/
 ├── components/
 │   ├── ui/              # shadcn/ui 组件
-│   ├── ti layout/          # 布局组件
-│   └── sidebar/         # 侧边栏组件
 ├── routes/              # TanStack Router 文件系统路由
 ├── zustand/             # Zustand stores
 ├── hooks/               # 自定义 hooks

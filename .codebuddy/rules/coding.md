@@ -81,9 +81,6 @@ type: always
 src/
 ├── components/
 │   ├── ui/           # shadcn/ui 组件
-│   ├── layout/       # 布局组件
-│   ├── sidebar/      # 侧边栏组件
-│   └── content/      # 内容区组件
 ├── routes/           # TanStack Router 路由
 ├── zustand/          # Zustand stores
 ├── hooks/            # 自定义 hooks

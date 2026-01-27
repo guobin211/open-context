@@ -1,9 +1,0 @@
-export { MainLayout } from './main-layout';
-export { Sidebar } from './sidebar';
-export { ContentArea } from './content-area';
-export { AIInputBar } from './ai-input-bar';
-export { TopSearchBar } from './top-search-bar';
-export { ExplorerPanel } from './explorer-panel';
-export { StatusBar } from './status-bar';
-export { FolderFileTree } from './folder-file-tree';
-export { EditorTabs } from './editor-tabs';
