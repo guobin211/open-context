@@ -1,5 +1,5 @@
-import { defineConfig } from 'vitest/config';
 import path from 'path';
+import { defineConfig } from 'vitest/config';
 
 export default defineConfig({
   test: {
@@ -13,7 +13,8 @@ export default defineConfig({
       exclude: ['node_modules/', 'tests/', 'dist/', '**/*.test.ts']
     },
     testTimeout: 10000,
-    hookTimeout: 10000
+    hookTimeout: 10000,
+    setupFiles: ['./tests/setup.mjs']
   },
   resolve: {
     alias: {

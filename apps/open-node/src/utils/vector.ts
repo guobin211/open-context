@@ -1,4 +1,4 @@
-import ollama from 'ollama';
+import { Ollama } from 'ollama';
 import logger from './logger';
 
 const DEFAULT_EMBEDDING_MODEL = process.env.OLLAMA_EMBEDDING_MODEL || 'qwen3-embedding';
@@ -12,10 +12,14 @@ const SUPPORTED_MODELS = {
 
 type SupportedModel = (typeof SUPPORTED_MODELS)[keyof typeof SUPPORTED_MODELS];
 
+const client = new Ollama({
+  host: process.env.OLLAMA_API_URL
+});
+
 export async function generateEmbedding(text: string, model?: SupportedModel): Promise<number[]> {
   const targetModel = model || DEFAULT_EMBEDDING_MODEL;
   try {
-    const response = await ollama.embeddings({
+    const response = await client.embeddings({
       model: targetModel,
       prompt: text
     });
@@ -31,7 +35,7 @@ export async function batchGenerateEmbeddings(texts: string[], model?: Supported
   try {
     const responses = await Promise.all(
       texts.map((text) =>
-        ollama.embeddings({
+        client.embeddings({
           model: targetModel,
           prompt: text
         })

@@ -115,8 +115,7 @@ pnpm fmt:rs         # Cargo fmt
 pnpm --filter open-node test
 
 # 运行单个测试文件 (支持文件名或路径)
-pnpm --filter open-node test workspace-service.test.ts
-pnpm --filter open-node test tests/services/workspace-service.test.ts
+pnpm --filter open-node test vector.test.ts
 
 # 运行一次测试 (CI 模式)
 pnpm --filter open-node test:run
