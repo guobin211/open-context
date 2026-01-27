@@ -26,7 +26,6 @@ dotenv = { workspace = true }
 serde = { workspace = true }
 serde_json = { workspace = true }
 log = { workspace = true }
-simplelog = "0.12"
 git2 = { workspace = true }
 walkdir = { workspace = true }
 lazy_static = { workspace = true }

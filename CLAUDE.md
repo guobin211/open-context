@@ -47,11 +47,9 @@ Open-Context 是一个开源的 AI Agent 上下文管理工具，提供对话、
 - 🗂️ 工作空间 - Git 仓库管理、文档组织、资源聚合
 - 🔍 RAG 检索 - 向量检索（Qdrant）+ 依赖关系图
 - 🔄 事件系统 - 完整的前后端通信机制
-- 🌐 MCP 协议支持 - 对外提供标准化服务接口
+- 🌐 Webview浏览器 - 基于tauri的内置浏览器
 
 **技术架构**：Tauri (Rust) + Node.js RAG 引擎 + React 前端
-
-**UI 特点**：VS Code 风格三栏布局，多标签页管理，现代化交互
 
 详细介绍请参考 [README.md](./README.md)。
 
@@ -101,9 +99,6 @@ open-context/
 │   │   └── src/
 │   │       ├── components/        # UI 组件
 │   │       │   ├── ui/            # shadcn/ui 基础组件
-│   │       │   ├── layout/        # 布局组件（三栏布局）
-│   │       │   ├── sidebar/       # 侧边栏组件（树形结构）
-│   │       │   ├── file-tree/     # 文件树组件
 │   │       │   └── tiptap-*/      # Tiptap 编辑器相关组件
 │   │       ├── routes/            # TanStack Router 路由
 │   │       │   ├── __root.tsx     # 根布局
@@ -145,13 +140,13 @@ open-context/
 
 ### 文件命名规范
 
-| 文件类型        | 命名规范              | 示例                |
-| --------------- | --------------------- | ------------------- |
+| 文件类型          | 命名规范                  | 示例                  |
+|---------------|-----------------------|---------------------|
 | Rust 文件       | `snake_case.rs`       | `app_events.rs`     |
 | TypeScript 文件 | `kebab-case.ts`       | `use-app-events.ts` |
 | React 组件      | `kebab-case.tsx`      | `simple-editor.tsx` |
-| 文档文件        | `UPPER_SNAKE_CASE.md` | `EVENT_SYSTEM.md`   |
-| 脚本文件        | `kebab-case.sh`       | `build-all.sh`      |
+| 文档文件          | `UPPER_SNAKE_CASE.md` | `EVENT_SYSTEM.md`   |
+| 脚本文件          | `kebab-case.sh`       | `build-all.sh`      |
 
 ### 重要约定
 
@@ -163,11 +158,11 @@ open-context/
 
 Open-Context 采用 Tauri 混合架构，三层协作：
 
-| 模块          | 职责                             | 技术栈                     | 运行端口 |
-| ------------- | -------------------------------- | -------------------------- | -------- |
-| **open-app**  | 桌面外壳，本地 FS 操作、系统调用 | Rust + Tauri 2.x           | -        |
-| **open-node** | RAG 引擎，代码索引、向量检索     | Node.js + Hono             | 4500     |
-| **open-web**  | React UI，用户界面和交互         | React 19 + TanStack Router | 1420     |
+| 模块            | 职责                 | 技术栈                        | 运行端口 |
+|---------------|--------------------|----------------------------|------|
+| **open-app**  | 桌面外壳，本地 FS 操作、系统调用 | Rust + Tauri 2.x           | -    |
+| **open-node** | RAG 引擎，代码索引、向量检索   | Node.js + Hono             | 4500 |
+| **open-web**  | React UI，用户界面和交互   | React 19 + TanStack Router | 1420 |
 
 ### 模块通信流程
 
@@ -198,7 +193,7 @@ use open_app_lib::{EventEmitter, AppEvent};
 
 let emitter = EventEmitter::new(app.handle().clone());
 let event = AppEvent::AppReady { timestamp: AppEvent::now() };
-emitter.emit_global(&event)?;
+emitter.emit_global( & event) ?;
 ```
 
 **前端监听事件（React）**：
@@ -207,8 +202,8 @@ emitter.emit_global(&event)?;
 import { useThemeEvent } from '@/hooks/use-app-events';
 
 function MyComponent() {
-  const theme = useThemeEvent('system');
-  return <div>Theme: {theme}</div>;
+    const theme = useThemeEvent('system');
+    return <div>Theme: {theme}</div>;
 }
 ```
 
@@ -248,22 +243,22 @@ import { FileTree } from '@/components/file-tree';
 1. 用户触发：`POST /repos/:repoId/index`
 2. JobService 创建任务 → JobQueue 入队
 3. IndexJob 执行：
-   - GitService 读取文件 → SymbolExtractor 解析 AST → 提取符号
-   - CodeChunkBuilder 生成代码块 → VectorService 生成嵌入向量
-   - GraphBuilder 构建依赖关系：
-     - 存储到 LevelDB（实时索引）
-     - 同步到 SurrealDB（全文检索 + 图查询）
-     - 存储到 Qdrant（向量检索）
-   - GraphService 加载到内存
+    - GitService 读取文件 → SymbolExtractor 解析 AST → 提取符号
+    - CodeChunkBuilder 生成代码块 → VectorService 生成嵌入向量
+    - GraphBuilder 构建依赖关系：
+        - 存储到 LevelDB（实时索引）
+        - 同步到 SurrealDB（全文检索 + 图查询）
+        - 存储到 Qdrant（向量检索）
+    - GraphService 加载到内存
 4. 任务状态更新：0% → 30% → 60% → 80% → 100%
 
 ### RAG 查询流程
 
 1. 用户查询：`POST /query/code`
 2. RAGService 根据查询类型选择存储层：
-   - **向量搜索**：VectorService 生成查询向量 → Qdrant 搜索 top-K 相似符号
-   - **全文搜索**：SurrealDB BM25 搜索符号名称或代码内容
-   - **图查询**：SurrealDB 查找符号依赖链、调用关系
+    - **向量搜索**：VectorService 生成查询向量 → Qdrant 搜索 top-K 相似符号
+    - **全文搜索**：SurrealDB BM25 搜索符号名称或代码内容
+    - **图查询**：SurrealDB 查找符号依赖链、调用关系
 3. GraphService 扩展结果，包含依赖关系
 4. 返回包含上下文的丰富结果
 
@@ -335,14 +330,13 @@ pnpm fmt:js         # JavaScript/TypeScript (Prettier)
 │   ├── right-sidebar.store.json   # 右侧栏状态
 │   ├── notebook-store.store.json  # 笔记状态
 │   └── workspace-store.store.json # 工作空间状态
-├── config/         # 配置文件（config.json）
 ├── database/       # 数据库数据
-│   ├── app_state.db    # SQLite 数据库（Tauri 端）
 │   ├── surrealdb/      # SurrealDB 数据库（图数据库）
-│   ├── leveldb/        # LevelDB 数据库
-│   │   ├── main/           # 主数据库（符号、元数据）
-│   │   ├── edges/          # 正向边（依赖关系）
-│   │   └── reverse-edges/  # 反向边（被依赖关系）
+│   ├── sqlite/        # LevelDB 数据库
+│   │   ├── app.db            # app主数据库
+│   │   ├── symbol.db         # 符号数据库（符号、元数据）
+│   │   ├── edges.db          # 正向边（依赖关系）
+│   │   └── reverse-edges.db  # 反向边（被依赖关系）
 │   └── qdrant/         # Qdrant 向量数据库（需独立部署）
 ├── notebook/       # 笔记数据
 ├── session/        # 会话数据
@@ -352,21 +346,19 @@ pnpm fmt:js         # JavaScript/TypeScript (Prettier)
 ├── plugins/        # 插件配置
 ├── commands/       # 命令历史/配置
 ├── skills/         # Skills 数据
-├── todos/          # Todo 数据
-├── projects/       # 项目数据
 ├── rules/          # 规则数据
 └── hooks/          # Hooks 配置
 ```
 
 ### 数据库技术栈
 
-| 数据库          | 用途                         | 位置                         |
-| --------------- | ---------------------------- | ---------------------------- |
-| **SQLite**      | 元数据、状态管理             | `database/app_state.db`      |
-| **LevelDB**     | 符号、依赖关系图（实时索引） | `database/leveldb/`          |
-| **SurrealDB**   | 全文检索、图数据库、关系查询 | `database/surrealdb/` 或远程 |
-| **Qdrant**      | 向量嵌入、语义搜索           | 独立部署或远程               |
-| **Tauri Store** | 前端状态持久化               | `cache/*.store.json`         |
+| 数据库             | 用途             | 位置                          |
+|-----------------|----------------|-----------------------------|
+| **SQLite**      | 元数据、状态管理       | `database/sqlite/app.db`    |
+| **SQLite**      | 符号、依赖关系图（实时索引） | `database/sqlite/symbol.db` |
+| **SurrealDB**   | 全文检索、图数据库、关系查询 | `database/surrealdb/` 或远程   |
+| **Qdrant**      | 向量嵌入、语义搜索      | 独立部署或远程                     |
+| **Tauri Store** | 前端状态持久化        | `cache/*.store.json`        |
 
 详细存储规范请参考 [docs/SHARED_STORAGE.md](./docs/SHARED_STORAGE.md)。
 
@@ -489,14 +481,14 @@ src/
 
 ```typescript
 export class ServiceName {
-  private repo = new RepositoryName();
+    private repo = new RepositoryName();
 
-  async operation(dto: CreateDto): Promise<Entity> {
-    logger.info({ field: value }, 'Operation');
-    const entity = await this.repo.create(dto);
-    logger.info({ id: entity.id }, 'Created');
-    return entity;
-  }
+    async operation(dto: CreateDto): Promise<Entity> {
+        logger.info({ field: value }, 'Operation');
+        const entity = await this.repo.create(dto);
+        logger.info({ id: entity.id }, 'Created');
+        return entity;
+    }
 }
 ```
 
@@ -506,21 +498,21 @@ export class ServiceName {
 
 - **语言支持**：仅实现了 TypeScript/JavaScript 索引
 - **Rust 后端**：
-  - ✅ 事件系统、状态管理、配置管理已完整实现
-  - ✅ 文件树管理（缓存、监听）已完整实现
-  - ✅ 任务调度系统已完整实现
-  - ⏳ Tauri 与 Node.js IPC 功能待实现
-  - ⏳ 进程管理器（app_sidecar.rs）待实现
+    - ✅ 事件系统、状态管理、配置管理已完整实现
+    - ✅ 文件树管理（缓存、监听）已完整实现
+    - ✅ 任务调度系统已完整实现
+    - ⏳ Tauri 与 Node.js IPC 功能待实现
+    - ⏳ 进程管理器（app_sidecar.rs）待实现
 - **前端**：
-  - ✅ UI 框架、事件系统 Hooks 已完整实现
-  - ✅ 三栏布局（左侧栏、中间区、右侧 Explorer）已实现
-  - ✅ 文件树组件（递归、右键菜单）已实现
-  - ✅ 标签页系统（多标签管理）已实现
-  - ⏳ 与 Node.js RAG 服务的 API 集成待完成
-  - ⏳ 笔记富文本编辑器集成待完成
+    - ✅ UI 框架、事件系统 Hooks 已完整实现
+    - ✅ 三栏布局（左侧栏、中间区、右侧 Explorer）已实现
+    - ✅ 文件树组件（递归、右键菜单）已实现
+    - ✅ 标签页系统（多标签管理）已实现
+    - ⏳ 与 Node.js RAG 服务的 API 集成待完成
+    - ⏳ 笔记富文本编辑器集成待完成
 - **Node.js 后端**：
-  - ✅ RAG 引擎已实现
-  - ⏳ 使用简单的内存队列（BullMQ 已导入但未使用）
+    - ✅ RAG 引擎已实现
+    - ⏳ 使用简单的内存队列（BullMQ 已导入但未使用）
 
 ### 开发建议
 
@@ -532,15 +524,15 @@ export class ServiceName {
 
 ## 配置文件
 
-| 文件                          | 说明                               |
-| ----------------------------- | ---------------------------------- |
-| `tauri.conf.json`             | Tauri 应用配置（窗口、打包、更新） |
-| `Cargo.toml`                  | Rust 依赖和构建配置                |
-| `apps/open-node/package.json` | Node.js 服务依赖                   |
-| `apps/open-web/package.json`  | 前端依赖                           |
-| `.oxlintrc.json`              | JavaScript/TypeScript 检查规则     |
-| `.prettierrc`                 | 代码格式化规则                     |
-| `pnpm-workspace.yaml`         | Monorepo 工作区配置                |
+| 文件                            | 说明                         |
+|-------------------------------|----------------------------|
+| `tauri.conf.json`             | Tauri 应用配置（窗口、打包、更新）       |
+| `Cargo.toml`                  | Rust 依赖和构建配置               |
+| `apps/open-node/package.json` | Node.js 服务依赖               |
+| `apps/open-web/package.json`  | 前端依赖                       |
+| `.oxlintrc.json`              | JavaScript/TypeScript 检查规则 |
+| `.prettierrc`                 | 代码格式化规则                    |
+| `pnpm-workspace.yaml`         | Monorepo 工作区配置             |
 
 ## 文档参考
 
@@ -556,8 +548,3 @@ export class ServiceName {
 
 - [open-node README](./apps/open-node/README.md) - RAG 引擎详细文档
 - [open-web README](./apps/open-web/README.md) - 前端架构文档
-
-### 代码示例
-
-- [apps/open-web/src/components/event-demo.tsx](./apps/open-web/src/components/event-demo.tsx) - React 事件示例
-- [apps/open-web/src/components/file-tree/file-tree-demo.tsx](./apps/open-web/src/components/file-tree/file-tree-demo.tsx) - 文件树示例

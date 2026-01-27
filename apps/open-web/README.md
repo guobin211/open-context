@@ -86,8 +86,6 @@ open-web/
 │   ├── components/        # React 组件
 │   │   ├── ui/           # shadcn/ui 组件库
 │   │   ├── tiptap-*/     # Tiptap 富文本编辑器
-│   │   ├── layout/       # 布局组件
-│   │   └── sidebar/      # 侧边栏组件
 │   ├── routes/            # TanStack Router 路由
 │   ├── storage/           # Zustand stores（客户端状态）
 │   ├── services/          # 服务层（HTTP/Tauri）

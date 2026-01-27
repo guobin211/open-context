@@ -10,8 +10,10 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as WorkspaceIndexRouteImport } from './routes/workspace/index'
 import { Route as SettingsIndexRouteImport } from './routes/settings/index'
 import { Route as PlaygroundIndexRouteImport } from './routes/playground/index'
+import { Route as LaunchPadIndexRouteImport } from './routes/launch-pad/index'
 import { Route as PlaygroundXmlParserRouteImport } from './routes/playground/xml-parser'
 import { Route as PlaygroundWorkflowEditorRouteImport } from './routes/playground/workflow-editor'
 import { Route as PlaygroundWordViewerRouteImport } from './routes/playground/word-viewer'
@@ -46,6 +48,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const WorkspaceIndexRoute = WorkspaceIndexRouteImport.update({
+  id: '/workspace/',
+  path: '/workspace/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SettingsIndexRoute = SettingsIndexRouteImport.update({
   id: '/settings/',
   path: '/settings/',
@@ -54,6 +61,11 @@ const SettingsIndexRoute = SettingsIndexRouteImport.update({
 const PlaygroundIndexRoute = PlaygroundIndexRouteImport.update({
   id: '/playground/',
   path: '/playground/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LaunchPadIndexRoute = LaunchPadIndexRouteImport.update({
+  id: '/launch-pad/',
+  path: '/launch-pad/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PlaygroundXmlParserRoute = PlaygroundXmlParserRouteImport.update({
@@ -229,8 +241,10 @@ export interface FileRoutesByFullPath {
   '/playground/word-viewer': typeof PlaygroundWordViewerRoute
   '/playground/workflow-editor': typeof PlaygroundWorkflowEditorRoute
   '/playground/xml-parser': typeof PlaygroundXmlParserRoute
+  '/launch-pad/': typeof LaunchPadIndexRoute
   '/playground/': typeof PlaygroundIndexRoute
   '/settings/': typeof SettingsIndexRoute
+  '/workspace/': typeof WorkspaceIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -262,8 +276,10 @@ export interface FileRoutesByTo {
   '/playground/word-viewer': typeof PlaygroundWordViewerRoute
   '/playground/workflow-editor': typeof PlaygroundWorkflowEditorRoute
   '/playground/xml-parser': typeof PlaygroundXmlParserRoute
+  '/launch-pad': typeof LaunchPadIndexRoute
   '/playground': typeof PlaygroundIndexRoute
   '/settings': typeof SettingsIndexRoute
+  '/workspace': typeof WorkspaceIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -296,8 +312,10 @@ export interface FileRoutesById {
   '/playground/word-viewer': typeof PlaygroundWordViewerRoute
   '/playground/workflow-editor': typeof PlaygroundWorkflowEditorRoute
   '/playground/xml-parser': typeof PlaygroundXmlParserRoute
+  '/launch-pad/': typeof LaunchPadIndexRoute
   '/playground/': typeof PlaygroundIndexRoute
   '/settings/': typeof SettingsIndexRoute
+  '/workspace/': typeof WorkspaceIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -331,8 +349,10 @@ export interface FileRouteTypes {
     | '/playground/word-viewer'
     | '/playground/workflow-editor'
     | '/playground/xml-parser'
+    | '/launch-pad/'
     | '/playground/'
     | '/settings/'
+    | '/workspace/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -364,8 +384,10 @@ export interface FileRouteTypes {
     | '/playground/word-viewer'
     | '/playground/workflow-editor'
     | '/playground/xml-parser'
+    | '/launch-pad'
     | '/playground'
     | '/settings'
+    | '/workspace'
   id:
     | '__root__'
     | '/'
@@ -397,8 +419,10 @@ export interface FileRouteTypes {
     | '/playground/word-viewer'
     | '/playground/workflow-editor'
     | '/playground/xml-parser'
+    | '/launch-pad/'
     | '/playground/'
     | '/settings/'
+    | '/workspace/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -431,8 +455,10 @@ export interface RootRouteChildren {
   PlaygroundWordViewerRoute: typeof PlaygroundWordViewerRoute
   PlaygroundWorkflowEditorRoute: typeof PlaygroundWorkflowEditorRoute
   PlaygroundXmlParserRoute: typeof PlaygroundXmlParserRoute
+  LaunchPadIndexRoute: typeof LaunchPadIndexRoute
   PlaygroundIndexRoute: typeof PlaygroundIndexRoute
   SettingsIndexRoute: typeof SettingsIndexRoute
+  WorkspaceIndexRoute: typeof WorkspaceIndexRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -442,6 +468,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/workspace/': {
+      id: '/workspace/'
+      path: '/workspace'
+      fullPath: '/workspace/'
+      preLoaderRoute: typeof WorkspaceIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/settings/': {
@@ -456,6 +489,13 @@ declare module '@tanstack/react-router' {
       path: '/playground'
       fullPath: '/playground/'
       preLoaderRoute: typeof PlaygroundIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/launch-pad/': {
+      id: '/launch-pad/'
+      path: '/launch-pad'
+      fullPath: '/launch-pad/'
+      preLoaderRoute: typeof LaunchPadIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/playground/xml-parser': {
@@ -687,8 +727,10 @@ const rootRouteChildren: RootRouteChildren = {
   PlaygroundWordViewerRoute: PlaygroundWordViewerRoute,
   PlaygroundWorkflowEditorRoute: PlaygroundWorkflowEditorRoute,
   PlaygroundXmlParserRoute: PlaygroundXmlParserRoute,
+  LaunchPadIndexRoute: LaunchPadIndexRoute,
   PlaygroundIndexRoute: PlaygroundIndexRoute,
   SettingsIndexRoute: SettingsIndexRoute,
+  WorkspaceIndexRoute: WorkspaceIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

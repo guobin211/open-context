@@ -2,6 +2,7 @@
 //!
 //! 提供日志级别、输出目标等配置管理
 
+use crate::app_state::AppConfig;
 use log::Level;
 use std::env;
 
@@ -63,14 +64,10 @@ impl LogConfig {
             });
 
         let log_dir = env::var("LOG_DIR").unwrap_or_else(|_| {
-            dirs::home_dir()
-                .map(|path| {
-                    path.join(".open-context")
-                        .join("logs")
-                        .to_string_lossy()
-                        .to_string()
-                })
-                .unwrap_or_else(|| "./logs".to_string())
+            AppConfig::base_dir()
+                .join("logs")
+                .to_string_lossy()
+                .to_string()
         });
 
         let retention_days = env::var("LOG_RETENTION_DAYS")

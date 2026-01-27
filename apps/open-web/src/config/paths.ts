@@ -51,8 +51,6 @@ export const StorageDirs = {
   PLUGINS: 'plugins',
   COMMANDS: 'commands',
   SKILLS: 'skills',
-  TODOS: 'todos',
-  PROJECTS: 'projects',
   RULES: 'rules',
   HOOKS: 'hooks',
   REPOS: 'repos'

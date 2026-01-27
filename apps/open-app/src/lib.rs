@@ -15,8 +15,6 @@ pub type TauriBuilder = tauri::Builder<Wry>;
 
 /// Run the application
 pub fn run() {
-    crate::logging::init("open-app").expect("Failed to initialize logger");
-
     let app_state = AppState::new().expect("Failed to initialize app state");
     init_app_dirs().expect("Failed to initialize app dirs");
     let task_manager = TaskManager::new();

@@ -151,7 +151,7 @@ impl AppConfig {
     /// - 开发环境：workspace/.open-context 或 git-root/.open-context
     /// - 生产环境：~/.open-context
     /// - 自定义：OPEN_CONTEXT_HOME 环境变量
-    fn base_dir() -> PathBuf {
+    pub fn base_dir() -> PathBuf {
         // 1. 环境变量优先级最高
         if let Ok(custom_home) = std::env::var("OPEN_CONTEXT_HOME") {
             return PathBuf::from(custom_home);

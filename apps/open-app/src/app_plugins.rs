@@ -1,4 +1,6 @@
+use crate::logging::log_config::{LogConfig, LogTarget};
 use tauri::{AppHandle, Manager, WebviewWindow, Wry};
+use tauri_plugin_log::{Target, TargetKind};
 use tauri_plugin_prevent_default::Flags;
 
 /// 执行窗口相关操作
@@ -45,6 +47,43 @@ type TauriBuilder = tauri::Builder<Wry>;
 
 /// 配置通用插件
 pub fn setup_general_plugins(builder: TauriBuilder) -> TauriBuilder {
+    // 配置日志插件
+    let log_config = LogConfig::from_env("open-app");
+    let log_level_filter = match log_config.level {
+        log::Level::Trace => log::LevelFilter::Trace,
+        log::Level::Debug => log::LevelFilter::Debug,
+        log::Level::Info => log::LevelFilter::Info,
+        log::Level::Warn => log::LevelFilter::Warn,
+        log::Level::Error => log::LevelFilter::Error,
+    };
+
+    let mut log_targets = vec![];
+    match log_config.target {
+        LogTarget::Console => {
+            log_targets.push(Target::new(TargetKind::Stdout));
+            log_targets.push(Target::new(TargetKind::Webview));
+        }
+        LogTarget::File => {
+            let log_file_name = format!("{}.log", log_config.file_prefix);
+            log_targets.push(Target::new(TargetKind::LogDir {
+                file_name: Some(log_file_name),
+            }));
+        }
+        LogTarget::Both => {
+            log_targets.push(Target::new(TargetKind::Stdout));
+            log_targets.push(Target::new(TargetKind::Webview));
+            let log_file_name = format!("{}.log", log_config.file_prefix);
+            log_targets.push(Target::new(TargetKind::LogDir {
+                file_name: Some(log_file_name),
+            }));
+        }
+    }
+
+    let log_plugin = tauri_plugin_log::Builder::new()
+        .targets(log_targets)
+        .level(log_level_filter)
+        .build();
+
     let builder = builder
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_fs_pro::init())
@@ -56,7 +95,7 @@ pub fn setup_general_plugins(builder: TauriBuilder) -> TauriBuilder {
         .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_localhost::Builder::new(14399).build())
         .plugin(tauri_plugin_shell::init())
-        .plugin(tauri_plugin_log::Builder::new().build())
+        .plugin(log_plugin)
         .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_window_state::Builder::new().build())
         .plugin(tauri_plugin_store::Builder::new().build())
