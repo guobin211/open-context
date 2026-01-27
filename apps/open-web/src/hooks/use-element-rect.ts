@@ -1,7 +1,7 @@
 'use client';
 
-import { useCallback, useEffect, useState } from 'react';
 import { useThrottledCallback } from '@/hooks/use-throttled-callback';
+import { useCallback, useEffect, useState } from 'react';
 
 export type RectState = Omit<DOMRect, 'toJSON'>;
 
@@ -99,8 +99,7 @@ export function useElementRect({
       });
     },
     throttleMs,
-    [enabled, getTargetElement],
-    { leading: true, trailing: true }
+    [enabled, getTargetElement]
   );
 
   useEffect(() => {

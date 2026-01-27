@@ -199,7 +199,8 @@
   "scripts": {
     "build": "tsc && vite build",
     "dev": "vite",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "type-check": "tsc --noEmit"
   },
   "type": "module",
   "version": "0.1.0"
