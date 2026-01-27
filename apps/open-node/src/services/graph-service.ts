@@ -66,6 +66,9 @@ export class GraphService {
   }
 
   async addEdge(from: string, to: string, type: EdgeType): Promise<void> {
+    if (!this.isInitialized) {
+      throw new Error('GraphService is not initialized. Call init() before adding edges.');
+    }
     if (!this.out.has(from)) {
       this.out.set(from, new Map());
     }
