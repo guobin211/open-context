@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { Background } from '@/components/background';
+import { Background } from '@/components/utils/background';
 
 const RouteComponent = () => {
   return (

@@ -7,10 +7,10 @@ import {
   PlaygroundHeader,
   PlaygroundMain
 } from '@/routes/playground/components';
-import { PlaygroundNavigation } from '@/components/navigation';
+import { PlaygroundNavigation } from '@/components/features/navigation';
 
 const DragAndDropDemo = lazyRouteComponent(() =>
-  import('@/components/drag-and-drop').then((m) => ({ default: m.DragAndDropDemo }))
+  import('@/components/utils/drag-and-drop').then((m) => ({ default: m.DragAndDropDemo }))
 );
 
 const RouteComponent = () => {

@@ -7,10 +7,10 @@ import {
   PlaygroundHeader,
   PlaygroundMain
 } from '@/routes/playground/components';
-import { PlaygroundNavigation } from '@/components/navigation';
+import { PlaygroundNavigation } from '@/components/features/navigation';
 
 const WordViewer = lazyRouteComponent(() =>
-  import('@/components/word-viewer').then((m) => ({ default: m.WordViewer }))
+  import('@/components/viewers/word-viewer').then((m) => ({ default: m.WordViewer }))
 );
 
 const RouteComponent = () => {

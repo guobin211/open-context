@@ -5,12 +5,12 @@ import {
   PlaygroundMain,
   PlaygroundSidebar
 } from '@/routes/playground/components';
-import { PlaygroundNavigation } from '@/components/navigation';
+import { PlaygroundNavigation } from '@/components/features/navigation';
 import { createFileRoute, lazyRouteComponent } from '@tanstack/react-router';
 import { Suspense } from 'react';
 
 const MarkdownEditor = lazyRouteComponent(() =>
-  import('@/components/markdown').then((m) => ({ default: m.MarkdownEditor }))
+  import('@/components/editors/markdown').then((m) => ({ default: m.MarkdownEditor }))
 );
 
 const RouteComponent = () => {

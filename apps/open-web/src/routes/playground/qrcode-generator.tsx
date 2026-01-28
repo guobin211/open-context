@@ -7,10 +7,10 @@ import {
   PlaygroundHeader,
   PlaygroundMain
 } from '@/routes/playground/components';
-import { PlaygroundNavigation } from '@/components/navigation';
+import { PlaygroundNavigation } from '@/components/features/navigation';
 
 const QrcodeGenerator = lazyRouteComponent(() =>
-  import('@/components/qrcode-generator').then((m) => ({ default: m.QrcodeGenerator }))
+  import('@/components/media/qrcode-generator').then((m) => ({ default: m.QrcodeGenerator }))
 );
 
 const RouteComponent = () => {

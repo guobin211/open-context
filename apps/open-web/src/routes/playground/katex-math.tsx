@@ -7,10 +7,10 @@ import {
   PlaygroundHeader,
   PlaygroundMain
 } from '@/routes/playground/components';
-import { PlaygroundNavigation } from '@/components/navigation';
+import { PlaygroundNavigation } from '@/components/features/navigation';
 
 const KatexMath = lazyRouteComponent(() =>
-  import('@/components/katex-math').then((m) => ({ default: m.KatexMath }))
+  import('@/components/utils/katex-math').then((m) => ({ default: m.KatexMath }))
 );
 
 const RouteComponent = () => {

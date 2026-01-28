@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { Suspense } from 'react';
+import { Suspense, useState } from 'react';
 import {
   PlaygroundLayout,
   PlaygroundSidebar,
@@ -7,10 +7,12 @@ import {
   PlaygroundHeader,
   PlaygroundMain
 } from '@/routes/playground/components';
-import { PlaygroundFileTree } from '@/components/playground/file-tree';
-import { PlaygroundNavigation } from '@/components/navigation';
+import { FileTree } from '@/components/core/file-tree';
+import { PlaygroundNavigation } from '@/components/features/navigation';
 
 const RouteComponent = () => {
+  const [selectedNode, setSelectedNode] = useState<{ path: string; isDirectory: boolean } | null>(null);
+
   return (
     <PlaygroundLayout>
       <PlaygroundSidebar>
@@ -21,7 +23,22 @@ const RouteComponent = () => {
         <PlaygroundHeader title="文件树" />
         <PlaygroundMain className="p-0">
           <Suspense fallback={<div className="flex h-full items-center justify-center">加载中...</div>}>
-            <PlaygroundFileTree />
+            <div className="h-full p-4">
+              <FileTree
+                rootPath="/Users/guobin/tencent/open-context"
+                onNodeSelect={(node) => setSelectedNode({ path: node.path, isDirectory: node.isDirectory })}
+              />
+              {selectedNode && (
+                <div className="mt-4 rounded border border-border bg-muted p-4">
+                  <p className="text-sm">
+                    <strong>已选择:</strong> {selectedNode.path}
+                  </p>
+                  <p className="text-sm text-muted-foreground">
+                    类型: {selectedNode.isDirectory ? '目录' : '文件'}
+                  </p>
+                </div>
+              )}
+            </div>
           </Suspense>
         </PlaygroundMain>
       </PlaygroundContent>

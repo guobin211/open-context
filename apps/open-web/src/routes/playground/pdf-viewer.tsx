@@ -7,10 +7,10 @@ import {
   PlaygroundHeader,
   PlaygroundMain
 } from '@/routes/playground/components';
-import { PlaygroundNavigation } from '@/components/navigation';
+import { PlaygroundNavigation } from '@/components/features/navigation';
 
 const PdfViewer = lazyRouteComponent(() =>
-  import('@/components/pdf-viewer').then((m) => ({ default: m.PdfViewer }))
+  import('@/components/viewers/pdf-viewer').then((m) => ({ default: m.PdfViewer }))
 );
 
 const RouteComponent = () => {

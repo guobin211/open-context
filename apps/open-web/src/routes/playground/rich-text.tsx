@@ -7,10 +7,10 @@ import {
   PlaygroundHeader,
   PlaygroundMain
 } from '@/routes/playground/components';
-import { PlaygroundNavigation } from '@/components/navigation';
+import { PlaygroundNavigation } from '@/components/features/navigation';
 
 const SimpleEditor = lazyRouteComponent(() =>
-  import('@/components/tiptap-templates/simple/simple-editor').then((m) => ({ default: m.SimpleEditor }))
+  import('@/components/tiptap/templates/simple/simple-editor').then((m) => ({ default: m.SimpleEditor }))
 );
 
 const RouteComponent = () => {

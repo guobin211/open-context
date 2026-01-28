@@ -7,10 +7,10 @@ import {
   PlaygroundHeader,
   PlaygroundMain
 } from '@/routes/playground/components';
-import { PlaygroundNavigation } from '@/components/navigation';
+import { PlaygroundNavigation } from '@/components/features/navigation';
 
 const VirtualList = lazyRouteComponent(() =>
-  import('@/components/virtual-list').then((m) => ({ default: m.VirtualList }))
+  import('@/components/utils/virtual-list').then((m) => ({ default: m.VirtualList }))
 );
 
 const RouteComponent = () => {

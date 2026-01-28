@@ -7,10 +7,10 @@ import {
   PlaygroundHeader,
   PlaygroundMain
 } from '@/routes/playground/components';
-import { PlaygroundNavigation } from '@/components/navigation';
+import { PlaygroundNavigation } from '@/components/features/navigation';
 
 const XmlParser = lazyRouteComponent(() =>
-  import('@/components/xml-parser').then((m) => ({ default: m.XmlParser }))
+  import('@/components/parsers/xml-parser').then((m) => ({ default: m.XmlParser }))
 );
 
 const RouteComponent = () => {

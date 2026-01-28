@@ -7,10 +7,10 @@ import {
   PlaygroundHeader,
   PlaygroundMain
 } from '@/routes/playground/components';
-import { PlaygroundNavigation } from '@/components/navigation';
+import { PlaygroundNavigation } from '@/components/features/navigation';
 
 const ImageEditor = lazyRouteComponent(() =>
-  import('@/components/image-editor').then((m) => ({ default: m.ImageEditor }))
+  import('@/components/editors/image-editor').then((m) => ({ default: m.ImageEditor }))
 );
 
 const RouteComponent = () => {

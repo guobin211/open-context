@@ -7,10 +7,10 @@ import {
   PlaygroundHeader,
   PlaygroundMain
 } from '@/routes/playground/components';
-import { PlaygroundNavigation } from '@/components/navigation';
+import { PlaygroundNavigation } from '@/components/features/navigation';
 
 const DiffViewer = lazyRouteComponent(() =>
-  import('@/components/diff-viewer').then((m) => ({ default: m.DiffViewer }))
+  import('@/components/tools/diff-viewer').then((m) => ({ default: m.DiffViewer }))
 );
 
 const RouteComponent = () => {

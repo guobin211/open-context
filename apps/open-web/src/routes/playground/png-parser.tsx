@@ -7,10 +7,10 @@ import {
   PlaygroundHeader,
   PlaygroundMain
 } from '@/routes/playground/components';
-import { PlaygroundNavigation } from '@/components/navigation';
+import { PlaygroundNavigation } from '@/components/features/navigation';
 
 const PngParser = lazyRouteComponent(() =>
-  import('@/components/png-parser').then((m) => ({ default: m.PngParser }))
+  import('@/components/parsers/png-parser').then((m) => ({ default: m.PngParser }))
 );
 
 const RouteComponent = () => {

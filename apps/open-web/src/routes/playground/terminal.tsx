@@ -7,10 +7,10 @@ import {
   PlaygroundHeader,
   PlaygroundMain
 } from '@/routes/playground/components';
-import { PlaygroundNavigation } from '@/components/navigation';
+import { PlaygroundNavigation } from '@/components/features/navigation';
 
 const XtermTerminal = lazyRouteComponent(() =>
-  import('@/components/terminal').then((m) => ({ default: m.XtermTerminal }))
+  import('@/components/tools/terminal').then((m) => ({ default: m.XtermTerminal }))
 );
 
 const RouteComponent = () => {

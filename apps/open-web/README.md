@@ -83,8 +83,55 @@
 open-web/
 ├── src/
 │   ├── components/        # React 组件
-│   │   ├── ui/           # shadcn/ui 组件库
-│   │   ├── tiptap-*/     # Tiptap 富文本编辑器
+│   │   ├── ui/           # shadcn/ui 基础组件库 (49个)
+│   │   ├── core/         # 核心文件处理系统
+│   │   │   ├── file-editor/      # 多模式文件编辑器
+│   │   │   ├── file-preview/     # 文件预览
+│   │   │   ├── file-tree/        # 文件树
+│   │   │   └── file-manager/     # 文件管理器
+│   │   ├── viewers/      # 文档查看器
+│   │   │   ├── excel-viewer/     # Excel 查看器
+│   │   │   ├── pdf-viewer/       # PDF 查看器
+│   │   │   ├── word-viewer/      # Word 查看器
+│   │   │   └── ocr-viewer/       # OCR 识别
+│   │   ├── editors/      # 专用编辑器
+│   │   │   ├── code-editor/      # 代码编辑器
+│   │   │   ├── json-editor/      # JSON 编辑器
+│   │   │   ├── image-editor/     # 图片编辑器
+│   │   │   └── markdown/         # Markdown 编辑器
+│   │   ├── tiptap/       # Tiptap 富文本系统
+│   │   │   ├── extension/        # 扩展层
+│   │   │   ├── icons/            # 图标层 (37个)
+│   │   │   ├── node/             # 节点层
+│   │   │   ├── ui/               # 功能按钮层 (13个)
+│   │   │   ├── ui-primitive/     # UI 原语层 (10个)
+│   │   │   └── templates/        # 模板层
+│   │   ├── tools/        # 开发工具
+│   │   │   ├── ast-viewer/       # AST 查看器
+│   │   │   ├── diff-viewer/      # 差异对比
+│   │   │   └── terminal/         # 终端模拟器
+│   │   ├── parsers/      # 格式解析器
+│   │   │   ├── excel-to-json/    # Excel 转 JSON
+│   │   │   ├── png-parser/       # PNG 解析
+│   │   │   └── xml-parser/       # XML 解析
+│   │   ├── features/     # 应用功能
+│   │   │   ├── chat/             # 聊天界面
+│   │   │   ├── webview/          # 网页浏览器
+│   │   │   ├── workflow/         # 工作流编辑器
+│   │   │   ├── data-viz/         # 数据可视化
+│   │   │   └── navigation/       # 导航组件
+│   │   ├── media/        # 媒体处理
+│   │   │   ├── cropper-demo/     # 图片裁剪
+│   │   │   └── qrcode-generator/ # 二维码生成
+│   │   ├── cloud/        # 云服务集成
+│   │   │   ├── cos-upload/       # COS 上传
+│   │   │   └── cos-tester/       # COS 测试
+│   │   └── utils/        # 工具组件
+│   │       ├── background/       # 背景组件
+│   │       ├── virtual-list/     # 虚拟列表
+│   │       ├── drag-and-drop/    # 拖拽演示
+│   │       ├── hotkeys-demo/     # 快捷键演示
+│   │       └── katex-math/       # 数学公式
 │   ├── routes/            # TanStack Router 路由
 │   ├── storage/           # Zustand stores（客户端状态）
 │   ├── services/          # 服务层（HTTP/Tauri）
@@ -167,6 +214,32 @@ pnpm preview
 - **Props 接口**：`{组件名}Props`
 - **类名合并**：使用 `cn()` 工具函数
 - **样式优先**：Tailwind CSS 原子类 > SCSS 模块
+
+### 组件导入示例
+
+```typescript
+// UI 基础组件
+import { Button, Input, Card } from '@/components/ui';
+
+// 核心文件处理
+import { FileEditor, FileTree, FilePreview } from '@/components/core';
+
+// 文档查看器
+import { PdfViewer, ExcelViewer, WordViewer } from '@/components/viewers';
+
+// 专用编辑器
+import { CodeEditor, JsonEditor, ImageEditor } from '@/components/editors';
+
+// Tiptap 富文本系统
+import { SimpleEditor } from '@/components/tiptap/templates';
+import { HeadingButton, MarkButton } from '@/components/tiptap/ui';
+
+// 开发工具
+import { AstViewer, DiffViewer } from '@/components/tools';
+
+// 应用功能
+import { ChatInterface, WebBrowser } from '@/components/features';
+```
 
 ## 相关文档
 

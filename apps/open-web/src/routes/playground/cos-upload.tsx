@@ -7,10 +7,10 @@ import {
   PlaygroundHeader,
   PlaygroundMain
 } from '@/routes/playground/components';
-import { PlaygroundNavigation } from '@/components/navigation';
+import { PlaygroundNavigation } from '@/components/features/navigation';
 
 const CosUpload = lazyRouteComponent(() =>
-  import('@/components/cos-upload').then((m) => ({ default: m.CosUpload }))
+  import('@/components/cloud/cos-upload').then((m) => ({ default: m.CosUpload }))
 );
 
 const RouteComponent = () => {

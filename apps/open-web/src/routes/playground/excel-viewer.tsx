@@ -7,10 +7,10 @@ import {
   PlaygroundHeader,
   PlaygroundMain
 } from '@/routes/playground/components';
-import { PlaygroundNavigation } from '@/components/navigation';
+import { PlaygroundNavigation } from '@/components/features/navigation';
 
 const ExcelViewer = lazyRouteComponent(() =>
-  import('@/components/excel-viewer').then((m) => ({ default: m.ExcelViewer }))
+  import('@/components/viewers/excel-viewer').then((m) => ({ default: m.ExcelViewer }))
 );
 
 const RouteComponent = () => {
