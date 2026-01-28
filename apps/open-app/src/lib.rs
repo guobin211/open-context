@@ -3,7 +3,7 @@ pub mod app_events;
 pub mod app_plugins;
 pub mod app_service;
 pub mod app_state;
-pub mod logging;
+pub mod common;
 
 use crate::app_state::init_app_dirs;
 use app_service::TaskManager;

@@ -1,4 +1,4 @@
-use crate::logging::log_config::{LogConfig, LogTarget};
+use crate::common::log_config::{LogConfig, LogTarget};
 use tauri::{AppHandle, Manager, WebviewWindow, Wry};
 use tauri_plugin_log::{Target, TargetKind};
 use tauri_plugin_prevent_default::Flags;
@@ -41,6 +41,13 @@ pub fn setup_desktop_plugins(app: &mut tauri::App) {
     app.handle()
         .plugin(tauri_plugin_updater::Builder::new().build())
         .expect("tauri_plugin_updater failed to initialize");
+    // Conditional compilation for macOS
+    #[cfg(target_os = "macos")]
+    {
+        app.handle()
+            .plugin(tauri_nspanel::init())
+            .expect("tauri_nspanel failed to initialize");
+    }
 }
 
 type TauriBuilder = tauri::Builder<Wry>;
@@ -84,18 +91,18 @@ pub fn setup_general_plugins(builder: TauriBuilder) -> TauriBuilder {
         .level(log_level_filter)
         .build();
 
-    let builder = builder
+    let mut builder = builder
         .plugin(tauri_plugin_fs::init())
         .plugin(tauri_plugin_fs_pro::init())
         .plugin(tauri_plugin_upload::init())
         .plugin(tauri_plugin_process::init())
+        .plugin(log_plugin)
         .plugin(tauri_plugin_single_instance::init(|app, args, cwd| {
             handle_single_instance(app, args, cwd);
         }))
         .plugin(tauri_plugin_notification::init())
         .plugin(tauri_plugin_localhost::Builder::new(14399).build())
         .plugin(tauri_plugin_shell::init())
-        .plugin(log_plugin)
         .plugin(tauri_plugin_updater::Builder::new().build())
         .plugin(tauri_plugin_window_state::Builder::new().build())
         .plugin(tauri_plugin_store::Builder::new().build())
@@ -112,14 +119,16 @@ pub fn setup_general_plugins(builder: TauriBuilder) -> TauriBuilder {
         .plugin(tauri_plugin_udp::init())
         .plugin(tauri_plugin_macos_permissions::init())
         .plugin(tauri_plugin_screenshots::init())
+        .plugin(tauri_plugin_deep_link::init())
         .plugin(tauri_nspanel::init());
+
     // 添加防止默认行为的插件
     let flags = Flags::all()
         .difference(Flags::CONTEXT_MENU | Flags::DEV_TOOLS | Flags::RELOAD | Flags::FOCUS_MOVE);
     let prevent_default = tauri_plugin_prevent_default::Builder::default()
         .with_flags(flags)
         .build();
-    let builder = builder.plugin(prevent_default);
+    builder = builder.plugin(prevent_default);
     log::info!("plugins initialized");
     builder
 }

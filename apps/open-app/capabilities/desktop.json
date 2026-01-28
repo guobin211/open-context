@@ -1,6 +1,9 @@
 {
   "identifier": "desktop-capability",
   "permissions": [
+    "global-shortcut:allow-is-registered",
+    "global-shortcut:allow-register",
+    "global-shortcut:allow-unregister",
     "autostart:default",
     "autostart:allow-disable",
     "autostart:allow-enable",
@@ -1166,5 +1169,5 @@
     "nspopover:allow-is-popover-shown"
   ],
   "platforms": ["macOS", "windows", "linux"],
-  "windows": ["main"]
+  "windows": ["main", "app-*"]
 }

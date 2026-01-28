@@ -4,15 +4,83 @@
     "macOSPrivateApi": true,
     "security": {
       "capabilities": ["default"],
-      "csp": null
+      "csp": {
+        "default-src": "'self' asset: http: https: ipc: blob: data:"
+      },
+      "dangerousDisableAssetCspModification": true,
+      "assetProtocol": {
+        "enable": true,
+        "scope": {
+          "allow": ["**/*"],
+          "requireLiteralLeadingDot": false
+        }
+      }
     },
     "windows": [
       {
+        "label": "main",
+        "title": "",
+        "url": "/launcher",
+        "height": 590,
+        "width": 680,
+        "decorations": false,
+        "minimizable": true,
+        "maximizable": true,
+        "skipTaskbar": true,
+        "resizable": false,
+        "acceptFirstMouse": true,
+        "shadow": true,
+        "transparent": true,
+        "fullscreen": false,
+        "center": false,
+        "visible": false,
+        "windowEffects": {
+          "effects": [],
+          "radius": 0
+        },
+        "visibleOnAllWorkspaces": true,
+        "alwaysOnTop": true
+      },
+      {
+        "label": "app-settings",
+        "title": "Settings",
+        "url": "/settings",
+        "width": 1000,
+        "minWidth": 1000,
+        "height": 700,
+        "minHeight": 700,
+        "center": true,
+        "transparent": true,
+        "maximizable": false,
+        "skipTaskbar": false,
+        "dragDropEnabled": false,
+        "hiddenTitle": true,
+        "visible": false,
+        "windowEffects": {
+          "effects": ["sidebar"],
+          "state": "active"
+        }
+      },
+      {
+        "label": "app-playground",
+        "title": "Playground",
+        "url": "/playground",
         "height": 600,
         "hiddenTitle": true,
         "minHeight": 600,
         "minWidth": 800,
-        "title": "",
+        "titleBarStyle": "Overlay",
+        "transparent": true,
+        "width": 800
+      },
+      {
+        "label": "app-workspace",
+        "title": "Workspace",
+        "url": "/workspace",
+        "height": 600,
+        "hiddenTitle": true,
+        "minHeight": 600,
+        "minWidth": 800,
         "titleBarStyle": "Overlay",
         "transparent": true,
         "width": 800

@@ -46,12 +46,14 @@ async-ffmpeg-sidecar = { workspace = true }
 
 # tauri
 tauri = { version = "2", features = [
-  "macos-private-api",
-  "tray-icon",
-  "image-png",
-  "rustls-tls",
-  "webview-data-url",
-  "config-json5",
+    "macos-private-api",
+    "tray-icon",
+    "image-png",
+    "image-ico",
+    "rustls-tls",
+    "webview-data-url",
+    "config-json5",
+    "protocol-asset",
 ] }
 tauri-plugin-opener = "2"
 tauri-plugin-clipboard-manager = "2"
@@ -65,12 +67,12 @@ tauri-plugin-shell = "2"
 tauri-plugin-localhost = "2"
 tauri-plugin-process = "2"
 tauri-plugin-upload = "2"
+tauri-plugin-deep-link = "2.0.0"
 tauri-plugin-cache = "0.1.6"
 tauri-plugin-tcp = "0.1"
 tauri-plugin-udp = "0.1"
 
 [target.'cfg(not(any(target_os = "android", target_os = "ios")))'.dependencies]
-tauri-remote-ui = "1.0.1-alpha.8"
 tauri-plugin-autostart = "2"
 tauri-plugin-global-shortcut = "2"
 tauri-plugin-positioner = "2"
