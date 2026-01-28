@@ -1,12 +1,13 @@
-import { createFileRoute, lazyRouteComponent } from '@tanstack/react-router';
 import {
-  PlaygroundLayout,
-  PlaygroundSidebar,
   PlaygroundContent,
   PlaygroundHeader,
-  PlaygroundMain
+  PlaygroundLayout,
+  PlaygroundMain,
+  PlaygroundSidebar
 } from '@/components/playground/layout';
 import { PlaygroundNavigation } from '@/components/playground/navigation';
+import { createFileRoute, lazyRouteComponent } from '@tanstack/react-router';
+import { Suspense } from 'react';
 
 const MarkdownEditor = lazyRouteComponent(() =>
   import('@/components/playground/markdown').then((m) => ({ default: m.MarkdownEditor }))
@@ -22,7 +23,9 @@ const RouteComponent = () => {
       <PlaygroundContent>
         <PlaygroundHeader title="Markdown 编辑器" />
         <PlaygroundMain className="p-0">
-          <MarkdownEditor />
+          <Suspense fallback={<div className="flex h-full items-center justify-center">加载中...</div>}>
+            <MarkdownEditor />
+          </Suspense>
         </PlaygroundMain>
       </PlaygroundContent>
     </PlaygroundLayout>

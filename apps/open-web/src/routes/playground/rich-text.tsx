@@ -1,4 +1,5 @@
 import { createFileRoute, lazyRouteComponent } from '@tanstack/react-router';
+import { Suspense } from 'react';
 import {
   PlaygroundLayout,
   PlaygroundSidebar,
@@ -23,7 +24,9 @@ const RouteComponent = () => {
         <PlaygroundHeader title="富文本编辑器" />
         <PlaygroundMain>
           <div className="border-border h-full rounded-lg border">
-            <SimpleEditor />
+            <Suspense fallback={<div className="flex h-full items-center justify-center">加载中...</div>}>
+              <SimpleEditor />
+            </Suspense>
           </div>
         </PlaygroundMain>
       </PlaygroundContent>

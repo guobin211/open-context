@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
+import { Suspense } from 'react';
 import {
   PlaygroundLayout,
   PlaygroundSidebar,
@@ -19,7 +20,9 @@ const RouteComponent = () => {
       <PlaygroundContent>
         <PlaygroundHeader title="文件树" />
         <PlaygroundMain className="p-0">
-          <PlaygroundFileTree />
+          <Suspense fallback={<div className="flex h-full items-center justify-center">加载中...</div>}>
+            <PlaygroundFileTree />
+          </Suspense>
         </PlaygroundMain>
       </PlaygroundContent>
     </PlaygroundLayout>

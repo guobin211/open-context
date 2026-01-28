@@ -1,12 +1,13 @@
-import { createFileRoute, lazyRouteComponent } from '@tanstack/react-router';
 import {
-  PlaygroundLayout,
-  PlaygroundSidebar,
   PlaygroundContent,
   PlaygroundHeader,
-  PlaygroundMain
+  PlaygroundLayout,
+  PlaygroundMain,
+  PlaygroundSidebar
 } from '@/components/playground/layout';
 import { PlaygroundNavigation } from '@/components/playground/navigation';
+import { createFileRoute, lazyRouteComponent } from '@tanstack/react-router';
+import { Suspense } from 'react';
 
 const MonacoEditor = lazyRouteComponent(() =>
   import('@/components/playground/code-editor').then((m) => ({ default: m.MonacoEditor }))
@@ -22,7 +23,9 @@ const RouteComponent = () => {
       <PlaygroundContent>
         <PlaygroundHeader title="代码编辑器" />
         <PlaygroundMain className="p-0">
-          <MonacoEditor />
+          <Suspense fallback={<div className="flex h-full items-center justify-center">加载中...</div>}>
+            <MonacoEditor />
+          </Suspense>
         </PlaygroundMain>
       </PlaygroundContent>
     </PlaygroundLayout>

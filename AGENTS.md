@@ -308,6 +308,42 @@ export class WorkspaceService {
 - 使用 `createFileRoute` 或 `createRootRoute`
 - 类型安全导航和参数访问
 
+**路由架构:**
+
+```
+routes/
+├── __root.tsx                 # 根路由，全局 Providers
+├── index.tsx                  # 默认重定向到 /launcher
+├── launcher.index.tsx         # 启动器主页
+├── browser.index.tsx          # 浏览器模式主页
+├── terminal.index.tsx         # 终端模式主页
+├── settings.index.tsx         # 设置主页
+├── workspace.index.tsx        # 工作区主页
+└── playground/
+    ├── index.tsx              # Playground 入口
+    ├── markdown.tsx           # 懒加载的子页面
+    ├── code-editor.tsx        # 懒加载的子页面
+    └── ...                   # 其他懒加载子页面
+```
+
+**路由导航机制:**
+
+- 统一使用 TanStack Router 的 `Link` 组件和 `useNavigate` 钩子
+- 禁止使用 `window.location.href` 或 `window.history.push()` (会刷新页面)
+- 使用类型安全的路由参数传递: `<Link to="/workspace" params={{ id: workspaceId }} />`
+
+**状态管理策略:**
+
+- Zustand: 管理全局状态 (主题、语言、用户设置)
+- React Context: 管理路由局部状态
+- 多窗口同步: Tauri 事件系统 + JSON 序列化
+
+**Playground 懒加载:**
+
+- 所有子页面使用 `lazyRouteComponent` 动态导入
+- 使用 `Suspense` 提供加载状态: `<Suspense fallback={<div>加载中...</div>}>`
+- 初始包体积优化: 首屏仅加载必要代码
+
 **组件结构:**
 
 ```

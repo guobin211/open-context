@@ -1,6 +1,7 @@
 import { BrainCircuit, Cloud, Database, Key, Palette, Server, Settings, X } from 'lucide-react';
 import { cn } from '../../../lib/utils';
 import { useSettingsStore } from '../../../storage/settings-store';
+import { useNavigate } from '@tanstack/react-router';
 import { AIProviderSettings } from './ai-provider-settings';
 import { AppearanceSettings } from './appearance-settings';
 import { CloudSettings } from './cloud-settings';
@@ -11,6 +12,7 @@ import { StorageSettings } from './storage-settings';
 
 const SettingsLayout = () => {
   const { config } = useSettingsStore();
+  const navigate = useNavigate();
 
   const iconMap = {
     Settings,
@@ -86,7 +88,7 @@ const SettingsLayout = () => {
             <h1 className="text-xl font-semibold text-gray-900">{activeItem?.label}</h1>
             <button
               className="rounded-md p-2 text-gray-500 transition-colors hover:bg-gray-100 hover:text-gray-700"
-              onClick={() => window.history.back()}
+              onClick={() => navigate({ to: "/" })}
             >
               <X className="h-5 w-5" />
             </button>

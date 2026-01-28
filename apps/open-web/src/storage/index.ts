@@ -9,6 +9,7 @@ export { useSettingsStore } from './settings-store';
 export { useSidebarChatStore } from './sidebar-chat-store';
 export { userStore } from './user-store';
 export { useDocumentStore } from './document-store';
+export { useAppStore, initializeMultiWindowSync } from './app-store';
 
 export type * from './types';
 export * from './constants';

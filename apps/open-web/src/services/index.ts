@@ -72,7 +72,9 @@ export { readDirectoryRecursive } from './folder-service';
 export { FileTreeService } from './file-tree-service';
 export type { FileTreeNode, FileTreeState } from './file-tree-service';
 
-// ==================== 使用示例 ====================
+// 导出窗口服务
+export { windowService, TauriWindowService } from './window-service';
+export type { WindowOptions } from './window-service';
 
 /*
 // 使用默认数据提供者（Tauri）

@@ -45,7 +45,7 @@ const convertToFileNode = (entry: DirEntry, parentPath: string): FileNode => {
 /**
  * 递归读取目录结构
  */
-export const readDirectoryRecursive = async (dirPath: string, maxDepth = 3, currentDepth = 0): Promise<FileNode[]> => {
+export const readDirectoryRecursive = async (dirPath: string, maxDepth = 2, currentDepth = 0): Promise<FileNode[]> => {
   if (currentDepth >= maxDepth) {
     return [];
   }
