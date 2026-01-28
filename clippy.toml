@@ -1,0 +1,16 @@
+# Clippy 配置文件
+# 用于配置项目级别的 Clippy 规则
+
+# 允许的规则（通常用于临时抑制警告）
+# 这些规则可能会在代码中通过 #[allow(clippy::rule_name)] 使用
+
+# 禁用的规则（项目级别禁用）
+# 这些规则在项目中通常不需要检查
+
+# 配置特定规则的阈值
+# 例如：too-many-arguments 的函数参数数量阈值
+too-many-arguments-threshold = 7
+
+# 配置复杂度阈值
+# 例如：cyclomatic-complexity 的复杂度阈值
+cognitive-complexity-threshold = 30
