@@ -17,6 +17,7 @@
     "clipboard-manager:allow-write-html",
     "clipboard-manager:allow-write-image",
     "clipboard-manager:allow-write-text",
+    "cache:default",
     "core:default",
     "core:app:default",
     "core:app:allow-app-hide",
