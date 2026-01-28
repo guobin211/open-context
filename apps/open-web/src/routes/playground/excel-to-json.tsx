@@ -6,11 +6,11 @@ import {
   PlaygroundContent,
   PlaygroundHeader,
   PlaygroundMain
-} from '@/components/playground/layout';
-import { PlaygroundNavigation } from '@/components/playground/navigation';
+} from '@/routes/playground/components';
+import { PlaygroundNavigation } from '@/components/navigation';
 
 const ExcelToJson = lazyRouteComponent(() =>
-  import('@/components/playground/excel-to-json').then((m) => ({ default: m.ExcelToJson }))
+  import('@/components/excel-to-json').then((m) => ({ default: m.ExcelToJson }))
 );
 
 const RouteComponent = () => {

@@ -6,11 +6,11 @@ import {
   PlaygroundContent,
   PlaygroundHeader,
   PlaygroundMain
-} from '@/components/playground/layout';
-import { PlaygroundNavigation } from '@/components/playground/navigation';
+} from '@/routes/playground/components';
+import { PlaygroundNavigation } from '@/components/navigation';
 
 const AstViewer = lazyRouteComponent(() =>
-  import('@/components/playground/ast-viewer').then((m) => ({ default: m.AstViewer }))
+  import('@/components/ast-viewer').then((m) => ({ default: m.AstViewer }))
 );
 
 const RouteComponent = () => {

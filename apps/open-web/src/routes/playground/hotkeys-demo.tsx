@@ -6,11 +6,11 @@ import {
   PlaygroundContent,
   PlaygroundHeader,
   PlaygroundMain
-} from '@/components/playground/layout';
-import { PlaygroundNavigation } from '@/components/playground/navigation';
+} from '@/routes/playground/components';
+import { PlaygroundNavigation } from '@/components/navigation';
 
 const HotkeysDemo = lazyRouteComponent(() =>
-  import('@/components/playground/hotkeys-demo').then((m) => ({ default: m.HotkeysDemo }))
+  import('@/components/hotkeys-demo').then((m) => ({ default: m.HotkeysDemo }))
 );
 
 const RouteComponent = () => {

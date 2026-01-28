@@ -6,11 +6,11 @@ import {
   PlaygroundContent,
   PlaygroundHeader,
   PlaygroundMain
-} from '@/components/playground/layout';
-import { PlaygroundNavigation } from '@/components/playground/navigation';
+} from '@/routes/playground/components';
+import { PlaygroundNavigation } from '@/components/navigation';
 
 const WorkflowEditor = lazyRouteComponent(() =>
-  import('@/components/playground/workflow').then((m) => ({ default: m.WorkflowEditor }))
+  import('@/components/workflow').then((m) => ({ default: m.WorkflowEditor }))
 );
 
 const RouteComponent = () => {

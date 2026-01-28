@@ -6,11 +6,11 @@ import {
   PlaygroundContent,
   PlaygroundHeader,
   PlaygroundMain
-} from '@/components/playground/layout';
-import { PlaygroundNavigation } from '@/components/playground/navigation';
+} from '@/routes/playground/components';
+import { PlaygroundNavigation } from '@/components/navigation';
 
 const CropperDemo = lazyRouteComponent(() =>
-  import('@/components/playground/cropper-demo').then((m) => ({ default: m.CropperDemo }))
+  import('@/components/cropper-demo').then((m) => ({ default: m.CropperDemo }))
 );
 
 const RouteComponent = () => {

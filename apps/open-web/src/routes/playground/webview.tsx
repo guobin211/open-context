@@ -6,11 +6,11 @@ import {
   PlaygroundContent,
   PlaygroundHeader,
   PlaygroundMain
-} from '@/components/playground/layout';
-import { PlaygroundNavigation } from '@/components/playground/navigation';
+} from '@/routes/playground/components';
+import { PlaygroundNavigation } from '@/components/navigation';
 
 const WebBrowser = lazyRouteComponent(() =>
-  import('@/components/playground/webview').then((m) => ({ default: m.WebBrowser }))
+  import('@/components/webview').then((m) => ({ default: m.WebBrowser }))
 );
 
 const RouteComponent = () => {

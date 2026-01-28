@@ -6,11 +6,11 @@ import {
   PlaygroundContent,
   PlaygroundHeader,
   PlaygroundMain
-} from '@/components/playground/layout';
-import { PlaygroundNavigation } from '@/components/playground/navigation';
+} from '@/routes/playground/components';
+import { PlaygroundNavigation } from '@/components/navigation';
 
 const ChatInterface = lazyRouteComponent(() =>
-  import('@/components/playground/chat').then((m) => ({ default: m.ChatInterface }))
+  import('@/components/chat').then((m) => ({ default: m.ChatInterface }))
 );
 
 const RouteComponent = () => {

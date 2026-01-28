@@ -6,11 +6,11 @@ import {
   PlaygroundContent,
   PlaygroundHeader,
   PlaygroundMain
-} from '@/components/playground/layout';
-import { PlaygroundNavigation } from '@/components/playground/navigation';
+} from '@/routes/playground/components';
+import { PlaygroundNavigation } from '@/components/navigation';
 
 const WordViewer = lazyRouteComponent(() =>
-  import('@/components/playground/word-viewer').then((m) => ({ default: m.WordViewer }))
+  import('@/components/word-viewer').then((m) => ({ default: m.WordViewer }))
 );
 
 const RouteComponent = () => {

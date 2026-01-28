@@ -4,13 +4,13 @@ import {
   PlaygroundLayout,
   PlaygroundMain,
   PlaygroundSidebar
-} from '@/components/playground/layout';
-import { PlaygroundNavigation } from '@/components/playground/navigation';
+} from '@/routes/playground/components';
+import { PlaygroundNavigation } from '@/components/navigation';
 import { createFileRoute, lazyRouteComponent } from '@tanstack/react-router';
 import { Suspense } from 'react';
 
 const MonacoEditor = lazyRouteComponent(() =>
-  import('@/components/playground/code-editor').then((m) => ({ default: m.MonacoEditor }))
+  import('@/components/code-editor').then((m) => ({ default: m.MonacoEditor }))
 );
 
 const RouteComponent = () => {

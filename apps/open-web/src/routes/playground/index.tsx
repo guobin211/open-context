@@ -31,7 +31,7 @@ import {
   PlaygroundContent,
   PlaygroundHeader,
   PlaygroundMain
-} from '@/components/playground/layout';
+} from '@/routes/playground/components';
 import { cn } from '@/lib/utils';
 
 interface PlaygroundItem {

@@ -6,11 +6,11 @@ import {
   PlaygroundContent,
   PlaygroundHeader,
   PlaygroundMain
-} from '@/components/playground/layout';
-import { PlaygroundNavigation } from '@/components/playground/navigation';
+} from '@/routes/playground/components';
+import { PlaygroundNavigation } from '@/components/navigation';
 
 const FileManager = lazyRouteComponent(() =>
-  import('@/components/playground/file-manager').then((m) => ({ default: m.FileManager }))
+  import('@/components/file-manager').then((m) => ({ default: m.FileManager }))
 );
 
 const RouteComponent = () => {

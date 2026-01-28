@@ -6,11 +6,11 @@ import {
   PlaygroundContent,
   PlaygroundHeader,
   PlaygroundMain
-} from '@/components/playground/layout';
-import { PlaygroundNavigation } from '@/components/playground/navigation';
+} from '@/routes/playground/components';
+import { PlaygroundNavigation } from '@/components/navigation';
 
 const XtermTerminal = lazyRouteComponent(() =>
-  import('@/components/playground/terminal').then((m) => ({ default: m.XtermTerminal }))
+  import('@/components/terminal').then((m) => ({ default: m.XtermTerminal }))
 );
 
 const RouteComponent = () => {

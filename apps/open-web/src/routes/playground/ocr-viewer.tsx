@@ -6,11 +6,11 @@ import {
   PlaygroundContent,
   PlaygroundHeader,
   PlaygroundMain
-} from '@/components/playground/layout';
-import { PlaygroundNavigation } from '@/components/playground/navigation';
+} from '@/routes/playground/components';
+import { PlaygroundNavigation } from '@/components/navigation';
 
 const OcrViewer = lazyRouteComponent(() =>
-  import('@/components/playground/ocr-viewer').then((m) => ({ default: m.OcrViewer }))
+  import('@/components/ocr-viewer').then((m) => ({ default: m.OcrViewer }))
 );
 
 const RouteComponent = () => {

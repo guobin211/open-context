@@ -6,11 +6,11 @@ import {
   PlaygroundContent,
   PlaygroundHeader,
   PlaygroundMain
-} from '@/components/playground/layout';
-import { PlaygroundNavigation } from '@/components/playground/navigation';
+} from '@/routes/playground/components';
+import { PlaygroundNavigation } from '@/components/navigation';
 
 const DataViz = lazyRouteComponent(() =>
-  import('@/components/playground/data-viz').then((m) => ({ default: m.DataViz }))
+  import('@/components/data-viz').then((m) => ({ default: m.DataViz }))
 );
 
 const RouteComponent = () => {

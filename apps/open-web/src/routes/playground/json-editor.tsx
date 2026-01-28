@@ -6,11 +6,11 @@ import {
   PlaygroundContent,
   PlaygroundHeader,
   PlaygroundMain
-} from '@/components/playground/layout';
-import { PlaygroundNavigation } from '@/components/playground/navigation';
+} from '@/routes/playground/components';
+import { PlaygroundNavigation } from '@/components/navigation';
 
 const JsonEditor = lazyRouteComponent(() =>
-  import('@/components/playground/json-editor').then((m) => ({ default: m.JsonEditor }))
+  import('@/components/json-editor').then((m) => ({ default: m.JsonEditor }))
 );
 
 const RouteComponent = () => {

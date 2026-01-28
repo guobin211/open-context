@@ -6,9 +6,9 @@ import {
   PlaygroundContent,
   PlaygroundHeader,
   PlaygroundMain
-} from '@/components/playground/layout';
+} from '@/routes/playground/components';
 import { PlaygroundFileTree } from '@/components/playground/file-tree';
-import { PlaygroundNavigation } from '@/components/playground/navigation';
+import { PlaygroundNavigation } from '@/components/navigation';
 
 const RouteComponent = () => {
   return (

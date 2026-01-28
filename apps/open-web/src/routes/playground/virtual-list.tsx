@@ -6,11 +6,11 @@ import {
   PlaygroundContent,
   PlaygroundHeader,
   PlaygroundMain
-} from '@/components/playground/layout';
-import { PlaygroundNavigation } from '@/components/playground/navigation';
+} from '@/routes/playground/components';
+import { PlaygroundNavigation } from '@/components/navigation';
 
 const VirtualList = lazyRouteComponent(() =>
-  import('@/components/playground/virtual-list').then((m) => ({ default: m.VirtualList }))
+  import('@/components/virtual-list').then((m) => ({ default: m.VirtualList }))
 );
 
 const RouteComponent = () => {
