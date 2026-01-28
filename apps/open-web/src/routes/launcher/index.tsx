@@ -1,6 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 
-export const Route = createFileRoute('/launch-pad/')({
+export const Route = createFileRoute('/launcher/')({
   component: RouteComponent
 });
 

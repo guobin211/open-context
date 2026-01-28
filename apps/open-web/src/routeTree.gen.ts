@@ -11,9 +11,11 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as WorkspaceIndexRouteImport } from './routes/workspace/index'
+import { Route as TerminalIndexRouteImport } from './routes/terminal/index'
 import { Route as SettingsIndexRouteImport } from './routes/settings/index'
 import { Route as PlaygroundIndexRouteImport } from './routes/playground/index'
-import { Route as LaunchPadIndexRouteImport } from '@/routes/launcher/index'
+import { Route as LauncherIndexRouteImport } from './routes/launcher/index'
+import { Route as BrowserIndexRouteImport } from './routes/browser/index'
 import { Route as PlaygroundXmlParserRouteImport } from './routes/playground/xml-parser'
 import { Route as PlaygroundWorkflowEditorRouteImport } from './routes/playground/workflow-editor'
 import { Route as PlaygroundWordViewerRouteImport } from './routes/playground/word-viewer'
@@ -53,6 +55,11 @@ const WorkspaceIndexRoute = WorkspaceIndexRouteImport.update({
   path: '/workspace/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TerminalIndexRoute = TerminalIndexRouteImport.update({
+  id: '/terminal/',
+  path: '/terminal/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const SettingsIndexRoute = SettingsIndexRouteImport.update({
   id: '/settings/',
   path: '/settings/',
@@ -63,9 +70,14 @@ const PlaygroundIndexRoute = PlaygroundIndexRouteImport.update({
   path: '/playground/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const LaunchPadIndexRoute = LaunchPadIndexRouteImport.update({
-  id: '/launch-pad/',
-  path: '/launch-pad/',
+const LauncherIndexRoute = LauncherIndexRouteImport.update({
+  id: '/launcher/',
+  path: '/launcher/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BrowserIndexRoute = BrowserIndexRouteImport.update({
+  id: '/browser/',
+  path: '/browser/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PlaygroundXmlParserRoute = PlaygroundXmlParserRouteImport.update({
@@ -241,9 +253,11 @@ export interface FileRoutesByFullPath {
   '/playground/word-viewer': typeof PlaygroundWordViewerRoute
   '/playground/workflow-editor': typeof PlaygroundWorkflowEditorRoute
   '/playground/xml-parser': typeof PlaygroundXmlParserRoute
-  '/launch-pad/': typeof LaunchPadIndexRoute
+  '/browser/': typeof BrowserIndexRoute
+  '/launcher/': typeof LauncherIndexRoute
   '/playground/': typeof PlaygroundIndexRoute
   '/settings/': typeof SettingsIndexRoute
+  '/terminal/': typeof TerminalIndexRoute
   '/workspace/': typeof WorkspaceIndexRoute
 }
 export interface FileRoutesByTo {
@@ -276,9 +290,11 @@ export interface FileRoutesByTo {
   '/playground/word-viewer': typeof PlaygroundWordViewerRoute
   '/playground/workflow-editor': typeof PlaygroundWorkflowEditorRoute
   '/playground/xml-parser': typeof PlaygroundXmlParserRoute
-  '/launch-pad': typeof LaunchPadIndexRoute
+  '/browser': typeof BrowserIndexRoute
+  '/launcher': typeof LauncherIndexRoute
   '/playground': typeof PlaygroundIndexRoute
   '/settings': typeof SettingsIndexRoute
+  '/terminal': typeof TerminalIndexRoute
   '/workspace': typeof WorkspaceIndexRoute
 }
 export interface FileRoutesById {
@@ -312,9 +328,11 @@ export interface FileRoutesById {
   '/playground/word-viewer': typeof PlaygroundWordViewerRoute
   '/playground/workflow-editor': typeof PlaygroundWorkflowEditorRoute
   '/playground/xml-parser': typeof PlaygroundXmlParserRoute
-  '/launch-pad/': typeof LaunchPadIndexRoute
+  '/browser/': typeof BrowserIndexRoute
+  '/launcher/': typeof LauncherIndexRoute
   '/playground/': typeof PlaygroundIndexRoute
   '/settings/': typeof SettingsIndexRoute
+  '/terminal/': typeof TerminalIndexRoute
   '/workspace/': typeof WorkspaceIndexRoute
 }
 export interface FileRouteTypes {
@@ -349,9 +367,11 @@ export interface FileRouteTypes {
     | '/playground/word-viewer'
     | '/playground/workflow-editor'
     | '/playground/xml-parser'
-    | '/launch-pad/'
+    | '/browser/'
+    | '/launcher/'
     | '/playground/'
     | '/settings/'
+    | '/terminal/'
     | '/workspace/'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -384,9 +404,11 @@ export interface FileRouteTypes {
     | '/playground/word-viewer'
     | '/playground/workflow-editor'
     | '/playground/xml-parser'
-    | '/launch-pad'
+    | '/browser'
+    | '/launcher'
     | '/playground'
     | '/settings'
+    | '/terminal'
     | '/workspace'
   id:
     | '__root__'
@@ -419,9 +441,11 @@ export interface FileRouteTypes {
     | '/playground/word-viewer'
     | '/playground/workflow-editor'
     | '/playground/xml-parser'
-    | '/launch-pad/'
+    | '/browser/'
+    | '/launcher/'
     | '/playground/'
     | '/settings/'
+    | '/terminal/'
     | '/workspace/'
   fileRoutesById: FileRoutesById
 }
@@ -455,9 +479,11 @@ export interface RootRouteChildren {
   PlaygroundWordViewerRoute: typeof PlaygroundWordViewerRoute
   PlaygroundWorkflowEditorRoute: typeof PlaygroundWorkflowEditorRoute
   PlaygroundXmlParserRoute: typeof PlaygroundXmlParserRoute
-  LaunchPadIndexRoute: typeof LaunchPadIndexRoute
+  BrowserIndexRoute: typeof BrowserIndexRoute
+  LauncherIndexRoute: typeof LauncherIndexRoute
   PlaygroundIndexRoute: typeof PlaygroundIndexRoute
   SettingsIndexRoute: typeof SettingsIndexRoute
+  TerminalIndexRoute: typeof TerminalIndexRoute
   WorkspaceIndexRoute: typeof WorkspaceIndexRoute
 }
 
@@ -477,6 +503,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof WorkspaceIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/terminal/': {
+      id: '/terminal/'
+      path: '/terminal'
+      fullPath: '/terminal/'
+      preLoaderRoute: typeof TerminalIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/settings/': {
       id: '/settings/'
       path: '/settings'
@@ -491,11 +524,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PlaygroundIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/launch-pad/': {
-      id: '/launch-pad/'
-      path: '/launch-pad'
-      fullPath: '/launch-pad/'
-      preLoaderRoute: typeof LaunchPadIndexRouteImport
+    '/launcher/': {
+      id: '/launcher/'
+      path: '/launcher'
+      fullPath: '/launcher/'
+      preLoaderRoute: typeof LauncherIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/browser/': {
+      id: '/browser/'
+      path: '/browser'
+      fullPath: '/browser/'
+      preLoaderRoute: typeof BrowserIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/playground/xml-parser': {
@@ -727,9 +767,11 @@ const rootRouteChildren: RootRouteChildren = {
   PlaygroundWordViewerRoute: PlaygroundWordViewerRoute,
   PlaygroundWorkflowEditorRoute: PlaygroundWorkflowEditorRoute,
   PlaygroundXmlParserRoute: PlaygroundXmlParserRoute,
-  LaunchPadIndexRoute: LaunchPadIndexRoute,
+  BrowserIndexRoute: BrowserIndexRoute,
+  LauncherIndexRoute: LauncherIndexRoute,
   PlaygroundIndexRoute: PlaygroundIndexRoute,
   SettingsIndexRoute: SettingsIndexRoute,
+  TerminalIndexRoute: TerminalIndexRoute,
   WorkspaceIndexRoute: WorkspaceIndexRoute,
 }
 export const routeTree = rootRouteImport
